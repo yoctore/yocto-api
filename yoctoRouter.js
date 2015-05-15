@@ -21,7 +21,7 @@ function YoctoRouter(dataModel, path) {
     this.dataModel  = dataModel;
     this.path       = path;
 
-    logger.info('New yocto router with path : ' + path);
+    logger.info('[ YoctoRouter ] - New yocto router with path : ' + path);
 }
 
 YoctoRouter.prototype.addGet = function(callback) {

@@ -1,0 +1,13 @@
+{
+  "routes" : [
+    { "path" : "\/user(s)?",
+      "model" : "User",
+      "requestNotDesired" : ["put", "delete" , "patch"]
+    },
+    { "path"                : "\/user(s)?\/:user_id",
+      "model"               : "User",
+      "indexParam"          : "0",
+      "requestNotDesired"   : ["post"]
+    }
+  ]
+}

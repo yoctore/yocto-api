@@ -7,10 +7,7 @@ var defaultMessage = {
     data    : {}
 };
 
-var code200 = _.merge(defaultMessage, {
-                                code : '200'
-                            }
-                     );
+var code200 = _.merge(defaultMessage, { code : '200' } );
 
 var newMessage = function(codeMessage, messageText) {
     var codeTemp = _.clone(codeMessage);

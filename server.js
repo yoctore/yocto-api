@@ -6,15 +6,7 @@ var bodyParser = require('body-parser');
 var _          = require('lodash');
 var mongoose   = require('mongoose');
 
-/**
- * Main class of Yocto API
- *
- *
- */
-
-//Load routes
-var userRoutes   = require('./app/routes/users.js');
-var userIDRoutes = require('./app/routes/usersID.js');
+var routes  = require('./app/routes/controller.js');
 
 // connect to our database
 mongoose.connect('mongodb://localhost:27017');
@@ -26,9 +18,10 @@ app.use(bodyParser.json());
 // set our port
 var port = process.env.PORT || 8080;
 
-//Set routes
-app.use('/api', userRoutes);
-app.use('/api', userIDRoutes);
+_.each(routes, function(router) {
+
+  app.use('/api', router);
+});
 
 // START THE SERVER
 app.listen(port);

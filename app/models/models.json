@@ -1,0 +1,10 @@
+{
+  "models" : [
+    { "User" : {
+      "name"      : "String",
+      "firstname" : "String",
+      "email"     : "String"
+      }
+    }
+  ]
+}

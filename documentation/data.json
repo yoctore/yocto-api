@@ -5,9 +5,134 @@
         "version": "0.1.0",
         "url": ""
     },
-    "files": {},
+    "files": {
+        "app/models/controller.js": {
+            "name": "app/models/controller.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "app/routes/controller.js": {
+            "name": "app/routes/controller.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "yoctoRouter.js": {
+            "name": "yoctoRouter.js",
+            "modules": {},
+            "classes": {
+                "yoctoRouter": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        }
+    },
     "modules": {},
-    "classes": {},
-    "classitems": [],
-    "warnings": []
+    "classes": {
+        "yoctoRouter": {
+            "name": "yoctoRouter",
+            "shortname": "yoctoRouter",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "file": "yoctoRouter.js",
+            "line": 5,
+            "description": "Yocto Router\n\nThis module his a wrapper of express.router for node js package\n\nFor more details on used dependencies read links below :\n- yocto-logger : git+ssh://lab.yocto.digital:yocto-node-modules/yocto-utils.git\n- express : http://expressjs.com",
+            "date": ": 13/05/2015",
+            "author": ": Cédric BALARD <cedric@yocto.re>",
+            "copyright": ": Yocto SAS, All right reserved"
+        }
+    },
+    "classitems": [
+        {
+            "file": "app/models/controller.js",
+            "line": 14,
+            "description": "Create a new model and add it in tabModel",
+            "params": [
+                {
+                    "name": "nameModel",
+                    "description": "[description]",
+                    "type": "[type]"
+                },
+                {
+                    "name": "model",
+                    "description": "[description]",
+                    "type": "[type]"
+                }
+            ],
+            "class": "yoctoRouter"
+        },
+        {
+            "file": "app/models/controller.js",
+            "line": 38,
+            "description": "Main function",
+            "return": {
+                "description": "[description]",
+                "type": "[type]"
+            },
+            "class": "yoctoRouter"
+        },
+        {
+            "file": "app/routes/controller.js",
+            "line": 12,
+            "description": "Get model from models.json by call the model controller",
+            "params": [
+                {
+                    "name": "nameModel",
+                    "description": "[description]",
+                    "type": "[type]"
+                }
+            ],
+            "class": "yoctoRouter"
+        },
+        {
+            "file": "app/routes/controller.js",
+            "line": 175,
+            "description": "Add a route to the router",
+            "params": [
+                {
+                    "name": "path",
+                    "description": "[description]",
+                    "type": "[type]"
+                },
+                {
+                    "name": "nameModel",
+                    "description": "[description]",
+                    "type": "[type]"
+                }
+            ],
+            "class": "yoctoRouter"
+        }
+    ],
+    "warnings": [
+        {
+            "message": "unknown tag: date",
+            "line": " yoctoRouter.js:5"
+        },
+        {
+            "message": "unknown tag: copyright",
+            "line": " yoctoRouter.js:5"
+        },
+        {
+            "message": "Missing item type\nCreate a new model and add it in tabModel",
+            "line": " app/models/controller.js:14"
+        },
+        {
+            "message": "Missing item type\nMain function",
+            "line": " app/models/controller.js:38"
+        },
+        {
+            "message": "Missing item type\nGet model from models.json by call the model controller",
+            "line": " app/routes/controller.js:12"
+        },
+        {
+            "message": "Missing item type\nAdd a route to the router",
+            "line": " app/routes/controller.js:175"
+        }
+    ]
 }
