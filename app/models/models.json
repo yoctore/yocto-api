@@ -1,6 +1,7 @@
 {
   "models" : [
-    { "User" : {
+    {
+      "User" : {
       "name"      : "String",
       "firstname" : "String",
       "email"     : "String"

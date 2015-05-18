@@ -9,130 +9,409 @@
         "app/models/controller.js": {
             "name": "app/models/controller.js",
             "modules": {},
-            "classes": {},
+            "classes": {
+                "ControllerModels": 1
+            },
             "fors": {},
             "namespaces": {}
         },
         "app/routes/controller.js": {
             "name": "app/routes/controller.js",
             "modules": {},
-            "classes": {},
+            "classes": {
+                "ControllerRoutes": 1
+            },
             "fors": {},
             "namespaces": {}
         },
-        "yoctoRouter.js": {
-            "name": "yoctoRouter.js",
+        "server.js": {
+            "name": "server.js",
             "modules": {},
-            "classes": {
-                "yoctoRouter": 1
-            },
+            "classes": {},
             "fors": {},
             "namespaces": {}
         }
     },
     "modules": {},
     "classes": {
-        "yoctoRouter": {
-            "name": "yoctoRouter",
-            "shortname": "yoctoRouter",
+        "ControllerModels": {
+            "name": "ControllerModels",
+            "shortname": "ControllerModels",
             "classitems": [],
             "plugins": [],
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "file": "yoctoRouter.js",
-            "line": 5,
-            "description": "Yocto Router\n\nThis module his a wrapper of express.router for node js package\n\nFor more details on used dependencies read links below :\n- yocto-logger : git+ssh://lab.yocto.digital:yocto-node-modules/yocto-utils.git\n- express : http://expressjs.com",
-            "date": ": 13/05/2015",
-            "author": ": Cédric BALARD <cedric@yocto.re>",
+            "file": "app/models/controller.js",
+            "line": 9,
+            "description": "Yocto API : Models Controller\n\nController of models, laod models from a json file\n\nAll models are save in an array and are accessible by calling method getModel\n\nFor more details on these dependencies read links below :\n- LodAsh : https://lodash.com/\n- yocto-logger : git+ssh://lab.yocto.digital:yocto-node-modules/yocto-utils.git\n- mongoose : http://mongoosejs.com/",
+            "date": ": 11/05/2015",
+            "author": ": Cedric Balard <cedric@yocto.re>",
+            "copyright": ": Yocto SAS, All right reserved"
+        },
+        "ControllerRoutes": {
+            "name": "ControllerRoutes",
+            "shortname": "ControllerRoutes",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "file": "app/routes/controller.js",
+            "line": 10,
+            "description": "Yocto API : Routes Controller\n\nController of routes based on Express\n\nFor more details on these dependencies read links below :\n- LodAsh : https://lodash.com/\n- yocto-logger : git+ssh://lab.yocto.digital:yocto-node-modules/yocto-utils.git\n- express : http://expressjs.com/",
+            "date": ": 11/05/2015",
+            "author": ": Cedric Balard <cedric@yocto.re>",
             "copyright": ": Yocto SAS, All right reserved"
         }
     },
     "classitems": [
         {
             "file": "app/models/controller.js",
-            "line": 14,
-            "description": "Create a new model and add it in tabModel",
-            "params": [
-                {
-                    "name": "nameModel",
-                    "description": "[description]",
-                    "type": "[type]"
-                },
-                {
-                    "name": "model",
-                    "description": "[description]",
-                    "type": "[type]"
-                }
-            ],
-            "class": "yoctoRouter"
+            "line": 29,
+            "description": "Array of Object that contains all models",
+            "itemtype": "property",
+            "name": "tabModel",
+            "type": "Array",
+            "default": "empty",
+            "class": "ControllerModels"
         },
         {
             "file": "app/models/controller.js",
             "line": 38,
-            "description": "Main function",
-            "return": {
-                "description": "[description]",
-                "type": "[type]"
-            },
-            "class": "yoctoRouter"
-        },
-        {
-            "file": "app/routes/controller.js",
-            "line": 12,
-            "description": "Get model from models.json by call the model controller",
+            "description": "Create a new model and add it in tabModel",
+            "itemtype": "method",
+            "name": "addModel",
             "params": [
                 {
                     "name": "nameModel",
-                    "description": "[description]",
+                    "description": "name of keys",
+                    "type": "NameModel"
+                },
+                {
+                    "name": "model",
+                    "description": "type of the keys",
                     "type": "[type]"
                 }
             ],
-            "class": "yoctoRouter"
+            "class": "ControllerModels"
+        },
+        {
+            "file": "app/models/controller.js",
+            "line": 65,
+            "description": "Initialise the Controller</br>\nRead routes.json and load all routes",
+            "itemtype": "method",
+            "name": "init",
+            "class": "ControllerModels"
+        },
+        {
+            "file": "app/models/controller.js",
+            "line": 86,
+            "description": "Get model from models.json and format it with mongoose",
+            "params": [
+                {
+                    "name": "nameModel",
+                    "description": "the name of model to retrieve",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "return the model if founded",
+                "type": "Object"
+            },
+            "class": "ControllerModels"
+        },
+        {
+            "file": "app/models/controller.js",
+            "line": 100,
+            "description": "Export current Controller to use it on node",
+            "class": "ControllerModels"
         },
         {
             "file": "app/routes/controller.js",
-            "line": 175,
-            "description": "Add a route to the router",
+            "line": 28,
+            "description": "List of all http request",
+            "itemtype": "property",
+            "name": "ALL_HTTP_REQUESTS",
+            "type": "Array",
+            "default": "[ 'post', 'get', 'put', 'patch', 'delete', 'head']",
+            "class": "ControllerRoutes"
+        },
+        {
+            "file": "app/routes/controller.js",
+            "line": 36,
+            "description": "Model's ControllerRoutes",
+            "itemtype": "property",
+            "name": "models",
+            "type": "Object",
+            "default": "require '../models/controller.js'",
+            "class": "ControllerRoutes"
+        },
+        {
+            "file": "app/routes/controller.js",
+            "line": 44,
+            "description": "The main router",
+            "itemtype": "property",
+            "name": "Express",
+            "type": "Object",
+            "default": "require '../models/controller.js'",
+            "class": "ControllerRoutes"
+        },
+        {
+            "file": "app/routes/controller.js",
+            "line": 54,
+            "description": "Test if string is defined </br>\nUsed to dertermine if we call find() or findById()",
+            "itemtype": "method",
+            "name": "getFn",
+            "params": [
+                {
+                    "name": "varToTest",
+                    "description": "the var to test",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "return 'find' if varToTest is undefined, otherwise 'findById'",
+                "type": "String"
+            },
+            "class": "ControllerRoutes"
+        },
+        {
+            "file": "app/routes/controller.js",
+            "line": 70,
+            "description": "Implement the http request : GET </br>\nGet an object </br>\nSend a error to the client if the request failed, otherwise a json file to the client with the data requested",
+            "itemtype": "method",
+            "name": "get",
+            "params": [
+                {
+                    "name": "model",
+                    "description": "the data model object",
+                    "type": "Object"
+                },
+                {
+                    "name": "path",
+                    "description": "the root path",
+                    "type": "String"
+                },
+                {
+                    "name": "paramToGet",
+                    "description": "The property to retrieve on url",
+                    "type": "String"
+                }
+            ],
+            "class": "ControllerRoutes"
+        },
+        {
+            "file": "app/routes/controller.js",
+            "line": 100,
+            "description": "Implement the http request : HEAD </br>\nGet a head of object </br>\nSend a error to the client if the request failed, otherwise a header will be sent",
+            "itemtype": "method",
+            "name": "head",
+            "params": [
+                {
+                    "name": "model",
+                    "description": "the data model object",
+                    "type": "Object"
+                },
+                {
+                    "name": "path",
+                    "description": "the root path",
+                    "type": "String"
+                },
+                {
+                    "name": "paramToGet",
+                    "description": "The property to retrieve on url",
+                    "type": "String"
+                }
+            ],
+            "class": "ControllerRoutes"
+        },
+        {
+            "file": "app/routes/controller.js",
+            "line": 132,
+            "description": "Implement the http request : POST </br>\nAdd a new Object in DB </br>\nSend a error to the client if the request failed, otherwise a json file to the client with the data",
+            "itemtype": "method",
+            "name": "post",
+            "params": [
+                {
+                    "name": "model",
+                    "description": "the data model object",
+                    "type": "Object"
+                },
+                {
+                    "name": "path",
+                    "description": "the root path",
+                    "type": "String"
+                }
+            ],
+            "class": "ControllerRoutes"
+        },
+        {
+            "file": "app/routes/controller.js",
+            "line": 171,
+            "description": "Implement the http request : PUT </br>\nUpdate an object in integrallity </br>\nSend a error to the client if the request failed, otherwise a json file to the client with the data",
+            "itemtype": "method",
+            "name": "put",
+            "params": [
+                {
+                    "name": "model",
+                    "description": "the data model object",
+                    "type": "Object"
+                },
+                {
+                    "name": "path",
+                    "description": "the root path",
+                    "type": "String"
+                },
+                {
+                    "name": "paramToGet",
+                    "description": "The property to retrieve on url to update the object",
+                    "type": "String"
+                }
+            ],
+            "class": "ControllerRoutes"
+        },
+        {
+            "file": "app/routes/controller.js",
+            "line": 219,
+            "description": "Implement the http request : PATCH </br>\nUpdate an object partialy </br>\nSend a error to the client if the request failed, otherwise a json file to the client with the data",
+            "itemtype": "method",
+            "name": "patch",
+            "params": [
+                {
+                    "name": "model",
+                    "description": "the data model object",
+                    "type": "Object"
+                },
+                {
+                    "name": "path",
+                    "description": "the root path",
+                    "type": "String"
+                },
+                {
+                    "name": "paramToGet",
+                    "description": "The property to retrieve on url to update the object",
+                    "type": "String"
+                }
+            ],
+            "class": "ControllerRoutes"
+        },
+        {
+            "file": "app/routes/controller.js",
+            "line": 263,
+            "description": "Implement the http request : DELETE </br>\nDelete an object </br>\nSend a error to the client if the request failed, otherwise a json file to the client with the data",
+            "itemtype": "method",
+            "name": "delete",
+            "params": [
+                {
+                    "name": "model",
+                    "description": "the data model object",
+                    "type": "Object"
+                },
+                {
+                    "name": "path",
+                    "description": "the root path",
+                    "type": "String"
+                },
+                {
+                    "name": "paramToGet",
+                    "description": "The property to retrieve on url to delete the object",
+                    "type": "String"
+                }
+            ],
+            "class": "ControllerRoutes"
+        },
+        {
+            "file": "app/routes/controller.js",
+            "line": 293,
+            "description": "Add a route to the main router",
+            "itemtype": "method",
+            "name": "addRoute",
             "params": [
                 {
                     "name": "path",
-                    "description": "[description]",
-                    "type": "[type]"
+                    "description": "route to add",
+                    "type": "String"
                 },
                 {
                     "name": "nameModel",
-                    "description": "[description]",
-                    "type": "[type]"
+                    "description": "name of the model object to retrieve into the controller of model",
+                    "type": "String"
+                },
+                {
+                    "name": "reqExcluded",
+                    "description": "array of excluded request",
+                    "type": "Array"
+                },
+                {
+                    "name": "paramToRetrieve",
+                    "description": "name of the param to retrieve",
+                    "type": "String"
                 }
             ],
-            "class": "yoctoRouter"
+            "class": "ControllerRoutes"
+        },
+        {
+            "file": "app/routes/controller.js",
+            "line": 318,
+            "description": "Add a middleware",
+            "itemtype": "method",
+            "name": "addMidlleware",
+            "class": "ControllerRoutes"
+        },
+        {
+            "file": "app/routes/controller.js",
+            "line": 332,
+            "description": "Initialise the controller </br>\nRetrieve all routes and thoose alias and add there on router",
+            "itemtype": "method",
+            "name": "init",
+            "class": "ControllerRoutes"
+        },
+        {
+            "file": "app/routes/controller.js",
+            "line": 366,
+            "description": "Export current Controller to use it on node",
+            "class": "ControllerRoutes"
+        },
+        {
+            "file": "server.js",
+            "line": 10,
+            "description": "Test server for Yocto Api",
+            "class": ""
         }
     ],
     "warnings": [
         {
             "message": "unknown tag: date",
-            "line": " yoctoRouter.js:5"
+            "line": " app/models/controller.js:9"
         },
         {
             "message": "unknown tag: copyright",
-            "line": " yoctoRouter.js:5"
+            "line": " app/models/controller.js:9"
         },
         {
-            "message": "Missing item type\nCreate a new model and add it in tabModel",
-            "line": " app/models/controller.js:14"
+            "message": "unknown tag: date",
+            "line": " app/routes/controller.js:10"
         },
         {
-            "message": "Missing item type\nMain function",
-            "line": " app/models/controller.js:38"
+            "message": "unknown tag: copyright",
+            "line": " app/routes/controller.js:10"
         },
         {
-            "message": "Missing item type\nGet model from models.json by call the model controller",
-            "line": " app/routes/controller.js:12"
+            "message": "Missing item type\nGet model from models.json and format it with mongoose",
+            "line": " app/models/controller.js:86"
         },
         {
-            "message": "Missing item type\nAdd a route to the router",
-            "line": " app/routes/controller.js:175"
+            "message": "Missing item type\nExport current Controller to use it on node",
+            "line": " app/models/controller.js:100"
+        },
+        {
+            "message": "Missing item type\nExport current Controller to use it on node",
+            "line": " app/routes/controller.js:366"
+        },
+        {
+            "message": "Missing item type\nTest server for Yocto Api",
+            "line": " server.js:10"
         }
     ]
 }

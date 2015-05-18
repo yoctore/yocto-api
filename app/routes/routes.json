@@ -1,13 +1,17 @@
 {
   "routes" : [
-    { "path" : "\/user(s)?",
-      "model" : "User",
+    {
+      "path"              : "/users",
+      "alias"             : ["user"],
+      "model"             : "User",
       "requestNotDesired" : ["put", "delete" , "patch"]
     },
-    { "path"                : "\/user(s)?\/:user_id",
+    {
+      "path"                : "/users/:user_id",
+      "alias"               : ["user"],
       "model"               : "User",
-      "indexParam"          : "0",
-      "requestNotDesired"   : ["post"]
+      "paramToRetrieve"     : "user_id",
+      "requestExcluded"     : ["post"]
     }
   ]
 }
