@@ -4,7 +4,7 @@
       "path"              : "/users",
       "alias"             : ["user"],
       "model"             : "User",
-      "requestNotDesired" : ["put", "delete" , "patch"]
+      "requestExcluded" : ["put", "delete" , "patch"]
     },
     {
       "path"                : "/users/:user_id",

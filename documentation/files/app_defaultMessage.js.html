@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>server.js - yocto-api</title>
+    <title>app/defaultMessage.js - yocto-api</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -76,42 +76,40 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-<h1 class="file-heading">File: server.js</h1>
+<h1 class="file-heading">File: app/defaultMessage.js</h1>
 
 <div class="file">
     <pre class="code prettyprint linenums">
-&#x27;use strict&#x27;;
-
-var express    = require(&#x27;express&#x27;);
-var app        = express();
-var bodyParser = require(&#x27;body-parser&#x27;);
-var _          = require(&#x27;lodash&#x27;);
-var mongoose   = require(&#x27;mongoose&#x27;);
-var routes     = require(&#x27;./app/routes/controller.js&#x27;);
-
 /**
- * Test server for Yocto Api
- *
+ * Creator of message
  */
 
-// connect to our database
-mongoose.connect(&#x27;mongodb://localhost:27017&#x27;);
+var _   = require(&#x27;lodash&#x27;);
 
-// configure app to use bodyParser()
-app.use(bodyParser.urlencoded({ extended : true }));
-app.use(bodyParser.json());
+var defaultMessage = {
+    code    : &#x27;&#x27;,
+    message : &#x27;&#x27;,
+    data    : {}
+};
 
-// set our port
-var port = process.env.PORT || 8080;
+var code200 = _.merge(defaultMessage, { code : &#x27;200&#x27; });
 
-//Initialise the router
-routes.init();
-//Set router
-app.use(&#x27;/api&#x27;, routes.router);
+var newMessage = function(codeMessage, messageText) {
+    var codeTemp = _.clone(codeMessage);
+    return _.merge(codeTemp, { message : messageText });
+};
 
-// START THE SERVER
-app.listen(port);
-console.log(&#x27;Magic happens on port &#x27; + port);
+var welcome     = newMessage(code200, &#x27;Welcome to the api&#x27;);
+var userCreated = newMessage(code200, &#x27;User was created with success&#x27;);
+var userUpdated = newMessage(code200, &#x27;User was updated with success&#x27;);
+var userDeleted = newMessage(code200, &#x27;User was deleted with success&#x27;);
+
+module.exports = {
+    welcome             : welcome,
+    userCreatedSucces   : userCreated,
+    userUpdated         : userUpdated,
+    userDeleted         : userDeleted
+};
 
     </pre>
 </div>

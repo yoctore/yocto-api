@@ -39,8 +39,8 @@ function Controller() {
  * Create a new model and add it in tabModel
  *
  * @method addModel
- * @param {nameModel} nameModel name of keys
- * @param {[type]} model type of the keys
+ * @param {String} nameModel name of the model
+ * @param {Object} model the model (formated in json)
  */
  Controller.prototype.addModel = function(nameModel, model) {
 
@@ -64,19 +64,18 @@ function Controller() {
 
 /**
  * Initialise the Controller</br>
- * Read routes.json and load all routes
+ * Read models.json and load all models
  *
  * @method init
  */
 Controller.prototype.init = function() {
 
   logger.info('[ ControllerModels.init ] - start');
+
   // Read each model in models.json
   _.each(models.models, function(model) {
-
     //Read into each model
     _.each(model, function(val, key) {
-
       //Procces Model
       this.addModel(key, val);
     }, this);
@@ -87,14 +86,21 @@ Controller.prototype.init = function() {
 * Get model from models.json and format it with mongoose
 *
 * @param {String} nameModel the name of model to retrieve
-* @return {Object} return the model if founded
+* @return {Object} return the model if founded, or false otherwise
 */
 Controller.prototype.getModel = function(nameModel) {
 
-  logger.info('[ ControllerModels.getModel ] - get Model of : ' + nameModel);
   if (!_.isEmpty(nameModel) && _.isString(nameModel)) {
-    return this.tabModel[_.findIndex(this.tabModel, { 'name': nameModel })].mongooseModel;
+    // return the model founded
+    var index = _.findIndex(this.tabModel, { 'name': nameModel });
+    //Test if a model was found
+    if (_.isUndefined(index) || (index >= 0)) {
+      logger.info('[ ControllerModels.getModel ] - get Model of : ' + nameModel);
+      return this.tabModel[index].mongooseModel;
+    }
   }
+  logger.error('[ ControllerModels.getModel ] - error model not found, model name is : ' + nameModel);
+  return false;
 };
 
 /**

@@ -1,3 +1,6 @@
+/**
+ * Creator of message
+ */
 
 var _   = require('lodash');
 
@@ -7,14 +10,11 @@ var defaultMessage = {
     data    : {}
 };
 
-var code200 = _.merge(defaultMessage, { code : '200' } );
+var code200 = _.merge(defaultMessage, { code : '200' });
 
 var newMessage = function(codeMessage, messageText) {
     var codeTemp = _.clone(codeMessage);
-    return _.merge(codeTemp, {
-                                message : messageText
-                            }
-                  );
+    return _.merge(codeTemp, { message : messageText });
 };
 
 var welcome     = newMessage(code200, 'Welcome to the api');

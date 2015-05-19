@@ -28,7 +28,6 @@
            yui : true,
        },
        all : [ 'server.js',
-               'yoctoRouter',
                'app/**/*.js'
                ]
      },
