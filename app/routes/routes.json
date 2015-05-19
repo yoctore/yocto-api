@@ -2,13 +2,13 @@
   "routes" : [
     {
       "path"              : "/users",
-      "alias"             : ["user"],
+      "alias"             : ["/user"],
       "model"             : "User",
       "requestExcluded" : ["put", "delete" , "patch"]
     },
     {
       "path"                : "/users/:user_id",
-      "alias"               : ["user"],
+      "alias"               : ["/user/:user_id"],
       "model"               : "User",
       "paramToRetrieve"     : "user_id",
       "requestExcluded"     : ["post"]

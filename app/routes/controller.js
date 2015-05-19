@@ -30,7 +30,7 @@ var routeJoiSchema = joi.object().keys({
 *
 * Controller of routes based on Express
 *
-* It read a jsonfile and create each route 
+* It read a jsonfile and create each route
 *
 * For more details on these dependencies read links below :
 * - LodAsh : https://lodash.com/
@@ -383,18 +383,20 @@ Controller.prototype.init = function() {
     //Check if have no error in joi validation
     if (_.isEmpty(result) || _.isEmpty(result.error)) {
 
-      //add Main route
-      this.addRoute(route.path, route.model, route.requestExcluded, route.paramToRetrieve);
+      //create a array that contains the main route, and all thoose aliases
+      var routeAndAlias = [];
+      routeAndAlias.push(route.path);
 
-      //Add alias routes
       if (!_.isEmpty(route.alias)) {
-        _.each(route.alias, function(alias) {
-
-          var split = _.words(route.path, /[^,/]+/g);
-          split[0] = '/'+alias;
-          this.addRoute(_(split).join('/'), route.model, route.requestExcluded, route.paramToRetrieve);
-        }, this);
+        routeAndAlias.push(route.alias);
+        routeAndAlias = _.flatten(routeAndAlias);
       }
+
+      //add Main route
+      _.each(routeAndAlias, function(val) {
+        this.addRoute(val, route.model, route.requestExcluded, route.paramToRetrieve);
+      }, this);
+
     } else {
       logger.error('[ ControllerRoutes.init ] - error when trying to add a new route, please check the file : \'routes.json\'');
 
