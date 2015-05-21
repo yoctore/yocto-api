@@ -1,10 +1,78 @@
 {
   "models" : [
     {
-      "User" : {
+      "user" : {
       "name"      : "String",
       "firstname" : "String",
-      "email"     : "String"
+      "email"     : "String",
+      "cart_id"   : ["ObjectId"]
+      }
+    },
+    {
+      "product" : {
+      "name"            : "String",
+      "reference"       : "String",
+      "availability_id" : ["ObjectId"],
+      "categorie_id"  : [{
+        "type" : "Number",
+        "required" : true
+        }]
+      }
+    },
+    {
+      "categorie" : {
+      "name"          : "String",
+      "categorie_id"  : ["ObjectId"]
+      }
+    },
+    {
+      "availability" : {
+      "state"       : "String",
+      "store_id"    : ["ObjecId"],
+      "product_id"  : "ObjectId"
+      }
+    },
+    {
+      "storeBrand"  : {
+      "name"        : "String",
+      "store_id"  : [{
+        "type" : "ObjectId",
+        "required" : true
+        }]
+      }
+    },
+    {
+      "store" : {
+      "storeBrand_id"  : "String",
+      "name"           : "String"
+      }
+    },
+    {
+      "cart" : {
+      "name"        : "String",
+      "product_id"  : ["ObjectId"],
+      "order_id"    : "ObjectId"
+      }
+    },
+    {
+      "order" : {
+      "name"           : "String",
+      "product_id"     : ["ObjectId"],
+      "transaction_id" : "ObjectId"
+      }
+    },
+    {
+      "transaction" : {
+      "state"     : "String",
+      "bill_id"   : "ObjectId",
+      "order_id"  : "ObjectId"
+      }
+    },
+    {
+      "bill" : {
+      "state"       : "String",
+      "product_id"  : ["ObjectId"],
+      "order_id"    : "ObjectId"
       }
     }
   ]

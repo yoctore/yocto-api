@@ -21,10 +21,13 @@ var welcome     = newMessage(code200, 'Welcome to the api');
 var userCreated = newMessage(code200, 'User was created with success');
 var userUpdated = newMessage(code200, 'User was updated with success');
 var userDeleted = newMessage(code200, 'User was deleted with success');
+var success     = newMessage(code200, 'Operation success');
+
 
 module.exports = {
     welcome             : welcome,
     userCreatedSucces   : userCreated,
     userUpdated         : userUpdated,
-    userDeleted         : userDeleted
+    userDeleted         : userDeleted,
+    success             : success
 };

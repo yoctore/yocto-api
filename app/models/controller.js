@@ -74,8 +74,10 @@ Controller.prototype.init = function() {
 
   // Read each model in models.json
   _.each(models.models, function(model) {
+
     //Read into each model
     _.each(model, function(val, key) {
+
       //Procces Model
       this.addModel(key, val);
     }, this);
@@ -91,8 +93,10 @@ Controller.prototype.init = function() {
 Controller.prototype.getModel = function(nameModel) {
 
   if (!_.isEmpty(nameModel) && _.isString(nameModel)) {
+
     // return the model founded
     var index = _.findIndex(this.tabModel, { 'name': nameModel });
+    
     //Test if a model was found
     if (_.isUndefined(index) || (index >= 0)) {
       logger.info('[ ControllerModels.getModel ] - get Model of : ' + nameModel);

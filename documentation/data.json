@@ -59,7 +59,7 @@
             "extension_for": [],
             "file": "app/routes/controller.js",
             "line": 28,
-            "description": "Yocto API : Routes Controller\n\nController of routes based on Express\n\nIt read a jsonfile and create each route \n\nFor more details on these dependencies read links below :\n- LodAsh : https://lodash.com/\n- yocto-logger : git+ssh://lab.yocto.digital:yocto-node-modules/yocto-utils.git\n- express : http://expressjs.com/\n- joi : https://github.com/hapijs/joi#array",
+            "description": "Yocto API : Routes Controller\n\nController of routes based on Express\n\nIt read a jsonfile and create each route\n\nFor more details on these dependencies read links below :\n- LodAsh : https://lodash.com/\n- yocto-logger : git+ssh://lab.yocto.digital:yocto-node-modules/yocto-utils.git\n- express : http://expressjs.com/\n- joi : https://github.com/hapijs/joi#array",
             "date": ": 11/05/2015",
             "author": ": Cedric Balard <cedric@yocto.re>",
             "copyright": ": Yocto SAS, All right reserved"
@@ -106,7 +106,7 @@
         },
         {
             "file": "app/models/controller.js",
-            "line": 85,
+            "line": 87,
             "description": "Get model from models.json and format it with mongoose",
             "params": [
                 {
@@ -123,14 +123,14 @@
         },
         {
             "file": "app/models/controller.js",
-            "line": 106,
+            "line": 110,
             "description": "Export current Controller to use it on node",
             "class": "ControllerModels"
         },
         {
             "file": "app/routes/controller.js",
             "line": 11,
-            "description": "List of all default property in a mongodb document",
+            "description": "List of all default property in a mongodb document\nyoct",
             "itemtype": "property",
             "name": "DEFAULT_PROP_MONGODB",
             "type": "Array",
@@ -213,7 +213,7 @@
         },
         {
             "file": "app/routes/controller.js",
-            "line": 123,
+            "line": 124,
             "description": "Implement the http request : HEAD </br>\nGet a head of object </br>\nSend a error to the client if the request failed, otherwise a header will be sent",
             "itemtype": "method",
             "name": "head",
@@ -238,7 +238,7 @@
         },
         {
             "file": "app/routes/controller.js",
-            "line": 155,
+            "line": 157,
             "description": "Implement the http request : POST </br>\nAdd a new Object in DB </br>\nSend a error to the client if the request failed, otherwise a json file to the client with the data",
             "itemtype": "method",
             "name": "post",
@@ -258,7 +258,7 @@
         },
         {
             "file": "app/routes/controller.js",
-            "line": 192,
+            "line": 201,
             "description": "Implement the http request : PUT </br>\nUpdate an object in integrallity </br>\nSend a error to the client if the request failed, otherwise a json file to the client with the data",
             "itemtype": "method",
             "name": "put",
@@ -283,7 +283,32 @@
         },
         {
             "file": "app/routes/controller.js",
-            "line": 239,
+            "line": 255,
+            "description": "Check if the parameter should not be empty </br>\nAnd if it's the case, add a validation step into mongoose",
+            "itemtype": "method",
+            "name": "checkModelValidation",
+            "params": [
+                {
+                    "name": "val",
+                    "description": "the value",
+                    "type": "Object"
+                },
+                {
+                    "name": "value",
+                    "description": "the object",
+                    "type": "Object"
+                },
+                {
+                    "name": "key",
+                    "description": "the key of the value",
+                    "type": "String"
+                }
+            ],
+            "class": "ControllerRoutes"
+        },
+        {
+            "file": "app/routes/controller.js",
+            "line": 283,
             "description": "Implement the http request : PATCH </br>\nUpdate an object partialy </br>\nSend a error to the client if the request failed, otherwise a json file to the client with the data",
             "itemtype": "method",
             "name": "patch",
@@ -308,7 +333,7 @@
         },
         {
             "file": "app/routes/controller.js",
-            "line": 284,
+            "line": 330,
             "description": "Implement the http request : DELETE </br>\nDelete an object </br>\nSend a error to the client if the request failed, otherwise a json file to the client with the data",
             "itemtype": "method",
             "name": "delete",
@@ -333,7 +358,7 @@
         },
         {
             "file": "app/routes/controller.js",
-            "line": 315,
+            "line": 362,
             "description": "Add a route to the main router",
             "itemtype": "method",
             "name": "addRoute",
@@ -363,7 +388,7 @@
         },
         {
             "file": "app/routes/controller.js",
-            "line": 349,
+            "line": 397,
             "description": "Add a middleware",
             "itemtype": "method",
             "name": "addMidlleware",
@@ -371,7 +396,7 @@
         },
         {
             "file": "app/routes/controller.js",
-            "line": 362,
+            "line": 410,
             "description": "Initialise the controller </br>\nRetrieve all routes and thoose alias and add there into router",
             "itemtype": "method",
             "name": "init",
@@ -379,7 +404,7 @@
         },
         {
             "file": "app/routes/controller.js",
-            "line": 410,
+            "line": 460,
             "description": "Export current Controller to use it on node",
             "class": "ControllerRoutes"
         },
@@ -409,15 +434,15 @@
         },
         {
             "message": "Missing item type\nGet model from models.json and format it with mongoose",
-            "line": " app/models/controller.js:85"
+            "line": " app/models/controller.js:87"
         },
         {
             "message": "Missing item type\nExport current Controller to use it on node",
-            "line": " app/models/controller.js:106"
+            "line": " app/models/controller.js:110"
         },
         {
             "message": "Missing item type\nExport current Controller to use it on node",
-            "line": " app/routes/controller.js:410"
+            "line": " app/routes/controller.js:460"
         },
         {
             "message": "Missing item type\nCreator of message",

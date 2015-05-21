@@ -10,7 +10,7 @@ var routes      = require('./routes.json');
 
 /**
 * List of all default property in a mongodb document
-*
+*yoct
 * @property {Array} DEFAULT_PROP_MONGODB
 * @default [ '__v', '_id']
 */
@@ -18,10 +18,10 @@ var DEFAULT_PROP_MONGODB = [ '__v', '_id' ];
 
 //Define a Joi schema for test if route have a goodformat
 var routeJoiSchema = joi.object().keys({
-  path : joi.string().required(),
-  alias : joi.array().items(joi.string()),
-  model : joi.string().required(),
-  paramToRetrieve : joi.string(),
+  path            : joi.string().required(),
+  alias           : joi.array().items(joi.string()),
+  model           : joi.string().required(),
+  paramToRetrieve : joi.array().items(joi.string()),
   requestExcluded : joi.array().items(joi.string())
 });
 
@@ -99,6 +99,7 @@ Controller.prototype.getFn = function(varToTest) {
 * @param  {String} paramToGet The property to retrieve on url
 */
 Controller.prototype.get = function(model, path, paramToGet) {
+
   // Determine if paramToGet is not empty, and get good function name
   var fn = this.getFn(paramToGet);
 
@@ -131,6 +132,7 @@ Controller.prototype.get = function(model, path, paramToGet) {
 * @param  {String} paramToGet The property to retrieve on url
 */
 Controller.prototype.head = function(model, path, paramToGet) {
+
   // Determine if paramToGet is not empty, and get good function name
   var fn = this.getFn(paramToGet);
 
@@ -162,18 +164,26 @@ Controller.prototype.head = function(model, path, paramToGet) {
 * @param  {String} path the root path
 */
 Controller.prototype.post = function(Model, path) {
+
+  //Save the scope
+  var scope = this;
+
   // Add methode post to the route
   this.router.post(path, function(req, res) {
 
     logger.info('[ ControllerRoutes.post ] - revceiving request, route is : ' + path);
 
     //Create a instance of model, used to save in db
-    var obj  = new Model();
+    var obj = new Model();
 
     //Retrieve all property of the object in the current model, and omit default property of mongodb
-    _.each( _.omit(Model.schema.paths, DEFAULT_PROP_MONGODB), function(val, key) {
+    _.each(_.omit(Model.schema.paths, DEFAULT_PROP_MONGODB), function(val, key) {
 
+      //Add the propriety to the new object
       obj[key] = req.body[key];
+
+      //Add a validation step for model
+      scope.checkModelValidation(val, obj, key);
     });
 
     //Save object in db
@@ -182,9 +192,8 @@ Controller.prototype.post = function(Model, path) {
       if (err) {
         res.send(err);
       }
-
       //Succes so Send a jsonfile
-      res.json(dm.userCreatedSucces);
+      res.json(dm.success);
     });
   });
 };
@@ -200,6 +209,10 @@ Controller.prototype.post = function(Model, path) {
 * @param  {String} paramToGet The property to retrieve on url to update the object
 */
 Controller.prototype.put = function(model, path, paramToGet) {
+
+  //Save the scope
+  var scope = this;
+
   // Add methode update to the route
   this.router.put(path, function(req, res) {
 
@@ -210,30 +223,61 @@ Controller.prototype.put = function(model, path, paramToGet) {
     }
 
     //Find
-    model.findById(req.params[paramToGet], function(err, val) {
+    model.findById(req.params[paramToGet], function(err, value) {
 
       if (err) {
         res.send(err);
       }
 
       //Retrieve all property of the object in the current model, and omit default property of mongodb
-      _.each( _.omit(model.schema.paths, DEFAULT_PROP_MONGODB), function(val, key) {
+      _.each(_.omit(model.schema.paths, DEFAULT_PROP_MONGODB), function(val, key) {
 
-        val[key] = req.body[key];
+        value[key] = req.body[key];
+
+        //Add a validation step for model
+        scope.checkModelValidation(val, value, key);
       });
 
       // save the user and check for errors
-      val.save(function(err) {
+      value.save(function(err) {
 
         if (err) {
           res.send(err);
         }
 
         //Succes so Send a jsonfile
-        res.json(dm.userUpdated);
+        res.json(dm.success);
       });
     });
   });
+};
+
+/**
+ * Check if the parameter should not be empty </br>
+ * And if it's the case, add a validation step into mongoose
+ *
+ * @method checkModelValidation
+ * @param {Object} val the value
+ * @param {Object} value the object
+ * @param {String} key the key of the value
+ */
+Controller.prototype.checkModelValidation = function(val, value, key) {
+
+  //Add a validation step for model
+  if (!_.isUndefined(val.caster)) {
+    if (!_.isUndefined(val.caster.isRequired)) {
+
+      //Add a validation step for model
+      value.schema.path(key).validate(function(valueToUpdate) {
+
+        //test if the var is empty, and return false to show that the validation failed
+        if (_.isEmpty(_.compact(valueToUpdate))) {
+          return false;
+        }
+      });
+    }
+  }
+
 };
 
 /**
@@ -247,6 +291,7 @@ Controller.prototype.put = function(model, path, paramToGet) {
 * @param  {String} paramToGet The property to retrieve on url to update the object
 */
 Controller.prototype.patch = function(model, path, paramToGet) {
+
   //Update user
   this.router.patch(path, function(req, res) {
 
@@ -265,6 +310,7 @@ Controller.prototype.patch = function(model, path, paramToGet) {
 
       //read each key, and update the model to save it on db
       _.each(req.body, function(value, key) {
+
         //Assign value
         val[key] = value;
       });
@@ -275,7 +321,7 @@ Controller.prototype.patch = function(model, path, paramToGet) {
         if (err) {
           res.send(err);
         }
-        res.json(dm.userUpdated);
+        res.json(dm.success);
       });
     });
   });
@@ -292,6 +338,7 @@ Controller.prototype.patch = function(model, path, paramToGet) {
 * @param  {String} paramToGet The property to retrieve on url to delete the object
 */
 Controller.prototype.delete = function(model, path, paramToGet) {
+
   //Update user
   this.router.delete(path, function(req, res) {
 
@@ -307,7 +354,7 @@ Controller.prototype.delete = function(model, path, paramToGet) {
       if (err) {
         res.send(err);
       }
-      res.json(dm.userDeleted);
+      res.json(dm.success);
     });
   });
 };
@@ -335,6 +382,7 @@ Controller.prototype.addRoute = function(path, nameModel, reqExcluded, paramToRe
     //Handle wich requests are implemented
     //Retrieve the difference betwenn ALL_HTTP_REQUESTS and all requests excluded
     _.each( _.difference(this.ALL_HTTP_REQUESTS, reqExcluded), function(fn) {
+
       //Call function by his name
       this[fn](model, path, paramToRetrieve);
     }, this);

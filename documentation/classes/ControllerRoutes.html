@@ -91,7 +91,7 @@
 <div class="box intro">
     <p>Yocto API : Routes Controller</p>
 <p>Controller of routes based on Express</p>
-<p>It read a jsonfile and create each route </p>
+<p>It read a jsonfile and create each route</p>
 <p>For more details on these dependencies read links below :</p>
 <ul>
 <li>LodAsh : <a href="https://lodash.com/">https://lodash.com/</a></li>
@@ -125,6 +125,10 @@
                             </li>
                             <li class="index-item method">
                                 <a href="#method_addRoute">addRoute</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_checkModelValidation">checkModelValidation</a>
 
                             </li>
                             <li class="index-item method">
@@ -206,7 +210,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/app_routes_controller.js.html#l349"><code>app&#x2F;routes&#x2F;controller.js:349</code></a>
+        <a href="../files/app_routes_controller.js.html#l397"><code>app&#x2F;routes&#x2F;controller.js:397</code></a>
         </p>
 
 
@@ -252,7 +256,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/app_routes_controller.js.html#l315"><code>app&#x2F;routes&#x2F;controller.js:315</code></a>
+        <a href="../files/app_routes_controller.js.html#l362"><code>app&#x2F;routes&#x2F;controller.js:362</code></a>
         </p>
 
 
@@ -318,6 +322,89 @@
 
 
 </div>
+<div id="method_checkModelValidation" class="method item">
+    <h3 class="name"><code>checkModelValidation</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>val</code>
+                </li>
+                <li class="arg">
+                        <code>value</code>
+                </li>
+                <li class="arg">
+                        <code>key</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/app_routes_controller.js.html#l255"><code>app&#x2F;routes&#x2F;controller.js:255</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Check if the parameter should not be empty </br>
+And if it&#39;s the case, add a validation step into mongoose</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">val</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>the value</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">value</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>the object</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">key</code>
+                        <span class="type">String</span>
+
+
+                    <div class="param-description">
+                        <p>the key of the value</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
 <div id="method_delete" class="method item">
     <h3 class="name"><code>delete</code></h3>
 
@@ -345,7 +432,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/app_routes_controller.js.html#l284"><code>app&#x2F;routes&#x2F;controller.js:284</code></a>
+        <a href="../files/app_routes_controller.js.html#l330"><code>app&#x2F;routes&#x2F;controller.js:330</code></a>
         </p>
 
 
@@ -580,7 +667,7 @@ Used to dertermine if we call find() or findById()</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/app_routes_controller.js.html#l123"><code>app&#x2F;routes&#x2F;controller.js:123</code></a>
+        <a href="../files/app_routes_controller.js.html#l124"><code>app&#x2F;routes&#x2F;controller.js:124</code></a>
         </p>
 
 
@@ -652,7 +739,7 @@ Send a error to the client if the request failed, otherwise a header will be sen
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/app_routes_controller.js.html#l362"><code>app&#x2F;routes&#x2F;controller.js:362</code></a>
+        <a href="../files/app_routes_controller.js.html#l410"><code>app&#x2F;routes&#x2F;controller.js:410</code></a>
         </p>
 
 
@@ -696,7 +783,7 @@ Retrieve all routes and thoose alias and add there into router</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/app_routes_controller.js.html#l239"><code>app&#x2F;routes&#x2F;controller.js:239</code></a>
+        <a href="../files/app_routes_controller.js.html#l283"><code>app&#x2F;routes&#x2F;controller.js:283</code></a>
         </p>
 
 
@@ -777,7 +864,7 @@ Send a error to the client if the request failed, otherwise a json file to the c
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/app_routes_controller.js.html#l155"><code>app&#x2F;routes&#x2F;controller.js:155</code></a>
+        <a href="../files/app_routes_controller.js.html#l157"><code>app&#x2F;routes&#x2F;controller.js:157</code></a>
         </p>
 
 
@@ -850,7 +937,7 @@ Send a error to the client if the request failed, otherwise a json file to the c
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/app_routes_controller.js.html#l192"><code>app&#x2F;routes&#x2F;controller.js:192</code></a>
+        <a href="../files/app_routes_controller.js.html#l201"><code>app&#x2F;routes&#x2F;controller.js:201</code></a>
         </p>
 
 
@@ -956,7 +1043,8 @@ Send a error to the client if the request failed, otherwise a json file to the c
                         </div>
                     
                         <div class="description">
-                            <p>List of all default property in a mongodb document</p>
+                            <p>List of all default property in a mongodb document
+                    yoct</p>
                     
                         </div>
                     

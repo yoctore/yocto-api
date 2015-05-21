@@ -28,7 +28,8 @@
            yui : true,
        },
        all : [ 'server.js',
-               'app/**/*.js'
+               'app/**/*.js',
+               'app/**/*.json'
                ]
      },
 
