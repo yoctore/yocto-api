@@ -89,68 +89,154 @@ Controller.prototype.getFn = function(varToTest) {
 };
 
 /**
-* Implement the http request : GET </br>
+* Implement the http request : GET and HEAD</br>
 * Get an object </br>
-* Send a error to the client if the request failed, otherwise a json file to the client with the data requested
+* Send a error to the client if the request failed, or a json file to the client with the data requested if it's an GET requerst </br>
+* OR if it's a head request, send a http header
 *
 * @method get
 * @param  {Object} model the data model object
 * @param  {String} path the root path
 * @param  {String} paramToGet The property to retrieve on url
+* @param  {String} reqType type of the http req (get or head)
 */
-Controller.prototype.get = function(model, path, paramToGet) {
-
-  // Determine if paramToGet is not empty, and get good function name
-  var fn = this.getFn(paramToGet);
-
-  // Add methode get to the route
-  this.router.get(path, function(req, res) {
-
-    logger.info('[ ControllerRoutes.get ] - revceiving request, route is : ' + path);
-
-    //Find
-    model[fn](req.params[paramToGet], function(err, val) {
-
-      if (err) {
-        res.send(err);
-      }
-
-      //Succes so Send a jsonfile
-      res.json(val);
-    });
-  });
-};
-
-/**
-* Implement the http request : HEAD </br>
-* Get a head of object </br>
-* Send a error to the client if the request failed, otherwise a header will be sent
-*
-* @method head
-* @param  {Object} model the data model object
-* @param  {String} path the root path
-* @param  {String} paramToGet The property to retrieve on url
-*/
-Controller.prototype.head = function(model, path, paramToGet) {
+Controller.prototype.addHTTPRequestGets = function(model, path, paramToGet, reqType) {
 
   // Determine if paramToGet is not empty, and get good function name
   var fn = this.getFn(paramToGet);
 
   // Add methode head to the route
-  this.router.head(path, function(req, res) {
+  this.router[reqType](path, function(req, res) {
 
-    logger.info('[ ControllerRoutes.head ] - revceiving request, route is : ' + path);
+    logger.info('[ ControllerRoutes.addHTTPRequest ] - revceiving ' + reqType +' request, route is : ' + path);
 
-    // Find
+    // Find object
     model[fn](req.params[paramToGet], function(err, val) {
 
       if (err) {
         res.send(err);
       }
 
-      //Succes so send success
-      res.status(200).send('OK');
+      var cb = reqType ==='get' ? res.json(val) : res.status(200).send('OK');
     });
+  });
+};
+
+//Use for PUT, PATCH, DELETE
+/**
+* Implement the http request : PUT, PATCH and DELETE</br>
+* Get an object </br>
+* send a message to the client
+*
+* @method get
+* @param  {Object} model the data model object
+* @param  {String} path the root path
+* @param  {String} paramToGet The property to retrieve on url
+* @param  {String} reqType type of the http req (put, patch or head)
+*/
+Controller.prototype.addHTTPRequest = function(model, path, paramToGet, reqType) {
+
+  //Save the scope
+  var scope = this;
+
+  // Add methode update to the route
+  this.router[reqType](path, function(req, res) {
+
+    logger.info('[ ControllerRoutes.addHTTPRequest ] - revceiving ' + reqType +' request, route is : ' + path);
+
+    if (_.isEmpty(paramToGet)) {
+      res.status(400).send('Id not defined');
+      return;
+    }
+
+    //determine wich cb is called
+    var cb = reqType === 'delete' ? scope.deleteObject(model, res, req, paramToGet) : scope.updateObject(model, res, req, paramToGet, scope, reqType);
+  });
+};
+
+/**
+* Update the model, it's used for : PUT and PATCH
+* Get an object </br>
+* send a message to the client
+*
+* @method get
+* @param  {Object} model the data model object
+* @param  {Object} res the http response
+* @param  {Object} req the http request
+* @param  {String} paramToGet The property to retrieve on url
+* @param  {String} reqType type of the http req (put, patch or head)
+* @param  {Object} scope scope of the Controller
+*
+*/
+Controller.prototype.updateObject = function(model, res, req, paramToGet, scope, reqType) {
+
+  //Find
+  model.findById(req.params[paramToGet], function(err, value) {
+
+    if (err) {
+      res.send(err);
+    }
+
+    //Retrieve all property of the object in the current model, and omit default property of mongodb
+    _.each((reqType === 'put') ? _.omit(model.schema.paths, DEFAULT_PROP_MONGODB) : req.body, function(val, key) {
+
+      value[key] = req.body[key];
+
+      //Add a validation step for model
+      scope.checkModelValidation(val, value, key);
+    });
+
+    //save object in db
+    scope.saveObject(value, res);
+  });
+};
+
+/**
+* delete the model, it's used for : DELETE </br>
+* Delete an object </br>
+* Send a error to the client if the request failed, otherwise a json file to the client with the data
+*
+* @method delete
+* @param  {Object} model the data model object
+* @param  {Object} res the http response
+* @param  {Object} req the http request
+* @param  {String} paramToGet The property to retrieve on url to delete the object
+*/
+Controller.prototype.deleteObject = function(model, res, req, paramToGet) {
+
+  // remove the object and check for errors
+  model.remove({_id: req.params[paramToGet]}, function(err, user) {
+
+    if (err) {
+      res.send(err);
+    }
+
+    //Succes so Send a jsonfile
+    res.json(dm.success);
+  });
+};
+
+/**
+* Save an object in db, it's used for : PUT, PATCH and POST </br>
+* Send a error to the client if the request failed, otherwise a json file to the client with the data
+*
+* @method delete
+* @param  {Object} model the data model object
+* @param  {Object} res the http response
+* @param  {Object} req the http request
+* @param  {String} paramToGet The property to retrieve on url to delete the object
+*/
+Controller.prototype.saveObject = function(obj, res) {
+
+  // save the object and check for errors
+  obj.save(function(err) {
+
+    if (err) {
+      res.send(err);
+    }
+
+    //Succes so Send a jsonfile
+    res.json(dm.success);
   });
 };
 
@@ -187,80 +273,19 @@ Controller.prototype.post = function(Model, path) {
     });
 
     //Save object in db
-    obj.save(function(err) {
-
-      if (err) {
-        res.send(err);
-      }
-      //Succes so Send a jsonfile
-      res.json(dm.success);
-    });
+    scope.saveObject(obj, res);
   });
 };
 
 /**
-* Implement the http request : PUT </br>
-* Update an object in integrallity </br>
-* Send a error to the client if the request failed, otherwise a json file to the client with the data
+* Check if the parameter should not be empty </br>
+* And if it's the case, add a validation step into mongoose
 *
-* @method put
-* @param  {Object} model the data model object
-* @param  {String} path the root path
-* @param  {String} paramToGet The property to retrieve on url to update the object
+* @method checkModelValidation
+* @param {Object} val the value
+* @param {Object} value the object
+* @param {String} key the key of the value
 */
-Controller.prototype.put = function(model, path, paramToGet) {
-
-  //Save the scope
-  var scope = this;
-
-  // Add methode update to the route
-  this.router.put(path, function(req, res) {
-
-    logger.info('[ ControllerRoutes.put ] - revceiving request, route is : ' + path);
-    if (_.isEmpty(paramToGet)) {
-      res.status(400).send('Id not defined');
-      return;
-    }
-
-    //Find
-    model.findById(req.params[paramToGet], function(err, value) {
-
-      if (err) {
-        res.send(err);
-      }
-
-      //Retrieve all property of the object in the current model, and omit default property of mongodb
-      _.each(_.omit(model.schema.paths, DEFAULT_PROP_MONGODB), function(val, key) {
-
-        value[key] = req.body[key];
-
-        //Add a validation step for model
-        scope.checkModelValidation(val, value, key);
-      });
-
-      // save the user and check for errors
-      value.save(function(err) {
-
-        if (err) {
-          res.send(err);
-        }
-
-        //Succes so Send a jsonfile
-        res.json(dm.success);
-      });
-    });
-  });
-};
-
-/**
- * Check if the parameter should not be empty </br>
- * And if it's the case, add a validation step into mongoose
- *
- * @method checkModelValidation
- * @param {Object} val the value
- * @param {Object} value the object
- * @param {String} key the key of the value
- */
 Controller.prototype.checkModelValidation = function(val, value, key) {
 
   //Add a validation step for model
@@ -277,86 +302,6 @@ Controller.prototype.checkModelValidation = function(val, value, key) {
       });
     }
   }
-
-};
-
-/**
-* Implement the http request : PATCH </br>
-* Update an object partialy </br>
-* Send a error to the client if the request failed, otherwise a json file to the client with the data
-*
-* @method patch
-* @param  {Object} model the data model object
-* @param  {String} path the root path
-* @param  {String} paramToGet The property to retrieve on url to update the object
-*/
-Controller.prototype.patch = function(model, path, paramToGet) {
-
-  //Update user
-  this.router.patch(path, function(req, res) {
-
-    logger.info('[ ControllerRoutes.patch ] - revceiving request, route is : ' + path);
-    if (_.isEmpty(paramToGet)) {
-      res.status(400).send('Id not defined');
-      return;
-    }
-
-    //Find
-    model.findById(req.params[paramToGet], function(err, val) {
-
-      if (err) {
-        res.send(err);
-      }
-
-      //read each key, and update the model to save it on db
-      _.each(req.body, function(value, key) {
-
-        //Assign value
-        val[key] = value;
-      });
-
-      // save the user and check for errors
-      val.save(function(err) {
-
-        if (err) {
-          res.send(err);
-        }
-        res.json(dm.success);
-      });
-    });
-  });
-};
-
-/**
-* Implement the http request : DELETE </br>
-* Delete an object </br>
-* Send a error to the client if the request failed, otherwise a json file to the client with the data
-*
-* @method delete
-* @param  {Object} model the data model object
-* @param  {String} path the root path
-* @param  {String} paramToGet The property to retrieve on url to delete the object
-*/
-Controller.prototype.delete = function(model, path, paramToGet) {
-
-  //Update user
-  this.router.delete(path, function(req, res) {
-
-    logger.info('[ ControllerRoutes.delete ] - revceiving request, route is : ' + path);
-
-    if (_.isEmpty(paramToGet)) {
-      res.status(400).send('Id not defined');
-      return;
-    }
-
-    model.remove({_id: req.params[paramToGet]}, function(err, user) {
-
-      if (err) {
-        res.send(err);
-      }
-      res.json(dm.success);
-    });
-  });
 };
 
 /**
@@ -381,16 +326,25 @@ Controller.prototype.addRoute = function(path, nameModel, reqExcluded, paramToRe
 
     //Handle wich requests are implemented
     //Retrieve the difference betwenn ALL_HTTP_REQUESTS and all requests excluded
-    _.each( _.difference(this.ALL_HTTP_REQUESTS, reqExcluded), function(fn) {
+    _.each(_.difference(this.ALL_HTTP_REQUESTS, reqExcluded), function(fn) {
 
-      //Call function by his name
-      this[fn](model, path, paramToRetrieve);
+      if (fn ==='patch' || fn ==='put' || fn ==='delete') {
+
+        //add request
+        this.addHTTPRequest(model, path, paramToRetrieve, fn);
+      } else if (fn ==='get' || fn ==='head') {
+
+        //add request
+        this.addHTTPRequestGets(model, path, paramToRetrieve, fn);
+      } else {
+
+        //Call function by his name
+        this[fn](model, path, paramToRetrieve);
+      }
     }, this);
-
     return true;
   }
-
-  logger.warning( '[ ControllerRoutes.addRoute ] - can\'t add route : \'' + path + '\' ,because model is not defined');
+  logger.warning('[ ControllerRoutes.addRoute ] - can\'t add route : \'' + path + '\' ,because model is not defined');
   return false;
 };
 
@@ -435,6 +389,7 @@ Controller.prototype.init = function() {
       var routeAndAlias = [];
       routeAndAlias.push(route.path);
 
+      //Add alias if exists
       if (!_.isEmpty(route.alias)) {
         routeAndAlias.push(route.alias);
         routeAndAlias = _.flatten(routeAndAlias);
@@ -451,7 +406,7 @@ Controller.prototype.init = function() {
       //log each error
       _.forEach(result.error.details, function(val) {
 
-          logger.warning('[ ControllerRoutes.initP ] - ' + val.message + ' at ' + val.path);
+        logger.warning('[ ControllerRoutes.init ] - ' + val.message + ' at ' + val.path);
       });
     }
   }, this);

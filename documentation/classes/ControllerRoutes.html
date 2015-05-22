@@ -136,6 +136,18 @@
 
                             </li>
                             <li class="index-item method">
+                                <a href="#method_delete">delete</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_get">get</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_get">get</a>
+
+                            </li>
+                            <li class="index-item method">
                                 <a href="#method_get">get</a>
 
                             </li>
@@ -144,23 +156,11 @@
 
                             </li>
                             <li class="index-item method">
-                                <a href="#method_head">head</a>
-
-                            </li>
-                            <li class="index-item method">
                                 <a href="#method_init">init</a>
 
                             </li>
                             <li class="index-item method">
-                                <a href="#method_patch">patch</a>
-
-                            </li>
-                            <li class="index-item method">
                                 <a href="#method_post">post</a>
-
-                            </li>
-                            <li class="index-item method">
-                                <a href="#method_put">put</a>
 
                             </li>
                     </ul>
@@ -210,7 +210,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/app_routes_controller.js.html#l397"><code>app&#x2F;routes&#x2F;controller.js:397</code></a>
+        <a href="../files/app_routes_controller.js.html#l351"><code>app&#x2F;routes&#x2F;controller.js:351</code></a>
         </p>
 
 
@@ -256,7 +256,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/app_routes_controller.js.html#l362"><code>app&#x2F;routes&#x2F;controller.js:362</code></a>
+        <a href="../files/app_routes_controller.js.html#l307"><code>app&#x2F;routes&#x2F;controller.js:307</code></a>
         </p>
 
 
@@ -349,7 +349,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/app_routes_controller.js.html#l255"><code>app&#x2F;routes&#x2F;controller.js:255</code></a>
+        <a href="../files/app_routes_controller.js.html#l280"><code>app&#x2F;routes&#x2F;controller.js:280</code></a>
         </p>
 
 
@@ -414,7 +414,10 @@ And if it&#39;s the case, add a validation step into mongoose</p>
                         <code>model</code>
                 </li>
                 <li class="arg">
-                        <code>path</code>
+                        <code>res</code>
+                </li>
+                <li class="arg">
+                        <code>req</code>
                 </li>
                 <li class="arg">
                         <code>paramToGet</code>
@@ -432,7 +435,7 @@ And if it&#39;s the case, add a validation step into mongoose</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/app_routes_controller.js.html#l330"><code>app&#x2F;routes&#x2F;controller.js:330</code></a>
+        <a href="../files/app_routes_controller.js.html#l219"><code>app&#x2F;routes&#x2F;controller.js:219</code></a>
         </p>
 
 
@@ -440,7 +443,104 @@ And if it&#39;s the case, add a validation step into mongoose</p>
     </div>
 
     <div class="description">
-        <p>Implement the http request : DELETE </br>
+        <p>Save an object in db, it&#39;s used for : PUT, PATCH and POST </br>
+Send a error to the client if the request failed, otherwise a json file to the client with the data</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">model</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>the data model object</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">res</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>the http response</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">req</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>the http request</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">paramToGet</code>
+                        <span class="type">String</span>
+
+
+                    <div class="param-description">
+                        <p>The property to retrieve on url to delete the object</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_delete" class="method item">
+    <h3 class="name"><code>delete</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>model</code>
+                </li>
+                <li class="arg">
+                        <code>res</code>
+                </li>
+                <li class="arg">
+                        <code>req</code>
+                </li>
+                <li class="arg">
+                        <code>paramToGet</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/app_routes_controller.js.html#l194"><code>app&#x2F;routes&#x2F;controller.js:194</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>delete the model, it&#39;s used for : DELETE </br>
 Delete an object </br>
 Send a error to the client if the request failed, otherwise a json file to the client with the data</p>
 
@@ -462,12 +562,23 @@ Send a error to the client if the request failed, otherwise a json file to the c
 
                 </li>
                 <li class="param">
-                        <code class="param-name">path</code>
-                        <span class="type">String</span>
+                        <code class="param-name">res</code>
+                        <span class="type">Object</span>
 
 
                     <div class="param-description">
-                        <p>the root path</p>
+                        <p>the http response</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">req</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>the http request</p>
 
                     </div>
 
@@ -503,6 +614,9 @@ Send a error to the client if the request failed, otherwise a json file to the c
                 <li class="arg">
                         <code>paramToGet</code>
                 </li>
+                <li class="arg">
+                        <code>reqType</code>
+                </li>
             </ul><span class="paren">)</span>
         </div>
 
@@ -516,7 +630,7 @@ Send a error to the client if the request failed, otherwise a json file to the c
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/app_routes_controller.js.html#l91"><code>app&#x2F;routes&#x2F;controller.js:91</code></a>
+        <a href="../files/app_routes_controller.js.html#l126"><code>app&#x2F;routes&#x2F;controller.js:126</code></a>
         </p>
 
 
@@ -524,9 +638,9 @@ Send a error to the client if the request failed, otherwise a json file to the c
     </div>
 
     <div class="description">
-        <p>Implement the http request : GET </br>
+        <p>Implement the http request : PUT, PATCH and DELETE</br>
 Get an object </br>
-Send a error to the client if the request failed, otherwise a json file to the client with the data requested</p>
+send a message to the client</p>
 
     </div>
 
@@ -563,6 +677,242 @@ Send a error to the client if the request failed, otherwise a json file to the c
 
                     <div class="param-description">
                         <p>The property to retrieve on url</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">reqType</code>
+                        <span class="type">String</span>
+
+
+                    <div class="param-description">
+                        <p>type of the http req (put, patch or head)</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_get" class="method item">
+    <h3 class="name"><code>get</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>model</code>
+                </li>
+                <li class="arg">
+                        <code>res</code>
+                </li>
+                <li class="arg">
+                        <code>req</code>
+                </li>
+                <li class="arg">
+                        <code>paramToGet</code>
+                </li>
+                <li class="arg">
+                        <code>reqType</code>
+                </li>
+                <li class="arg">
+                        <code>scope</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/app_routes_controller.js.html#l157"><code>app&#x2F;routes&#x2F;controller.js:157</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Update the model, it&#39;s used for : PUT and PATCH
+Get an object </br>
+send a message to the client</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">model</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>the data model object</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">res</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>the http response</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">req</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>the http request</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">paramToGet</code>
+                        <span class="type">String</span>
+
+
+                    <div class="param-description">
+                        <p>The property to retrieve on url</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">reqType</code>
+                        <span class="type">String</span>
+
+
+                    <div class="param-description">
+                        <p>type of the http req (put, patch or head)</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">scope</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>scope of the Controller</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_get" class="method item">
+    <h3 class="name"><code>get</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>model</code>
+                </li>
+                <li class="arg">
+                        <code>path</code>
+                </li>
+                <li class="arg">
+                        <code>paramToGet</code>
+                </li>
+                <li class="arg">
+                        <code>reqType</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/app_routes_controller.js.html#l91"><code>app&#x2F;routes&#x2F;controller.js:91</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Implement the http request : GET and HEAD</br>
+Get an object </br>
+Send a error to the client if the request failed, or a json file to the client with the data requested if it&#39;s an GET requerst </br>
+OR if it&#39;s a head request, send a http header</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">model</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>the data model object</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">path</code>
+                        <span class="type">String</span>
+
+
+                    <div class="param-description">
+                        <p>the root path</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">paramToGet</code>
+                        <span class="type">String</span>
+
+
+                    <div class="param-description">
+                        <p>The property to retrieve on url</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">reqType</code>
+                        <span class="type">String</span>
+
+
+                    <div class="param-description">
+                        <p>type of the http req (get or head)</p>
 
                     </div>
 
@@ -640,90 +990,6 @@ Used to dertermine if we call find() or findById()</p>
 
 
 </div>
-<div id="method_head" class="method item">
-    <h3 class="name"><code>head</code></h3>
-
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-                <li class="arg">
-                        <code>model</code>
-                </li>
-                <li class="arg">
-                        <code>path</code>
-                </li>
-                <li class="arg">
-                        <code>paramToGet</code>
-                </li>
-            </ul><span class="paren">)</span>
-        </div>
-
-
-
-
-
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/app_routes_controller.js.html#l124"><code>app&#x2F;routes&#x2F;controller.js:124</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Implement the http request : HEAD </br>
-Get a head of object </br>
-Send a error to the client if the request failed, otherwise a header will be sent</p>
-
-    </div>
-
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-                <li class="param">
-                        <code class="param-name">model</code>
-                        <span class="type">Object</span>
-
-
-                    <div class="param-description">
-                        <p>the data model object</p>
-
-                    </div>
-
-                </li>
-                <li class="param">
-                        <code class="param-name">path</code>
-                        <span class="type">String</span>
-
-
-                    <div class="param-description">
-                        <p>the root path</p>
-
-                    </div>
-
-                </li>
-                <li class="param">
-                        <code class="param-name">paramToGet</code>
-                        <span class="type">String</span>
-
-
-                    <div class="param-description">
-                        <p>The property to retrieve on url</p>
-
-                    </div>
-
-                </li>
-            </ul>
-        </div>
-
-
-
-</div>
 <div id="method_init" class="method item">
     <h3 class="name"><code>init</code></h3>
 
@@ -739,7 +1005,7 @@ Send a error to the client if the request failed, otherwise a header will be sen
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/app_routes_controller.js.html#l410"><code>app&#x2F;routes&#x2F;controller.js:410</code></a>
+        <a href="../files/app_routes_controller.js.html#l364"><code>app&#x2F;routes&#x2F;controller.js:364</code></a>
         </p>
 
 
@@ -752,90 +1018,6 @@ Retrieve all routes and thoose alias and add there into router</p>
 
     </div>
 
-
-
-
-</div>
-<div id="method_patch" class="method item">
-    <h3 class="name"><code>patch</code></h3>
-
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-                <li class="arg">
-                        <code>model</code>
-                </li>
-                <li class="arg">
-                        <code>path</code>
-                </li>
-                <li class="arg">
-                        <code>paramToGet</code>
-                </li>
-            </ul><span class="paren">)</span>
-        </div>
-
-
-
-
-
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/app_routes_controller.js.html#l283"><code>app&#x2F;routes&#x2F;controller.js:283</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Implement the http request : PATCH </br>
-Update an object partialy </br>
-Send a error to the client if the request failed, otherwise a json file to the client with the data</p>
-
-    </div>
-
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-                <li class="param">
-                        <code class="param-name">model</code>
-                        <span class="type">Object</span>
-
-
-                    <div class="param-description">
-                        <p>the data model object</p>
-
-                    </div>
-
-                </li>
-                <li class="param">
-                        <code class="param-name">path</code>
-                        <span class="type">String</span>
-
-
-                    <div class="param-description">
-                        <p>the root path</p>
-
-                    </div>
-
-                </li>
-                <li class="param">
-                        <code class="param-name">paramToGet</code>
-                        <span class="type">String</span>
-
-
-                    <div class="param-description">
-                        <p>The property to retrieve on url to update the object</p>
-
-                    </div>
-
-                </li>
-            </ul>
-        </div>
 
 
 
@@ -864,7 +1046,7 @@ Send a error to the client if the request failed, otherwise a json file to the c
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/app_routes_controller.js.html#l157"><code>app&#x2F;routes&#x2F;controller.js:157</code></a>
+        <a href="../files/app_routes_controller.js.html#l243"><code>app&#x2F;routes&#x2F;controller.js:243</code></a>
         </p>
 
 
@@ -900,90 +1082,6 @@ Send a error to the client if the request failed, otherwise a json file to the c
 
                     <div class="param-description">
                         <p>the root path</p>
-
-                    </div>
-
-                </li>
-            </ul>
-        </div>
-
-
-
-</div>
-<div id="method_put" class="method item">
-    <h3 class="name"><code>put</code></h3>
-
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-                <li class="arg">
-                        <code>model</code>
-                </li>
-                <li class="arg">
-                        <code>path</code>
-                </li>
-                <li class="arg">
-                        <code>paramToGet</code>
-                </li>
-            </ul><span class="paren">)</span>
-        </div>
-
-
-
-
-
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/app_routes_controller.js.html#l201"><code>app&#x2F;routes&#x2F;controller.js:201</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Implement the http request : PUT </br>
-Update an object in integrallity </br>
-Send a error to the client if the request failed, otherwise a json file to the client with the data</p>
-
-    </div>
-
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-                <li class="param">
-                        <code class="param-name">model</code>
-                        <span class="type">Object</span>
-
-
-                    <div class="param-description">
-                        <p>the data model object</p>
-
-                    </div>
-
-                </li>
-                <li class="param">
-                        <code class="param-name">path</code>
-                        <span class="type">String</span>
-
-
-                    <div class="param-description">
-                        <p>the root path</p>
-
-                    </div>
-
-                </li>
-                <li class="param">
-                        <code class="param-name">paramToGet</code>
-                        <span class="type">String</span>
-
-
-                    <div class="param-description">
-                        <p>The property to retrieve on url to update the object</p>
 
                     </div>
 

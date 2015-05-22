@@ -31,3 +31,47 @@ module.exports = {
     userDeleted         : userDeleted,
     success             : success
 };
+
+
+
+// /**
+// * Implement the http request : PUT </br>
+//
+//          _.each(_.omit(model.schema.paths, DEFAULT_PROP_MONGODB), function(val, key) {
+//
+//         value[key] = req.body[key];
+//
+//
+// /**
+// * Implement the http request : PATCH </br>
+
+//     //Find
+//
+//       //read each key, and update the model to save it on db
+//       _.each(req.body, function(value, key) {
+//
+//         //Assign value
+//         val[key] = value;
+//       });
+
+//Find
+//     model.findById(req.params[paramToGet], function(err, val) {
+//
+//       if (err) {
+//         res.send(err);
+//       }
+//
+//       //read each key, and update the model to save it on db
+//       _.each(req.body, function(value, key) {
+//
+//         //Assign value
+//         val[key] = value;
+//       });
+//
+//       // save the user and check for errors
+//       val.save(function(err) {
+//
+//         if (err) {
+//           res.send(err);
+//         }
+//         res.json(dm.success);

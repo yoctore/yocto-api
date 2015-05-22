@@ -189,7 +189,7 @@
         {
             "file": "app/routes/controller.js",
             "line": 91,
-            "description": "Implement the http request : GET </br>\nGet an object </br>\nSend a error to the client if the request failed, otherwise a json file to the client with the data requested",
+            "description": "Implement the http request : GET and HEAD</br>\nGet an object </br>\nSend a error to the client if the request failed, or a json file to the client with the data requested if it's an GET requerst </br>\nOR if it's a head request, send a http header",
             "itemtype": "method",
             "name": "get",
             "params": [
@@ -207,16 +207,21 @@
                     "name": "paramToGet",
                     "description": "The property to retrieve on url",
                     "type": "String"
+                },
+                {
+                    "name": "reqType",
+                    "description": "type of the http req (get or head)",
+                    "type": "String"
                 }
             ],
             "class": "ControllerRoutes"
         },
         {
             "file": "app/routes/controller.js",
-            "line": 124,
-            "description": "Implement the http request : HEAD </br>\nGet a head of object </br>\nSend a error to the client if the request failed, otherwise a header will be sent",
+            "line": 126,
+            "description": "Implement the http request : PUT, PATCH and DELETE</br>\nGet an object </br>\nsend a message to the client",
             "itemtype": "method",
-            "name": "head",
+            "name": "get",
             "params": [
                 {
                     "name": "model",
@@ -232,6 +237,11 @@
                     "name": "paramToGet",
                     "description": "The property to retrieve on url",
                     "type": "String"
+                },
+                {
+                    "name": "reqType",
+                    "description": "type of the http req (put, patch or head)",
+                    "type": "String"
                 }
             ],
             "class": "ControllerRoutes"
@@ -239,6 +249,106 @@
         {
             "file": "app/routes/controller.js",
             "line": 157,
+            "description": "Update the model, it's used for : PUT and PATCH\nGet an object </br>\nsend a message to the client",
+            "itemtype": "method",
+            "name": "get",
+            "params": [
+                {
+                    "name": "model",
+                    "description": "the data model object",
+                    "type": "Object"
+                },
+                {
+                    "name": "res",
+                    "description": "the http response",
+                    "type": "Object"
+                },
+                {
+                    "name": "req",
+                    "description": "the http request",
+                    "type": "Object"
+                },
+                {
+                    "name": "paramToGet",
+                    "description": "The property to retrieve on url",
+                    "type": "String"
+                },
+                {
+                    "name": "reqType",
+                    "description": "type of the http req (put, patch or head)",
+                    "type": "String"
+                },
+                {
+                    "name": "scope",
+                    "description": "scope of the Controller",
+                    "type": "Object"
+                }
+            ],
+            "class": "ControllerRoutes"
+        },
+        {
+            "file": "app/routes/controller.js",
+            "line": 194,
+            "description": "delete the model, it's used for : DELETE </br>\nDelete an object </br>\nSend a error to the client if the request failed, otherwise a json file to the client with the data",
+            "itemtype": "method",
+            "name": "delete",
+            "params": [
+                {
+                    "name": "model",
+                    "description": "the data model object",
+                    "type": "Object"
+                },
+                {
+                    "name": "res",
+                    "description": "the http response",
+                    "type": "Object"
+                },
+                {
+                    "name": "req",
+                    "description": "the http request",
+                    "type": "Object"
+                },
+                {
+                    "name": "paramToGet",
+                    "description": "The property to retrieve on url to delete the object",
+                    "type": "String"
+                }
+            ],
+            "class": "ControllerRoutes"
+        },
+        {
+            "file": "app/routes/controller.js",
+            "line": 219,
+            "description": "Save an object in db, it's used for : PUT, PATCH and POST </br>\nSend a error to the client if the request failed, otherwise a json file to the client with the data",
+            "itemtype": "method",
+            "name": "delete",
+            "params": [
+                {
+                    "name": "model",
+                    "description": "the data model object",
+                    "type": "Object"
+                },
+                {
+                    "name": "res",
+                    "description": "the http response",
+                    "type": "Object"
+                },
+                {
+                    "name": "req",
+                    "description": "the http request",
+                    "type": "Object"
+                },
+                {
+                    "name": "paramToGet",
+                    "description": "The property to retrieve on url to delete the object",
+                    "type": "String"
+                }
+            ],
+            "class": "ControllerRoutes"
+        },
+        {
+            "file": "app/routes/controller.js",
+            "line": 243,
             "description": "Implement the http request : POST </br>\nAdd a new Object in DB </br>\nSend a error to the client if the request failed, otherwise a json file to the client with the data",
             "itemtype": "method",
             "name": "post",
@@ -258,32 +368,7 @@
         },
         {
             "file": "app/routes/controller.js",
-            "line": 201,
-            "description": "Implement the http request : PUT </br>\nUpdate an object in integrallity </br>\nSend a error to the client if the request failed, otherwise a json file to the client with the data",
-            "itemtype": "method",
-            "name": "put",
-            "params": [
-                {
-                    "name": "model",
-                    "description": "the data model object",
-                    "type": "Object"
-                },
-                {
-                    "name": "path",
-                    "description": "the root path",
-                    "type": "String"
-                },
-                {
-                    "name": "paramToGet",
-                    "description": "The property to retrieve on url to update the object",
-                    "type": "String"
-                }
-            ],
-            "class": "ControllerRoutes"
-        },
-        {
-            "file": "app/routes/controller.js",
-            "line": 255,
+            "line": 280,
             "description": "Check if the parameter should not be empty </br>\nAnd if it's the case, add a validation step into mongoose",
             "itemtype": "method",
             "name": "checkModelValidation",
@@ -308,57 +393,7 @@
         },
         {
             "file": "app/routes/controller.js",
-            "line": 283,
-            "description": "Implement the http request : PATCH </br>\nUpdate an object partialy </br>\nSend a error to the client if the request failed, otherwise a json file to the client with the data",
-            "itemtype": "method",
-            "name": "patch",
-            "params": [
-                {
-                    "name": "model",
-                    "description": "the data model object",
-                    "type": "Object"
-                },
-                {
-                    "name": "path",
-                    "description": "the root path",
-                    "type": "String"
-                },
-                {
-                    "name": "paramToGet",
-                    "description": "The property to retrieve on url to update the object",
-                    "type": "String"
-                }
-            ],
-            "class": "ControllerRoutes"
-        },
-        {
-            "file": "app/routes/controller.js",
-            "line": 330,
-            "description": "Implement the http request : DELETE </br>\nDelete an object </br>\nSend a error to the client if the request failed, otherwise a json file to the client with the data",
-            "itemtype": "method",
-            "name": "delete",
-            "params": [
-                {
-                    "name": "model",
-                    "description": "the data model object",
-                    "type": "Object"
-                },
-                {
-                    "name": "path",
-                    "description": "the root path",
-                    "type": "String"
-                },
-                {
-                    "name": "paramToGet",
-                    "description": "The property to retrieve on url to delete the object",
-                    "type": "String"
-                }
-            ],
-            "class": "ControllerRoutes"
-        },
-        {
-            "file": "app/routes/controller.js",
-            "line": 362,
+            "line": 307,
             "description": "Add a route to the main router",
             "itemtype": "method",
             "name": "addRoute",
@@ -388,7 +423,7 @@
         },
         {
             "file": "app/routes/controller.js",
-            "line": 397,
+            "line": 351,
             "description": "Add a middleware",
             "itemtype": "method",
             "name": "addMidlleware",
@@ -396,7 +431,7 @@
         },
         {
             "file": "app/routes/controller.js",
-            "line": 410,
+            "line": 364,
             "description": "Initialise the controller </br>\nRetrieve all routes and thoose alias and add there into router",
             "itemtype": "method",
             "name": "init",
@@ -404,7 +439,7 @@
         },
         {
             "file": "app/routes/controller.js",
-            "line": 460,
+            "line": 415,
             "description": "Export current Controller to use it on node",
             "class": "ControllerRoutes"
         },
@@ -442,7 +477,7 @@
         },
         {
             "message": "Missing item type\nExport current Controller to use it on node",
-            "line": " app/routes/controller.js:460"
+            "line": " app/routes/controller.js:415"
         },
         {
             "message": "Missing item type\nCreator of message",
