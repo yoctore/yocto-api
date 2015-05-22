@@ -1,0 +1,19 @@
+{
+  "models" : {
+    "model" : {
+      "name"      : "product",
+      "properties" : {
+        "name"            : "String",
+        "reference"       : "String",
+        "availability_id" : ["ObjectId"],
+        "categorie_id"    : [{
+          "type" : "Number",
+          "required" : true
+          }]
+        }
+      }
+    },
+  "apidoc" : {
+    "type" : "tata"
+  }
+}

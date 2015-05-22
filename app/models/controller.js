@@ -2,9 +2,10 @@
 
 var _           = require('lodash');
 var mongoose    = require('mongoose');
-var models      = require('./models.json');
 var logger      = require('yocto-logger');
 var Schema      = mongoose.Schema;
+var path        = require('path');
+var glob        = require('glob');
 
 /**
  * Yocto API : Models Controller
@@ -72,15 +73,12 @@ Controller.prototype.init = function() {
 
   logger.info('[ ControllerModels.init ] - start');
 
-  // Read each model in models.json
-  _.each(models.models, function(model) {
+  _.each(_.words(glob.sync("./app/models/*.json", 'cwd'), /[^,,]+/g), function(file) {
 
-    //Read into each model
-    _.each(model, function(val, key) {
+    var jsonFile = require('./'+path.basename(file));
 
-      //Procces Model
-      this.addModel(key, val);
-    }, this);
+    this.addModel(jsonFile.models.model.name, jsonFile.models.model.properties);
+
   }, this);
 };
 
@@ -96,7 +94,7 @@ Controller.prototype.getModel = function(nameModel) {
 
     // return the model founded
     var index = _.findIndex(this.tabModel, { 'name': nameModel });
-    
+
     //Test if a model was found
     if (_.isUndefined(index) || (index >= 0)) {
       logger.info('[ ControllerModels.getModel ] - get Model of : ' + nameModel);

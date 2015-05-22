@@ -1,0 +1,14 @@
+{
+  "models" : {
+    "model" : {
+      "name"      : "store",
+      "properties" : {
+        "storeBrand_id"  : "String",
+        "name"           : "String"
+        }
+      }
+    },
+  "apidoc" : {
+    "type" : "tata"
+  }
+}

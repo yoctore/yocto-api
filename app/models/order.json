@@ -1,0 +1,15 @@
+{
+  "models" : {
+    "model" : {
+      "name"      : "order",
+      "properties" : {
+        "name"           : "String",
+        "product_id"     : ["ObjectId"],
+        "transaction_id" : "ObjectId"
+        }
+      }
+    },
+  "apidoc" : {
+    "type" : "tata"
+  }
+}

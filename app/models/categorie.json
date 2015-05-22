@@ -1,0 +1,14 @@
+{
+  "models" : {
+      "model" : {
+        "name"      : "categorie",
+        "properties" : {
+          "name"          : "String",
+          "categorie_id"  : ["ObjectId"]
+        }
+      }
+    },
+  "apidoc" : {
+    "type" : "toto"
+  }
+}

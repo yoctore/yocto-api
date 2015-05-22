@@ -1,0 +1,15 @@
+{
+  "models" : {
+    "model" : {
+      "name"      : "transaction",
+      "properties" : {
+        "state"     : "String",
+        "bill_id"   : "ObjectId",
+        "order_id"  : "ObjectId"
+        }
+      }
+    },
+  "apidoc" : {
+    "type" : "tata"
+  }
+}

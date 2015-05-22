@@ -1,0 +1,15 @@
+{
+  "models" : {
+      "model" : {
+        "name"      : "availability",
+        "properties" : {
+          "state"       : "String",
+          "store_id"    : ["ObjecId"],
+          "product_id"  : "ObjectId"
+        }
+      }
+    },
+  "apidoc" : {
+    "type" : "toto"
+  }
+}

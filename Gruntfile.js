@@ -34,6 +34,16 @@
      },
 
      /**
+      * @submodule apidoc
+      */
+      apidoc: {
+         myapp: {
+           src: "app/",
+           dest: "apidoc/"
+         }
+       },
+
+     /**
       * Yuidoc permit to generate the yuidoc of the Yocto Stack Generator
       *
       * @submodule yuidoc
@@ -56,7 +66,8 @@
    // Load the plugins
    grunt.loadNpmTasks('grunt-contrib-jshint');
    grunt.loadNpmTasks('grunt-contrib-yuidoc');
+   grunt.loadNpmTasks('grunt-apidoc');
 
    // register task
-   grunt.registerTask('default', [ 'jshint', 'yuidoc']);
+   grunt.registerTask('default', [ 'jshint', 'yuidoc', 'apidoc']);
  };

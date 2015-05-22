@@ -1,0 +1,16 @@
+{
+  "models" : {
+      "model" : {
+        "name"      : "user",
+        "properties" : {
+          "name"      : "String",
+          "firstname" : "String",
+          "email"     : "String",
+          "cart_id"   : ["ObjectId"]
+        }
+      }
+    },
+  "apidoc" : {
+    "type" : "toto"
+  }
+}

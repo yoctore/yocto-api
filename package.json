@@ -21,6 +21,7 @@
   "dependencies": {
     "body-parser": "~1.0.1",
     "express": "~4.0.0",
+    "glob": "^5.0.7",
     "joi": "^6.4.1",
     "lodash": "^3.8.0",
     "mongoose": "~3.6.13",
@@ -28,10 +29,15 @@
   },
   "devDependencies": {
     "grunt": "~0.4.5",
+    "grunt-apidoc": "^0.10.1",
     "grunt-contrib-copy": "^0.8.0",
     "grunt-contrib-jshint": "~0.10.0",
     "grunt-contrib-nodeunit": "~0.4.1",
     "grunt-contrib-uglify": "~0.5.0",
     "grunt-contrib-yuidoc": "^0.7.0"
+  },
+  "apidoc": {
+    "title": "Yocto Rest Api",
+    "url": "git+ssh:://git@lab.yocto.digital:yocto-tools/yocto-api.git"
   }
 }
