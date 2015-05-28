@@ -3,13 +3,122 @@
     "model" : {
       "name"      : "transaction",
       "properties" : {
-        "state"     : "String",
+        "state"     : {
+          "type" : "String",
+          "required" : true
+        },
         "bill_id"   : "ObjectId",
         "order_id"  : "ObjectId"
-        }
       }
-    },
+    }
+  },
   "apidoc" : {
-    "type" : "tata"
+    "methods" : [
+      {
+        "apiVersion"    : "0.1.0",
+        "type"          : "get",
+        "title"         : "GET transaction(s)",
+        "path"          : "/transaction/:transaction_id",
+        "apiPermission"  : "admin",
+        "addDefaultParamFromModel" : false,
+        "methodDescription" : "Method to retrieve one or all transaction, if you want get one transaction you should specify his id, otherwise the whole transactions are returned",
+        "specificParam" : [
+          {
+            "name"  : "transaction_id",
+            "type"  : "Object_id"
+          }
+        ],
+        "apiSuccessExample" : {
+          "name"    : "Success-Response",
+          "addDefaultParamFromModel" : true,
+          "example" : {
+            "header"  : "HTTP/1.1 200 OK"
+          }
+        },
+        "apiErrorExample" : "notFound"
+      },
+      {
+        "apiVersion"    : "0.1.0",
+        "type"          : "head",
+        "title"         : "HEAD of transaction(s)",
+        "path"          : "/transaction/:transaction_id",
+        "apiPermission"  : "admin",
+        "methodDescription" : "Method to retrieve the header of one or all transaction, if you want get  the header of one transaction you should specify his id, otherwise the header of whole transactions are returned",
+        "addDefaultParamFromModel" : false,
+        "specificParam" : [
+          {
+            "name"  : "transaction_id",
+            "type"  : "Object_id"
+          }
+        ],
+        "apiSuccessExample" : "none",
+        "apiErrorExample" : "notFound"
+      },
+      {
+        "apiVersion" : "0.1.0",
+        "type"      : "post",
+        "path"      : "/transaction/",
+        "methodDescription" : "Method to add a new transaction in database",
+        "title"         : "POST one transaction",
+        "apiPermission"  : "admin",
+        "specificParam" : [],
+        "apiSuccessExample" : "success",
+        "apiErrorExample" : "notFound"
+      },
+      {
+        "apiVersion"    : "0.1.0",
+        "type"          : "delete",
+        "title"         : "DELETE one transaction",
+        "path"          : "/transaction/:transaction_id",
+        "apiPermission"  : "admin",
+        "methodDescription" : "Method to delete a transaction in database",
+        "addDefaultParamFromModel" : false,
+        "specificParam" : [
+          {
+            "name"  : "transaction_id",
+            "type"  : "Object_id",
+            "required" : true
+          }
+        ],
+        "apiSuccessExample" : "success",
+        "apiErrorExample" : "notFound"
+      },
+      {
+        "apiVersion"    : "0.1.0",
+        "type"          : "patch",
+        "title"         : "PATCH one transaction",
+        "path"          : "/transaction/:transaction_id",
+        "apiPermission"  : "admin",
+        "methodDescription" : "Method to patch a specific param to transaction in database",
+        "addDefaultParamFromModel" : true,
+        "specificParam" : [
+          {
+            "name"  : "transaction_id",
+            "type"  : "Object_id",
+            "required" : true
+          }
+        ],
+        "apiSuccessExample" : "success",
+        "apiErrorExample" : "notFound"
+      },
+      {
+        "apiVersion"    : "0.1.0",
+        "type"          : "put",
+        "title"         : "PUT one transaction",
+        "path"          : "/transaction/:transaction_id",
+        "apiPermission"  : "admin",
+        "methodDescription" : "Method to put all property of a transaction in database",
+        "addDefaultParamFromModel" : true,
+        "specificParam" : [
+          {
+            "name"  : "transaction_id",
+            "type"  : "Object_id",
+            "required" : true
+          }
+        ],
+        "apiSuccessExample" : "success",
+        "apiErrorExample" : "notFound"
+      }
+    ]
   }
 }

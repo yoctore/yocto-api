@@ -1,15 +1,10 @@
 {
   "models" : {
-    "model" : {
-      "name"      : "store",
-      "properties" : {
-        "storeBrand_id"  : "String",
-        "name"           : {
-          "type" : "String",
-          "required" : true
-          }
-
-
+      "model" : {
+        "name"      : "category",
+        "properties" : {
+          "name"          : "String",
+          "category_id"  : ["ObjectId"]
         }
       }
     },
@@ -18,14 +13,14 @@
         {
           "apiVersion"    : "0.1.0",
           "type"          : "get",
-          "title"         : "GET store(s)",
-          "path"          : "/store/:store_id",
+          "title"         : "GET category(s)",
+          "path"          : "/category/:category_id",
           "apiPermission"  : "admin",
           "addDefaultParamFromModel" : false,
-          "methodDescription" : "Method to retrieve one or all store, if you want get one store you should specify his id, otherwise the whole stores are returned",
+          "methodDescription" : "Method to retrieve one or all category, if you want get one category you should specify his id, otherwise the whole categorys are returned",
           "specificParam" : [
             {
-              "name"  : "store_id",
+              "name"  : "category_id",
               "type"  : "Object_id"
             }
           ],
@@ -41,14 +36,14 @@
         {
           "apiVersion"    : "0.1.0",
           "type"          : "head",
-          "title"         : "HEAD of store(s)",
-          "path"          : "/store/:store_id",
+          "title"         : "HEAD of category(s)",
+          "path"          : "/category/:category_id",
           "apiPermission"  : "admin",
-          "methodDescription" : "Method to retrieve the header of one or all store, if you want get  the header of one store you should specify his id, otherwise the header of whole stores are returned",
+          "methodDescription" : "Method to retrieve the header of one or all category, if you want get  the header of one category you should specify his id, otherwise the header of whole categorys are returned",
           "addDefaultParamFromModel" : false,
           "specificParam" : [
             {
-              "name"  : "store_id",
+              "name"  : "category_id",
               "type"  : "Object_id"
             }
           ],
@@ -58,9 +53,9 @@
         {
           "apiVersion" : "0.1.0",
           "type"      : "post",
-          "path"      : "/store/",
-          "methodDescription" : "Method to add a new store in database",
-          "title"         : "POST one store",
+          "path"      : "/category/",
+          "methodDescription" : "Method to add a new category in database",
+          "title"         : "POST one category",
           "apiPermission"  : "admin",
           "specificParam" : [],
           "apiSuccessExample" : "success",
@@ -69,16 +64,15 @@
         {
           "apiVersion"    : "0.1.0",
           "type"          : "delete",
-          "title"         : "DELETE one store",
-          "path"          : "/store/:store_id",
+          "title"         : "DELETE one category",
+          "path"          : "/category/:category_id",
           "apiPermission"  : "admin",
-          "methodDescription" : "Method to delete a store in database",
+          "methodDescription" : "Method to delete a category in database",
           "addDefaultParamFromModel" : false,
           "specificParam" : [
             {
-              "name"  : "store_id",
-              "type"  : "Object_id",
-              "required" : true
+              "name"  : "category_id",
+              "type"  : "Object_id"
             }
           ],
           "apiSuccessExample" : "success",
@@ -87,16 +81,15 @@
         {
           "apiVersion"    : "0.1.0",
           "type"          : "patch",
-          "title"         : "PATCH one store",
-          "path"          : "/store/:store_id",
+          "title"         : "PATCH one category",
+          "path"          : "/category/:category_id",
           "apiPermission"  : "admin",
-          "methodDescription" : "Method to patch a specific param to store in database",
+          "methodDescription" : "Method to patch a specific param to category in database",
           "addDefaultParamFromModel" : true,
           "specificParam" : [
             {
-              "name"  : "store_id",
-              "type"  : "Object_id",
-              "required" : true
+              "name"  : "category_id",
+              "type"  : "Object_id"
             }
           ],
           "apiSuccessExample" : "success",
@@ -105,16 +98,15 @@
         {
           "apiVersion"    : "0.1.0",
           "type"          : "put",
-          "title"         : "PUT one store",
-          "path"          : "/store/:store_id",
+          "title"         : "PUT one category",
+          "path"          : "/category/:category_id",
           "apiPermission"  : "admin",
-          "methodDescription" : "Method to put all property of a store in database",
+          "methodDescription" : "Method to put all property of a category in database",
           "addDefaultParamFromModel" : true,
           "specificParam" : [
             {
-              "name"  : "store_id",
-              "type"  : "Object_id",
-              "required" : true
+              "name"  : "category_id",
+              "type"  : "Object_id"
             }
           ],
           "apiSuccessExample" : "success",

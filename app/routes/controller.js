@@ -32,11 +32,14 @@ var routeJoiSchema = joi.object().keys({
 *
 * It read a jsonfile and create each route
 *
+* Cors Express is enable to permit test with apidocjs
+*
 * For more details on these dependencies read links below :
 * - LodAsh : https://lodash.com/
 * - yocto-logger : git+ssh://lab.yocto.digital:yocto-node-modules/yocto-utils.git
 * - express : http://expressjs.com/
 * - joi : https://github.com/hapijs/joi#array
+*
 *
 *
 * @date : 11/05/2015
@@ -356,6 +359,22 @@ Controller.prototype.addRoute = function(path, nameModel, reqExcluded, paramToRe
 Controller.prototype.addMidlleware = function() {
 
   this.router.use(function(req, res, next) {
+
+    logger.debug('[ ControllerRoutes.Middleware ] - incoming request');
+
+    // Enable exoress CORS
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
+
+    //Read all property of the request and delete all property that have an empty value
+    _.each(req.body, function(value, key) {
+
+      if(_.isEmpty(value))
+      {
+        delete req.body[key];
+      }
+    });
 
     next(); // make sure we go to the next routes and don't stop here
   });

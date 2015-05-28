@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>app/testAPIDoc.js - yocto-api</title>
+    <title>apiDoc.js - yocto-api</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -76,36 +76,28 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-<h1 class="file-heading">File: app/testAPIDoc.js</h1>
+<h1 class="file-heading">File: apiDoc.js</h1>
 
 <div class="file">
     <pre class="code prettyprint linenums">
-/**
- * @api {get} /user/:id Request User information
- * @apiName GetUser
- * @apiGroup User
- *
- * @apiParam {Number} id Users unique ID.
- *
- * @apiSuccess {String} firstname Firstname of the User.
- * @apiSuccess {String} lastname  Lastname of the User.
- *
- * @apiSuccessExample Success-Response:
- *     HTTP/1.1 200 OK
- *     {
- *       &quot;firstname&quot;: &quot;John&quot;,
- *       &quot;lastname&quot;: &quot;Doe&quot;
- *     }
- *
- * @apiError UserNotFound The id of the User was not found.
- *
- * @apiErrorExample Error-Response:
- *     HTTP/1.1 404 Not Found
- *     {
- *       &quot;error&quot;: &quot;UserNotFound&quot;
- *     }
- */
-
+/** 
+* @api {get} /user/:id Request for get information about one or more User
+* @apiname GetUser 
+* @apiGroup User
+* 
+* @apiParam {Number} id User unique ID
+* 
+* @apiSuccess {String} firstname Firstname of the User 
+* @apiSuccess {String} lastname Lastname of the User 
+* 
+* @apiSuccessExample Success-Response: 
+*  HTTP/1.1 200 OK 
+*  { 
+*       firstname : John, 
+*       lastname  : Doe 
+*  } 
+* 
+*/
     </pre>
 </div>
                     </div>

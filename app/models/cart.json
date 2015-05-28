@@ -3,13 +3,122 @@
     "model" : {
       "name"      : "cart",
       "properties" : {
-        "name"        : "String",
+        "name"        : {
+          "type" : "String",
+          "required" : true
+        },
         "product_id"  : ["ObjectId"],
         "order_id"    : "ObjectId"
         }
       }
     },
-  "apidoc" : {
-    "type" : "tata"
-  }
+    "apidoc" : {
+      "methods" : [
+        {
+          "apiVersion"    : "0.1.0",
+          "type"          : "get",
+          "title"         : "GET cart(s)",
+          "path"          : "/cart/:cart_id",
+          "apiPermission"  : "admin",
+          "addDefaultParamFromModel" : false,
+          "methodDescription" : "Method to retrieve one or all cart, if you want get one cart you should specify his id, otherwise the whole carts are returned",
+          "specificParam" : [
+            {
+              "name"  : "cart_id",
+              "type"  : "Object_id"
+            }
+          ],
+          "apiSuccessExample" : {
+            "name"    : "Success-Response",
+            "addDefaultParamFromModel" : true,
+            "example" : {
+              "header"  : "HTTP/1.1 200 OK"
+            }
+          },
+          "apiErrorExample" : "notFound"
+        },
+        {
+          "apiVersion"    : "0.1.0",
+          "type"          : "head",
+          "title"         : "HEAD of cart(s)",
+          "path"          : "/cart/:cart_id",
+          "apiPermission"  : "admin",
+          "methodDescription" : "Method to retrieve the header of one or all cart, if you want get  the header of one cart you should specify his id, otherwise the header of whole carts are returned",
+          "addDefaultParamFromModel" : false,
+          "specificParam" : [
+            {
+              "name"  : "cart_id",
+              "type"  : "Object_id"
+            }
+          ],
+          "apiSuccessExample" : "none",
+          "apiErrorExample" : "notFound"
+        },
+        {
+          "apiVersion" : "0.1.0",
+          "type"      : "post",
+          "path"      : "/cart/",
+          "methodDescription" : "Method to add a new cart in database",
+          "title"         : "POST one cart",
+          "apiPermission"  : "admin",
+          "specificParam" : [],
+          "apiSuccessExample" : "success",
+          "apiErrorExample" : "notFound"
+        },
+        {
+          "apiVersion"    : "0.1.0",
+          "type"          : "delete",
+          "title"         : "DELETE one cart",
+          "path"          : "/cart/:cart_id",
+          "apiPermission"  : "admin",
+          "methodDescription" : "Method to delete a cart in database",
+          "addDefaultParamFromModel" : false,
+          "specificParam" : [
+            {
+              "name"  : "cart_id",
+              "type"  : "Object_id",
+              "required" : true
+            }
+          ],
+          "apiSuccessExample" : "success",
+          "apiErrorExample" : "notFound"
+        },
+        {
+          "apiVersion"    : "0.1.0",
+          "type"          : "patch",
+          "title"         : "PATCH one cart",
+          "path"          : "/cart/:cart_id",
+          "apiPermission"  : "admin",
+          "methodDescription" : "Method to patch a specific param to cart in database",
+          "addDefaultParamFromModel" : true,
+          "specificParam" : [
+            {
+              "name"  : "cart_id",
+              "type"  : "Object_id",
+              "required" : true
+            }
+          ],
+          "apiSuccessExample" : "success",
+          "apiErrorExample" : "notFound"
+        },
+        {
+          "apiVersion"    : "0.1.0",
+          "type"          : "put",
+          "title"         : "PUT one cart",
+          "path"          : "/cart/:cart_id",
+          "apiPermission"  : "admin",
+          "methodDescription" : "Method to put all property of a cart in database",
+          "addDefaultParamFromModel" : true,
+          "specificParam" : [
+            {
+              "name"  : "cart_id",
+              "type"  : "Object_id",
+              "required" : true
+            }
+          ],
+          "apiSuccessExample" : "success",
+          "apiErrorExample" : "notFound"
+        }
+      ]
+    }
 }

@@ -1,0 +1,149 @@
+#All line which start with '#' is a comment
+
+@api {<%= type %>} <%= path %> <%= title %>
+@apigroup <%= model.name %>
+@apiVersion <%= apiVersion %>
+@apiPermission <%= apiPermission %>
+@apiDescription <%= methodDescription %>
+
+#Add all params that is in specificParam
+<% if (typeof specificParam !== 'undefined') { %>
+  <% if (specificParam.length > 0) { %>
+    <% specificParam.forEach(function(param) { %>
+      <% if (typeof param.required !== 'undefined') { %>
+        <% if ( param.required === true || param.required === 'true') { %>
+          <% if (Object.prototype.toString.call(param.type) == '[object Array]') { %>
+            @apiParam {[<%-param.type%>]} <%- param.name %>  <%- param.name %>(s) of the <%= model.name %>
+          <% } else { %>
+            @apiParam {<%-param.type%>} <%- param.name %>  <%- param.name %>(s) of the <%= model.name %>
+          <% } %>
+        <% } else { %>
+          <% if (Object.prototype.toString.call(param.type) == '[object Array]') { %>
+            @apiParam {[<%-param.type%>]} [<%- param.name %>]  <%- param.name %>(s) of the <%= model.name %>
+          <% } else { %>
+            @apiParam {<%-param.type%>} [<%- param.name %>]  <%- param.name %>(s) of the <%= model.name %>
+          <% } %>
+        <% } %>
+      <% } else { %>
+        @apiParam {<%-param.type%>} [<%- param.name %>]  <%- param.name %>(s) of the <%= model.name %>
+      <% } %>
+    <% }); %>
+  <% } %>
+<% } %>
+
+<% if (typeof addDefaultParamFromModel !== 'undefined') { %>
+  <% if ( addDefaultParamFromModel === true || addDefaultParamFromModel === 'true') { %>
+    <% for(var key in model.properties) { %>
+      <% if (Object.prototype.toString.call(model.properties[key]) == '[object Array]') { %>
+        <% if (Object.prototype.toString.call(model.properties[key][0]) == '[object Object]') { %>
+          @apiParam {[<%-model.properties[key][0].type%>]} <%- key %>  <%- key %>(s) of the <%= model.name %>
+        <% } else { %>
+          @apiParam {[<%-model.properties[key]%>]} [<%- key %>]  <%- key %>(s) of the <%= model.name %>
+        <% } %>
+      <% } else if (Object.prototype.toString.call(model.properties[key]) == '[object Object]' ) { %>
+        <% if ((model.properties[key].required === true || model.properties[key].required === 'true') && type !== 'patch') { %>
+            @apiParam {<%-model.properties[key].type%>} <%- key %> <%- key %> of the <%= model.name %>
+          <% } else { %>
+            @apiParam {<%-model.properties[key].type%>} [<%- key %>] <%- key %> of the <%= model.name %>
+          <%  } %>
+      <% } else { %>
+        @apiParam {<%-model.properties[key]%>} [<%- key %>] <%- key %> of the <%= model.name %>
+      <% } %>
+    <% } %>
+  <% } %>
+<% } else { %>
+  <% for(var key in model.properties) { %>
+    <% if (Object.prototype.toString.call(model.properties[key]) == '[object Array]') { %>
+      <% if (Object.prototype.toString.call(model.properties[key][0]) == '[object Object]') { %>
+        @apiParam {[<%-model.properties[key][0].type%>]} <%- key %>  <%- key %>(s) of the <%= model.name %>
+      <% } else { %>
+        @apiParam {[<%-model.properties[key]%>]} [<%- key %>]  <%- key %>(s) of the <%= model.name %>
+      <% } %>
+    <% } else if (Object.prototype.toString.call(model.properties[key]) == '[object Object]') { %>
+      <% if ((model.properties[key].required === true || model.properties[key].required === 'true' ) && type !== 'patch') { %>
+          @apiParam {<%-model.properties[key].type%>} <%- key %> <%- key %> of the <%= model.name %>
+      <% } else { %>
+        @apiParam {<%-model.properties[key].type%>} [<%- key %>] <%- key %> of the <%= model.name %>
+      <%  } %>
+    <% } else { %>
+      @apiParam {<%-model.properties[key]%>} [<%- key %>] <%- key %> of the <%= model.name %>
+    <% } %>
+  <% } %>
+<% } %>
+
+#<% apiSuccess.forEach(function(success) { %>
+#@apiSuccess {<%= success.type %>} <%= success.name %> <%= success.description %>
+#<% }); %>
+
+#@apiSuccessExample <%= apiSuccessExample.name %>:
+#<%= apiSuccessExample.example.header %>
+#<%- JSON.stringify(apiSuccessExample.example.content, null, "*   ") %>
+
+#handle API SUCCESS
+<% if (typeof apiSuccessExample !== 'undefined') { %>
+
+  #//Case or apiSuccessExample is an object
+  <% if (Object.prototype.toString.call(apiSuccessExample) == '[object Object]') { %>
+
+    #test if we add default succes param based on model
+    <% if (typeof apiSuccessExample.addDefaultParamFromModel !== 'undefined') { %>
+      <% if ( apiSuccessExample.addDefaultParamFromModel === true || apiSuccessExample.addDefaultParamFromModel === 'true') { %>
+        <% for(var key in model.properties) { %>
+
+          <% if (Object.prototype.toString.call(model.properties[key]) == '[object Array]') { %>
+
+            <% if (Object.prototype.toString.call(model.properties[key][0]) == '[object Object]') { %>
+              @apiSuccess {[<%-model.properties[key][0].type%>]} <%- key %>  <%- key %>(s) of the <%= model.name %>
+            <% } else { %>
+              @apiSuccess {[<%-model.properties[key]%>]} [<%- key %>]  <%- key %>(s) of the <%= model.name %>
+            <% } %>
+
+            <% } else if (Object.prototype.toString.call(model.properties[key]) == '[object Object]') { %>
+              <% if (model.properties[key].required === true || model.properties[key].required === 'true') { %>
+                  @apiSuccess {<%-model.properties[key].type%>} <%- key %> <%- key %> of the <%= model.name %>
+              <%  } %>
+
+          <% } else { %>
+            @apiSuccess {<%-model.properties[key]%>} <%- key %> <%- key %> of the <%= model.name %>
+          <% } %>
+        <% } %>
+
+        @apiSuccessExample {json}<%= apiSuccessExample.name %>
+        <%= apiSuccessExample.example.header %>:
+        {
+        <% for(var key in model.properties) { %><% if (Object.prototype.toString.call(model.properties[key]) == '[object Array]') { %><% if (Object.prototype.toString.call(model.properties[key][0]) == '[object Object]') { %>
+          "<%- key %>" : ["<%= model.properties[key].type %>"]
+          <% } else { %>
+          "<%- key %>" : ["<%= model.properties[key] %>"]
+          <% } %><% } else { %>"<%- key %>" : "<%= model.properties[key] %>"<% } %><% } %>
+        }
+    <% } %>
+  <% } %>
+
+  #Case is a normal success
+  <% } else if (apiSuccessExample === 'success') { %>
+
+    @apiSuccessExample <%= model.name %>Success-Response:
+    HTTP/1.1 200 OK
+    {
+      "message" : "request success"
+    }
+
+    @apiSuccess {String} message request success
+
+  <% } %>
+<% } %>
+
+<% if (typeof apiErrorExample !== 'undefined') { %>
+  <% if (apiErrorExample === 'notFound') { %>
+
+    @apiErrorExample <%= model.name %>NotFound:
+    HTTP/1.1 400
+    {
+      "error" : " Failed <%= type %> a <%= model.name %>"
+    }
+
+    @apiError {String} error Failed <%= type %> a <%= model.name %>
+
+  <% } %>
+<% } %>

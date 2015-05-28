@@ -27,16 +27,16 @@
       "requestExcluded"     : ["post"]
     },
     {
-      "path"              : "/categories",
-      "alias"             : ["/categorie"],
-      "model"             : "categorie",
+      "path"              : "/categorys",
+      "alias"             : ["/category"],
+      "model"             : "category",
       "requestExcluded"   : ["put", "delete" , "patch"]
     },
     {
-      "path"                : "/categories/:categorie_id",
-      "alias"               : ["/categorie/:categorie_id"],
-      "model"               : "categorie",
-      "paramToRetrieve"     : ["categorie_id"],
+      "path"                : "/categorys/:category_id",
+      "alias"               : ["/category/:category_id"],
+      "model"               : "category",
+      "paramToRetrieve"     : ["category_id"],
       "requestExcluded"     : ["post"]
     },
     {

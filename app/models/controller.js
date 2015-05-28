@@ -73,12 +73,14 @@ Controller.prototype.init = function() {
 
   logger.info('[ ControllerModels.init ] - start');
 
+  //Get all json file in repoitory models
   _.each(_.words(glob.sync("./app/models/*.json", 'cwd'), /[^,,]+/g), function(file) {
 
+    //Import the file
     var jsonFile = require('./'+path.basename(file));
 
+    //Add the model in the main array
     this.addModel(jsonFile.models.model.name, jsonFile.models.model.properties);
-
   }, this);
 };
 
