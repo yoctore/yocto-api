@@ -49,7 +49,7 @@ module.exports = function(grunt) {
     },
 
     /**
-    * Yuidoc permit to generate the yuidoc of the Yocto Stack Generator
+    * Yuidoc permit to generate the yuidoc
     *
     * @submodule yuidoc
     */
