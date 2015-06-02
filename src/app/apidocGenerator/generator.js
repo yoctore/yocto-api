@@ -7,6 +7,8 @@ var path              = require('path');
 var logger            = require('yocto-logger');
 var ejs               = require('ejs');
 var lineByLineReader  = require('line-by-line');
+var conf              = require('../../../package.json');
+
 
 /**
  * Generator of comments for apidocjs (www.apidocjs.com)
@@ -34,8 +36,8 @@ var lineByLineReader  = require('line-by-line');
  */
 
 
-var lineReader  = new lineByLineReader('./app/apidocGenerator/template/methods');
-var PATH_APIDOC = './app/apidocGenerator/temp/apiDoc.js';
+var lineReader  = new lineByLineReader('./src/app/apidocGenerator/template/methods');
+var PATH_APIDOC = './src/app/apidocGenerator/temp/apiDoc.js';
 var commentFile = '';
 var template    = '/**\n';
 
@@ -61,11 +63,11 @@ lineReader.on('end', function() {
     template += '*/';
 
     //Get each json file that are on the models repository
-    _.each(_.words(glob.sync("./app/models/*.json", 'cwd'), /[^,,]+/g), function(file) {
+    _.each(_.words(glob.sync( conf.apidoc.pathFolderModels+'*.json'), /[^,,]+/g), function(file) {
 
+      console.log( '\n -- file : ' + file);
       //Get json file
-      var jsonModel = require('../models/' + path.basename(file));
-
+      var jsonModel = JSON.parse(fs.readFileSync(file, 'utf-8'));
       //Create the doc
       createApiFile(template, jsonModel);
     });

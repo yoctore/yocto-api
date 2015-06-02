@@ -20,7 +20,7 @@ module.exports = function(grunt) {
 
     execute: {
       target : {
-        src: ['./app/apidocGenerator/generator.js']
+        src: ['./src/app/apidocGenerator/generator.js']
       }
     },
 
@@ -34,8 +34,8 @@ module.exports = function(grunt) {
         yui : true,
       },
       all : [ 'server.js',
-      'app/**/*.js',
-      'app/**/*.json'
+      'src/app/**/*.js',
+      'src/app/**/*.json'
     ]},
 
     /**
@@ -43,7 +43,7 @@ module.exports = function(grunt) {
     */
     apidoc: {
       myapp: {
-        src: "app/apidocGenerator/temp/",
+        src: "src/app/apidocGenerator/temp/",
         dest: "apidoc/"
       }
     },

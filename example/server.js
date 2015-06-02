@@ -3,7 +3,7 @@
 var express    = require('express'); // Load express
 var bodyParser = require('body-parser'); // load bodyparser
 var mongoose   = require('mongoose'); // Load the mongodb driver
-var routes     = require('../app/routes/controller.js'); // Load the api
+var routes     = require('../src/app/routes/controller.js'); // Load the api
 var app        = express(); // Create app
 var path     = require('path');
 var fs        = require('fs');

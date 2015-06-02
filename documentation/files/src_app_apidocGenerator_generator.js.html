@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>app/defaultMessage.js - yocto-api</title>
+    <title>src/app/apidocGenerator/generator.js - yocto-api</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -76,42 +76,108 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-<h1 class="file-heading">File: app/defaultMessage.js</h1>
+<h1 class="file-heading">File: src/app/apidocGenerator/generator.js</h1>
 
 <div class="file">
     <pre class="code prettyprint linenums">
+&#x27;use strict&#x27;;
+
+var _                 = require(&#x27;lodash&#x27;);
+var glob              = require(&#x27;glob&#x27;);
+var fs                = require(&#x27;fs&#x27;);
+var path              = require(&#x27;path&#x27;);
+var logger            = require(&#x27;yocto-logger&#x27;);
+var ejs               = require(&#x27;ejs&#x27;);
+var lineByLineReader  = require(&#x27;line-by-line&#x27;);
+var conf              = require(&#x27;../../../package.json&#x27;);
+
+
 /**
- * Creator of message
+ * Generator of comments for apidocjs (www.apidocjs.com)
+ *
+ * This generator will generate a comments file based on an EJS template and lot of model (define in json)
+ *
+ * The comments file once generated will be execute in a apidocjs process for generate an Api Web Documentation
+ *
+ * Apidocjs will provide also an interface for testing all REST request
+ *
+ *
+ * For more details on these dependencies read links below :
+ * - LodAsh : https://lodash.com/
+ * - yocto-logger : git+ssh://lab.yocto.digital:yocto-node-modules/yocto-utils.git
+ * - glob : https://www.npmjs.com/package/glob
+ * - fs : https://nodejs.org/api/fs.html
+ * - path : https://nodejs.org/api/path.html
+ * - ejs : https://www.npmjs.com/package/ejs
+ * - lineByLineReader : https://www.npmjs.com/package/line-by-line
+ *
+ *
+ * @date : 26/05/2015
+ * @author : BALARD, Cédric cedric@yocto.re
+ * @copyright : YOCTO SAS, All rights reversed &lt;http://www.yocto.re&gt;
  */
 
-var _   = require(&#x27;lodash&#x27;);
 
-var defaultMessage = {
-    code    : &#x27;&#x27;,
-    message : &#x27;&#x27;,
-    data    : {}
-};
+var lineReader  = new lineByLineReader(&#x27;./src/app/apidocGenerator/template/methods&#x27;);
+var PATH_APIDOC = &#x27;./src/app/apidocGenerator/temp/apiDoc.js&#x27;;
+var commentFile = &#x27;&#x27;;
+var template    = &#x27;/**\n&#x27;;
 
-var code200 = _.merge(defaultMessage, { code : &#x27;200&#x27; });
+//Delete the commentFile if exist
+if (fs.existsSync(PATH_APIDOC)) {
 
-var newMessage = function(codeMessage, messageText) {
-    var codeTemp = _.clone(codeMessage);
-    return _.merge(codeTemp, { message : messageText });
-};
+  logger.info(&#x27;delete file apidoc file&#x27;);
+  fs.unlinkSync(PATH_APIDOC);
+}
 
-var welcome     = newMessage(code200, &#x27;Welcome to the api&#x27;);
-var userCreated = newMessage(code200, &#x27;User was created with success&#x27;);
-var userUpdated = newMessage(code200, &#x27;User was updated with success&#x27;);
-var userDeleted = newMessage(code200, &#x27;User was deleted with success&#x27;);
-var success     = newMessage(code200, &#x27;Operation success&#x27;);
+// Read eachline of file the template
+lineReader.on(&#x27;line&#x27;, function(line) {
+  //Test if line is not a commentaire
+  if (!_.startsWith(_.trim(line), &#x27;#&#x27;)) {
+    template += &#x27;* &#x27; + line + &#x27;\n&#x27;;
+  }
+});
 
+// All lines are read, file is closed now so we start process
+lineReader.on(&#x27;end&#x27;, function() {
 
-module.exports = {
-    welcome             : welcome,
-    userCreatedSucces   : userCreated,
-    userUpdated         : userUpdated,
-    userDeleted         : userDeleted,
-    success             : success
+    //End comments in template
+    template += &#x27;*/&#x27;;
+
+    //Get each json file that are on the models repository
+    _.each(_.words(glob.sync( conf.apidoc.pathFolderModels+&#x27;*.json&#x27;), /[^,,]+/g), function(file) {
+
+      console.log( &#x27;\n -- file : &#x27; + file);
+      //Get json file
+      var jsonModel = JSON.parse(fs.readFileSync(file, &#x27;utf-8&#x27;));
+      //Create the doc
+      createApiFile(template, jsonModel);
+    });
+});
+
+/**
+ * Create the whole comments based on templates and models
+ * Add this into the comments file
+ *
+ * @method createApiFile
+ * @param  {Object} theTemplate [description]
+ * @param  {Object} jsonModel   [description]
+ */
+var createApiFile = function(theTemplate, jsonModel) {
+
+  //Retrieve each methos on models files
+  _.each(jsonModel.apidoc.methods, function(method) {
+
+    //Retrieve all necessary Object in json
+    var model = _.clone(jsonModel.models);
+    _.extend(model, method);
+
+    //EJS Process
+    commentFile += ejs.render(theTemplate, model);
+  });
+
+  //Add the new comments method in file
+  fs.appendFile(PATH_APIDOC, commentFile);
 };
 
     </pre>

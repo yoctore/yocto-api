@@ -88,7 +88,9 @@ var logger      = require(&#x27;yocto-logger&#x27;);
 var express     = require(&#x27;express&#x27;);
 var models      = require(&#x27;../models/controller.js&#x27;);
 var dm          = require(&#x27;../defaultMessage.js&#x27;);
-var routes      = require(&#x27;./routes.json&#x27;);
+var fs          = require(&#x27;fs&#x27;);
+
+
 
 /**
 * List of all default property in a mongodb document
@@ -468,11 +470,17 @@ Controller.prototype.addMidlleware = function() {
 *
 * @method init
 */
-Controller.prototype.init = function() {
+Controller.prototype.init = function(pathRoutes, pathModels) {
   logger.info(&#x27;[ ControllerRoutes.init ] - start&#x27;);
 
+  if (!_.isString(pathRoutes) || !_.isString(pathModels)) {
+    return false;
+  }
+
+  var routes = JSON.parse(fs.readFileSync(pathRoutes, &#x27;utf-8&#x27;));
+
   //Init models Controller
-  this.models.init();
+  this.models.init(pathModels);
 
   //Ass middleware
   this.addMidlleware();

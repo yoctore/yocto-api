@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>app/apidocGenerator/generator.js - yocto-api</title>
+    <title>src/app/models/controller.js - yocto-api</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -76,107 +76,125 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-<h1 class="file-heading">File: app/apidocGenerator/generator.js</h1>
+<h1 class="file-heading">File: src/app/models/controller.js</h1>
 
 <div class="file">
     <pre class="code prettyprint linenums">
 &#x27;use strict&#x27;;
 
-var _                 = require(&#x27;lodash&#x27;);
-var glob              = require(&#x27;glob&#x27;);
-var fs                = require(&#x27;fs&#x27;);
-var path              = require(&#x27;path&#x27;);
-var logger            = require(&#x27;yocto-logger&#x27;);
-var ejs               = require(&#x27;ejs&#x27;);
-var lineByLineReader  = require(&#x27;line-by-line&#x27;);
+var _           = require(&#x27;lodash&#x27;);
+var mongoose    = require(&#x27;mongoose&#x27;);
+var logger      = require(&#x27;yocto-logger&#x27;);
+var Schema      = mongoose.Schema;
+var path        = require(&#x27;path&#x27;);
+var glob        = require(&#x27;glob&#x27;);
+var fs          = require(&#x27;fs&#x27;);
+
 
 /**
- * Generator of comments for apidocjs (www.apidocjs.com)
+ * Yocto API : Models Controller
  *
- * This generator will generate a comments file based on an EJS template and lot of model (define in json)
+ * Controller of models, laod models from a json file
  *
- * The comments file once generated will be execute in a apidocjs process for generate an Api Web Documentation
- *
- * Apidocjs will provide also an interface for testing all REST request
- *
+ * All models are save in an array and are accessible by calling method getModel
  *
  * For more details on these dependencies read links below :
  * - LodAsh : https://lodash.com/
  * - yocto-logger : git+ssh://lab.yocto.digital:yocto-node-modules/yocto-utils.git
- * - glob : https://www.npmjs.com/package/glob
- * - fs : https://nodejs.org/api/fs.html
- * - path : https://nodejs.org/api/path.html
- * - ejs : https://www.npmjs.com/package/ejs
- * - lineByLineReader : https://www.npmjs.com/package/line-by-line
+ * - mongoose : http://mongoosejs.com/
  *
  *
- * @date : 26/05/2015
- * @author : BALARD, Cédric cedric@yocto.re
- * @copyright : YOCTO SAS, All rights reversed &lt;http://www.yocto.re&gt;
+ * @date : 11/05/2015
+ * @author : Cedric Balard &lt;cedric@yocto.re&gt;
+ * @copyright : Yocto SAS, All right reserved
+ * @class ControllerModels
  */
+function Controller() {
 
-
-var lineReader  = new lineByLineReader(&#x27;./app/apidocGenerator/template/methods&#x27;);
-var PATH_APIDOC = &#x27;./app/apidocGenerator/temp/apiDoc.js&#x27;;
-var commentFile = &#x27;&#x27;;
-var template    = &#x27;/**\n&#x27;;
-
-//Delete the commentFile if exist
-if (fs.existsSync(PATH_APIDOC)) {
-
-  logger.info(&#x27;delete file apidoc file&#x27;);
-  fs.unlinkSync(PATH_APIDOC);
+  /**
+    * Array of Object that contains all models
+    *
+    * @property {Array} tabModel
+    * @default empty
+    */
+  this.tabModel = [];
 }
 
-// Read eachline of file the template
-lineReader.on(&#x27;line&#x27;, function(line) {
-  //Test if line is not a commentaire
-  if (!_.startsWith(_.trim(line), &#x27;#&#x27;)) {
-    template += &#x27;* &#x27; + line + &#x27;\n&#x27;;
-  }
-});
+/**
+ * Create a new model and add it in tabModel
+ *
+ * @method addModel
+ * @param {String} nameModel name of the model
+ * @param {Object} model the model (formated in json)
+ */
+ Controller.prototype.addModel = function(nameModel, model) {
 
-// All lines are read, file is closed now so we start process
-lineReader.on(&#x27;end&#x27;, function() {
+  logger.info(&#x27;[ ControllerModel.addModel ] - &#x27; + nameModel);
 
-    //End comments in template
-    template += &#x27;*/&#x27;;
+  //Instantiate a new mongodb Schema based in model
+  this.model = new Schema(model);
 
-    //Get each json file that are on the models repository
-    _.each(_.words(glob.sync(&quot;./app/models/*.json&quot;, &#x27;cwd&#x27;), /[^,,]+/g), function(file) {
+  //Set the params
+  var t = [ nameModel, model ];
 
-      //Get json file
-      var jsonModel = require(&#x27;../models/&#x27; + path.basename(file));
+  // Generate the mongo Model
+  var mongModel = mongoose.model.apply(mongoose, t);
 
-      //Create the doc
-      createApiFile(template, jsonModel);
-    });
-});
+  //Add the MongoModel in the array tabModel
+  this.tabModel.push({
+                  name          : nameModel,
+                  mongooseModel : mongModel
+                 });
+};
 
 /**
- * Create the whole comments based on templates and models
- * Add this into the comments file
+ * Initialise the Controller&lt;/br&gt;
+ * Read models.json and load all models
  *
- * @method createApiFile
- * @param  {Object} theTemplate [description]
- * @param  {Object} jsonModel   [description]
+ * @method init
  */
-var createApiFile = function(theTemplate, jsonModel) {
+Controller.prototype.init = function(pathModels) {
 
-  //Retrieve each methos on models files
-  _.each(jsonModel.apidoc.methods, function(method) {
+  logger.info(&#x27;[ ControllerModels.init ] - start&#x27;);
 
-    //Retrieve all necessary Object in json
-    var model = _.clone(jsonModel.models);
-    _.extend(model, method);
+  //Get all json file in repoitory models
+  _.each(_.words(glob.sync(pathModels+&#x27;*.json&#x27;, &#x27;cwd&#x27;), /[^,,]+/g), function(file) {
 
-    //EJS Process
-    commentFile += ejs.render(theTemplate, model);
-  });
+    //Import the file
+    var jsonFile = JSON.parse(fs.readFileSync(file), &#x27;utf-8&#x27;);
 
-  //Add the new comments method in file
-  fs.appendFile(PATH_APIDOC, commentFile);
+    //Add the model in the main array
+    this.addModel(jsonFile.models.model.name, jsonFile.models.model.properties);
+  }, this);
 };
+
+/**
+* Get model from models.json and format it with mongoose
+*
+* @param {String} nameModel the name of model to retrieve
+* @return {Object} return the model if founded, or false otherwise
+*/
+Controller.prototype.getModel = function(nameModel) {
+
+  if (!_.isEmpty(nameModel) &amp;&amp; _.isString(nameModel)) {
+
+    // return the model founded
+    var index = _.findIndex(this.tabModel, { &#x27;name&#x27;: nameModel });
+
+    //Test if a model was found
+    if (_.isUndefined(index) || (index &gt;= 0)) {
+      logger.info(&#x27;[ ControllerModels.getModel ] - get Model of : &#x27; + nameModel);
+      return this.tabModel[index].mongooseModel;
+    }
+  }
+  logger.error(&#x27;[ ControllerModels.getModel ] - error model not found, model name is : &#x27; + nameModel);
+  return false;
+};
+
+/**
+ * Export current Controller to use it on node
+ */
+module.exports = new (Controller)();
 
     </pre>
 </div>

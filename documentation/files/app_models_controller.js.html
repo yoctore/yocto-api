@@ -88,6 +88,9 @@ var logger      = require(&#x27;yocto-logger&#x27;);
 var Schema      = mongoose.Schema;
 var path        = require(&#x27;path&#x27;);
 var glob        = require(&#x27;glob&#x27;);
+var fs          = require(&#x27;fs&#x27;);
+
+
 
 /**
  * Yocto API : Models Controller
@@ -151,15 +154,15 @@ function Controller() {
  *
  * @method init
  */
-Controller.prototype.init = function() {
+Controller.prototype.init = function(pathModels) {
 
   logger.info(&#x27;[ ControllerModels.init ] - start&#x27;);
 
   //Get all json file in repoitory models
-  _.each(_.words(glob.sync(&quot;./app/models/*.json&quot;, &#x27;cwd&#x27;), /[^,,]+/g), function(file) {
+  _.each(_.words(glob.sync(pathModels+&#x27;*.json&#x27;, &#x27;cwd&#x27;), /[^,,]+/g), function(file) {
 
     //Import the file
-    var jsonFile = require(&#x27;./&#x27;+path.basename(file));
+    var jsonFile = JSON.parse(fs.readFileSync(file), &#x27;utf-8&#x27;);
 
     //Add the model in the main array
     this.addModel(jsonFile.models.model.name, jsonFile.models.model.properties);

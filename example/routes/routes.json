@@ -5,6 +5,13 @@
       "alias"             : ["/user"],
       "model"             : "user",
       "requestExcluded"   : ["put", "delete" , "patch"]
+    },
+    {
+      "path"                : "/users/:user_id",
+      "alias"               : ["/user/:user_id"],
+      "model"               : "user",
+      "paramToRetrieve"     : ["user_id"],
+      "requestExcluded"     : ["post"]
     }
   ]
 }

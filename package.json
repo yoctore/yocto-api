@@ -40,6 +40,7 @@
     "grunt-execute": "^0.2.2"
   },
   "apidoc": {
+    "pathFolderModels" : "example/models/",
     "title": "Yocto Rest Api",
     "sampleUrl": "http://localhost:8080/api",
     "url": "http://localhost:8080/api"
