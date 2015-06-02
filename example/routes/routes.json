@@ -1,0 +1,10 @@
+{
+  "routes" : [
+    {
+      "path"              : "/users",
+      "alias"             : ["/user"],
+      "model"             : "user",
+      "requestExcluded"   : ["put", "delete" , "patch"]
+    }
+  ]
+}
