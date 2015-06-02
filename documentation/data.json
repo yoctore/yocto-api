@@ -3,7 +3,7 @@
         "name": "yocto-api",
         "description": "Yocto REST API",
         "version": "0.1.0",
-        "url": ""
+        "url": "http://www.yocto.re"
     },
     "files": {
         "apidoc/utils/handlebars_helper.js": {

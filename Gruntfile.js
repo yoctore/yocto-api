@@ -48,6 +48,18 @@ module.exports = function(grunt) {
       }
     },
 
+    uglify : {
+      my_target : {
+        files : {
+
+           'dist/app/models/controller.js' : ['src/app/models/controller.js'],
+           'dist/app/routes/controller.js' : ['src/app/routes/controller.js'],
+           'dist/app/defaultMessage.js' : ['src/app/defaultMessage.js']
+
+        }
+      }
+     },
+
     /**
     * Yuidoc permit to generate the yuidoc
     *
@@ -73,7 +85,10 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-yuidoc');
   grunt.loadNpmTasks('grunt-apidoc');
   grunt.loadNpmTasks('grunt-execute');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
 
   // register task
-  grunt.registerTask('default', [ 'jshint', 'execute', 'yuidoc', 'apidoc']);
+  grunt.registerTask('default', [ 'jshint', 'execute', 'yuidoc', 'apidoc', 'uglify']);
+  grunt.registerTask('minify', ['uglify']);
+
 };

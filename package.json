@@ -2,7 +2,9 @@
   "name": "yocto-api",
   "main": "server.js",
   "version": "0.1.0",
+  "private": true,
   "description": "Yocto REST API",
+  "homepage": "http://www.yocto.re",
   "repository": {
     "type": "git",
     "url": "git+ssh:://git@lab.yocto.digital:yocto-tools/yocto-api.git"
@@ -18,6 +20,19 @@
       "email": "cedric@yocto.re"
     }
   ],
+  "main": "dist/app/routes/controller.js",
+ "repository": {
+   "type": "git",
+   "url": "git+ssh:://git@lab.yocto.digital:yocto-node-modules/yocto-api.git"
+ },
+ "engines": {
+   "node": ">=0.12.2"
+ },
+ "files": [
+   "dist",
+   "documentation",
+   "example"
+ ],
   "dependencies": {
     "body-parser": "~1.0.1",
     "ejs": "^2.3.1",
