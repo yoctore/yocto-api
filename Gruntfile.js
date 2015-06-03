@@ -18,12 +18,6 @@ module.exports = function(grunt) {
     // default package
     pkg : grunt.file.readJSON('package.json'),
 
-    execute: {
-      target : {
-        src: ['./src/app/apidocGenerator/generator.js']
-      }
-    },
-
     /**
     * Jshint permit to flags suspicious usage in programs
     * @submodule jshint
@@ -39,23 +33,14 @@ module.exports = function(grunt) {
     ]},
 
     /**
-    * @submodule apidoc
+    * @submodule uglify
     */
-    apidoc: {
-      myapp: {
-        src: "src/app/apidocGenerator/temp/",
-        dest: "apidoc/"
-      }
-    },
-
     uglify : {
       my_target : {
         files : {
-
            'dist/app/models/controller.js' : ['src/app/models/controller.js'],
            'dist/app/routes/controller.js' : ['src/app/routes/controller.js'],
            'dist/app/defaultMessage.js' : ['src/app/defaultMessage.js']
-
         }
       }
      },
@@ -88,7 +73,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
 
   // register task
-  grunt.registerTask('default', [ 'jshint', 'execute', 'yuidoc', 'apidoc', 'uglify']);
+  grunt.registerTask('default', [ 'jshint', 'yuidoc', 'uglify']);
   grunt.registerTask('minify', ['uglify']);
 
 };
