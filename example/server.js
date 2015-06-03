@@ -8,8 +8,9 @@ var app        = express(); // Create app
 var path     = require('path');
 var fs        = require('fs');
 
-var base = path.normalize(__dirname);
+var base = path.normalize(process.cwd());
 
+console.log(' -- base ' + base);
 // connect to our database
 mongoose.connect('mongodb://localhost:27017');
 
@@ -21,7 +22,7 @@ app.use(bodyParser.json());
 var port = process.env.PORT || 8080;
 
 //Initialise the API router
-routes.init(base+'/routes/routes.json', base +'/models/');
+routes.init(base+'/example/routes/routes.json', base +'/example/models/');
 
 //Use the router
 app.use('/api', routes.router);

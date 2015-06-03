@@ -3,7 +3,7 @@
   "main": "server.js",
   "version": "0.1.0",
   "private": true,
-  "description": "Yocto REST API",
+  "description": "Yocto REST API ",
   "homepage": "http://www.yocto.re",
   "repository": {
     "type": "git",
