@@ -36,6 +36,10 @@ function Controller() {
     * @default empty
     */
   this.tabModel = [];
+
+  this.mongoose = mongoose;
+
+  this.logger   = logger;
 }
 
 /**
@@ -56,7 +60,7 @@ function Controller() {
   var t = [ nameModel, model ];
 
   // Generate the mongo Model
-  var mongModel = mongoose.model.apply(mongoose, t);
+  var mongModel = this.mongoose.model.apply(this.mongoose, t);
 
   //Add the MongoModel in the array tabModel
   this.tabModel.push({
@@ -78,11 +82,17 @@ Controller.prototype.init = function(pathModels) {
   //Get all json file in repoitory models
   _.each(_.words(glob.sync(pathModels+'*.json', 'cwd'), /[^,,]+/g), function(file) {
 
-    //Import the file
-    var jsonFile = JSON.parse(fs.readFileSync(file), 'utf-8');
+    try {
+      //Import the file
+      var jsonFile = JSON.parse(fs.readFileSync(file), 'utf-8');
 
-    //Add the model in the main array
-    this.addModel(jsonFile.models.model.name, jsonFile.models.model.properties);
+      //Add the model in the main array
+      this.addModel(jsonFile.models.model.name, jsonFile.models.model.properties);
+
+    } catch (e) {
+      logger.error('[ ControllerModels.init() ] - error rencountring during init, more details : ' + e );
+    }
+
   }, this);
 };
 

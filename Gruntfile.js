@@ -62,6 +62,21 @@ module.exports = function(grunt) {
           exclude : 'Gruntfile.js, example, dist, documentation, node_modules'
         }
       },
+    },
+
+    /**
+    * Mocah unit test
+    */
+    mochacli : {
+      options : {
+        'reporter'       : 'spec',
+        'inline-diffs'   : false,
+        'no-exit'        : true,
+        'force'          : false,
+        'check-leaks'    : true,
+        'bail'           : false
+      },
+      all : [ 'test/*.js' ]
     }
   });
 
@@ -71,9 +86,10 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-apidoc');
   grunt.loadNpmTasks('grunt-execute');
   grunt.loadNpmTasks('grunt-contrib-uglify');
+   grunt.loadNpmTasks('grunt-mocha-cli');
 
   // register task
   grunt.registerTask('default', [ 'jshint', 'yuidoc', 'uglify']);
   grunt.registerTask('minify', ['uglify']);
-
+  grunt.registerTask('tests', 'mochacli');
 };

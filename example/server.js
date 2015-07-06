@@ -10,9 +10,14 @@ var fs        = require('fs');
 
 var base = path.normalize(process.cwd());
 
-console.log(' -- base ' + base);
 // connect to our database
-mongoose.connect('mongodb://localhost:27017');
+
+try {
+  mongoose.connect('mongodb://localhost:27017');
+
+} catch (e) {
+  console.log('ERROR Please verify connection to mongodb\n' +e);
+}
 
 // configure app to use bodyParser()
 app.use(bodyParser.urlencoded({ extended : true }));

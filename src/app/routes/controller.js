@@ -75,6 +75,14 @@ function Controller() {
   */
   this.router = express();
 
+  /**
+  * The main logger
+  *
+  * @property {Object} logger
+  */
+  this.logger = logger;
+
+  
 }
 
 /**
@@ -389,13 +397,24 @@ Controller.prototype.addMidlleware = function() {
 * @method init
 */
 Controller.prototype.init = function(pathRoutes, pathModels) {
-  logger.info('[ ControllerRoutes.init ] - start');
+  logger.debug('[ ControllerRoutes.init ] - start');
 
+  // test if string
   if (!_.isString(pathRoutes) || !_.isString(pathModels)) {
     return false;
   }
 
-  var routes = JSON.parse(fs.readFileSync(pathRoutes, 'utf-8'));
+  var routes = {};
+
+  // Test if file exist and retrive routes file
+  try {
+    fs.accessSync(pathRoutes);
+    fs.accessSync(pathModels);
+    routes = JSON.parse(fs.readFileSync(pathRoutes, 'utf-8'));
+  } catch (e) {
+    logger.error('[ ControllerRoutes.init ] - error during loading files, more details : ' + e );
+    return false;
+  }
 
   //Init models Controller
   this.models.init(pathModels);
@@ -403,7 +422,7 @@ Controller.prototype.init = function(pathRoutes, pathModels) {
   //Ass middleware
   this.addMidlleware();
 
-  // read json file and add routes
+  // read json file and add each routes
   _.each(routes.routes, function(route) {
 
     //Execute the joi vailidation
@@ -437,9 +456,11 @@ Controller.prototype.init = function(pathRoutes, pathModels) {
       });
     }
   }, this);
+
+  return true;
 };
 
 /**
 * Export current Controller to use it on node
 */
-module.exports = new (Controller)();
+module.exports = new (Controller) ();
