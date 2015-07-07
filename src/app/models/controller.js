@@ -7,34 +7,45 @@ var Schema      = mongoose.Schema;
 var path        = require('path');
 var glob        = require('glob');
 var fs          = require('fs');
+var joi         = require('joi');
 
+//Define a Joi schema for test if model have a goodformat
+var modelJoiSchema = joi.object().keys({
+  name            : joi.string().required().min(1).trim(),
+  properties      : joi.object().required().min(1).pattern(/.+/, [
+    joi.object().keys({
+      type     : joi.string().required().valid(['String', 'ObjectId', 'Number', 'Boolean']),
+      required : joi.boolean().default(true)
+    }), joi.array(), joi.string().valid(['String', 'ObjectId', 'Number', 'Boolean'])
+  ])
+});
 
 /**
- * Yocto API : Models Controller
- *
- * Controller of models, laod models from a json file
- *
- * All models are save in an array and are accessible by calling method getModel
- *
- * For more details on these dependencies read links below :
- * - LodAsh : https://lodash.com/
- * - yocto-logger : git+ssh://lab.yocto.digital:yocto-node-modules/yocto-utils.git
- * - mongoose : http://mongoosejs.com/
- *
- *
- * @date : 11/05/2015
- * @author : Cedric Balard <cedric@yocto.re>
- * @copyright : Yocto SAS, All right reserved
- * @class ControllerModels
- */
+* Yocto API : Models Controller
+*
+* Controller of models, laod models from a json file
+*
+* All models are save in an array and are accessible by calling method getModel
+*
+* For more details on these dependencies read links below :
+* - LodAsh : https://lodash.com/
+* - yocto-logger : git+ssh://lab.yocto.digital:yocto-node-modules/yocto-utils.git
+* - mongoose : http://mongoosejs.com/
+*
+*
+* @date : 11/05/2015
+* @author : Cedric Balard <cedric@yocto.re>
+* @copyright : Yocto SAS, All right reserved
+* @class ControllerModels
+*/
 function Controller() {
 
   /**
-    * Array of Object that contains all models
-    *
-    * @property {Array} tabModel
-    * @default empty
-    */
+  * Array of Object that contains all models
+  *
+  * @property {Array} tabModel
+  * @default empty
+  */
   this.tabModel = [];
 
   this.mongoose = mongoose;
@@ -43,41 +54,61 @@ function Controller() {
 }
 
 /**
- * Create a new model and add it in tabModel
- *
- * @method addModel
- * @param {String} nameModel name of the model
- * @param {Object} model the model (formated in json)
- */
- Controller.prototype.addModel = function(nameModel, model) {
+* Create a new model and add it in tabModel
+*
+* @method addModel
+* @param {String} nameModel name of the model
+* @param {Object} model the model (formated in json)
+*/
+Controller.prototype.addModel = function(model) {
+  //Execute the joi vailidation
+  var result = modelJoiSchema.validate(model);
 
-  logger.info('[ ControllerModel.addModel ] - ' + nameModel);
+  //Check if have no error in joi validation
+  if (_.isEmpty(result) || _.isEmpty(result.error)) {
 
-  //Instantiate a new mongodb Schema based in model
-  this.model = new Schema(model);
+    try {
+      //Instantiate a new mongodb Schema based in model
+      this.model = new Schema(model.properties);
 
-  //Set the params
-  var t = [ nameModel, model ];
+      //Set the params
+      var t = [ model.name, model.properties ];
 
-  // Generate the mongo Model
-  var mongModel = this.mongoose.model.apply(this.mongoose, t);
+      // Generate the mongo Model
+      var mongModel = this.mongoose.model.apply(this.mongoose, t);
 
-  //Add the MongoModel in the array tabModel
-  this.tabModel.push({
-                  name          : nameModel,
-                  mongooseModel : mongModel
-                 });
+      //Add the MongoModel in the array tabModel
+      this.tabModel.push({
+        name          : model.name,
+        mongooseModel : mongModel
+      });
+      return true;
+    } catch (e) {
+      this.logger.error('[ ControllerModel.addModel ] - error, more details : ' +e );
+      return false;
+    }
+  }
+
+  logger.error('[ ControllerModel.addModel ] - error in joi validation ');
+
+  //log each error
+  _.forEach(result.error.details, function(val) {
+    this.logger.warning('[ ControllerRoutes.init ] - ' + val.message + ' at ' + val.path);
+  }, this);
+  return false;
+
 };
 
 /**
- * Initialise the Controller</br>
- * Read models.json and load all models
- *
- * @method init
- */
+* Initialise the Controller</br>
+* Retrieve all json file in folder 'pathModels' and load all models
+*
+* @method init
+* @param {String} pathModels Path of folders that contains all jsonFile
+*/
 Controller.prototype.init = function(pathModels) {
 
-  logger.info('[ ControllerModels.init ] - start');
+  this.logger.info('[ ControllerModels.init ] - start');
 
   //Get all json file in repoitory models
   _.each(_.words(glob.sync(pathModels+'*.json', 'cwd'), /[^,,]+/g), function(file) {
@@ -87,10 +118,10 @@ Controller.prototype.init = function(pathModels) {
       var jsonFile = JSON.parse(fs.readFileSync(file), 'utf-8');
 
       //Add the model in the main array
-      this.addModel(jsonFile.models.model.name, jsonFile.models.model.properties);
+      this.addModel(jsonFile.models.model);
 
     } catch (e) {
-      logger.error('[ ControllerModels.init() ] - error rencountring during init, more details : ' + e );
+      this.logger.error('[ ControllerModels.init() ] - error rencountring during init, more details : ' + e );
     }
 
   }, this);
@@ -111,15 +142,15 @@ Controller.prototype.getModel = function(nameModel) {
 
     //Test if a model was found
     if (_.isUndefined(index) || (index >= 0)) {
-      logger.info('[ ControllerModels.getModel ] - get Model of : ' + nameModel);
+      this.logger.info('[ ControllerModels.getModel ] - get Model of : ' + nameModel);
       return this.tabModel[index].mongooseModel;
     }
   }
-  logger.error('[ ControllerModels.getModel ] - error model not found, model name is : ' + nameModel);
+  this.logger.error('[ ControllerModels.getModel ] - error model not found, model name is : ' + nameModel);
   return false;
 };
 
 /**
- * Export current Controller to use it on node
- */
+* Export current Controller to use it on node
+*/
 module.exports = new (Controller)();
