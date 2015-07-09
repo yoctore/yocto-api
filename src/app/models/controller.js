@@ -9,14 +9,15 @@ var glob        = require('glob');
 var fs          = require('fs');
 var joi         = require('joi');
 
+var listValidTypeForJoi = ['String', 'ObjectId', 'Number', 'Boolean'];
 //Define a Joi schema for test if model have a goodformat
 var modelJoiSchema = joi.object().keys({
   name            : joi.string().required().min(1).trim(),
   properties      : joi.object().required().min(1).pattern(/.+/, [
     joi.object().keys({
-      type     : joi.string().required().valid(['String', 'ObjectId', 'Number', 'Boolean']),
+      type     : [joi.string().required().valid(listValidTypeForJoi), joi.array().min(1).items(joi.string().valid(listValidTypeForJoi))  ],
       required : joi.boolean().default(true)
-    }), joi.array(), joi.string().valid(['String', 'ObjectId', 'Number', 'Boolean'])
+    }), joi.array().min(1).items(joi.string().valid(listValidTypeForJoi)), joi.string().valid(listValidTypeForJoi)
   ])
 });
 
@@ -89,7 +90,7 @@ Controller.prototype.addModel = function(model) {
     }
   }
 
-  logger.error('[ ControllerModel.addModel ] - error in joi validation ');
+  logger.error('[ ControllerModel.addModel ] - error in JOI validation ');
 
   //log each error
   _.forEach(result.error.details, function(val) {

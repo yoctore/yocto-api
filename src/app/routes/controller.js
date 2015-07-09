@@ -7,7 +7,7 @@ var express     = require('express');
 var models      = require('../models/controller.js');
 var dm          = require('../defaultMessage.js');
 var fs          = require('fs');
-
+var isObjectiId    = require('mongoose').Types.ObjectId;
 
 
 /**
@@ -189,17 +189,31 @@ function Controller() {
         res.send(err);
       }
 
+      var correctDataInRequest = true;
+
       //Retrieve all property of the object in the current model, and omit default property of mongodb
       _.each((reqType === 'put') ? _.omit(model.schema.paths, DEFAULT_PROP_MONGODB) : req.body, function(val, key) {
 
         value[key] = req.body[key];
 
+        //Retrieve all property of the object in the current model, and omit default property of mongodb
+        _.each(_.omit(model.schema.paths, DEFAULT_PROP_MONGODB), function(val1, key1) {
+
+          //Compare data in object with model to check if it's the good type
+          if (!_.isUndefined(req.body[key1]) && !scope.checkTypeValidation(val1, req.body[key1])) {
+            res.status(400).send({ error: 'error type validation for key : ' + key1 });
+            correctDataInRequest = false;
+          }
+        });
+
         //Add a validation step for model
         scope.checkModelValidation(val, value, key);
       });
 
-      //save object in db
-      scope.saveObject(value, res);
+      //Save object in db
+      if(correctDataInRequest) {
+         scope.saveObject(value, res);
+      }
     });
   };
 
@@ -220,7 +234,7 @@ function Controller() {
     model.remove({_id: req.params[paramToGet]}, function(err, user) {
 
       if (err) {
-        res.send(err);
+        res.status(400).send(err);
       }
 
       //Succes so Send a jsonfile
@@ -244,7 +258,7 @@ function Controller() {
     obj.save(function(err) {
 
       if (err) {
-        res.send(err);
+        res.status(400).send(err);
       }
 
       //Succes so Send a jsonfile
@@ -274,22 +288,104 @@ function Controller() {
       //Create a instance of model, used to save in db
       var obj = new Model();
 
+      var correctDataInRequest = true;
+
       //Retrieve all property of the object in the current model, and omit default property of mongodb
       _.each(_.omit(Model.schema.paths, DEFAULT_PROP_MONGODB), function(val, key) {
+
+        //Compare data in object with model to check if it's the good type
+        if (!scope.checkTypeValidation(val, req.body[key])) {
+          res.status(400).send({ error: 'error type validation for key : ' + key });
+          correctDataInRequest = false;
+        }
 
         //Add the propriety to the new object
         obj[key] = req.body[key];
 
-        //Add a validation step for model
+        //Add a validation step for model -> check if value is required
         scope.checkModelValidation(val, obj, key);
       });
 
       //Save object in db
-      scope.saveObject(obj, res);
+      if(correctDataInRequest) {
+         scope.saveObject(obj, res);
+      }
     });
   };
 
   /**
+  * Compare data in object with model to check if it's the good type
+  *
+  * @method checkTypeValidation
+  * @param {Object} val the mongoose model
+  * @param {Sting, Object, Number} param the param to compare
+  */
+  this.checkTypeValidation = function(val, param) {
+    //Add a validation step for model
+    var typeOfParam = this.getTypeParam(param);
+
+    //Test is is string
+    if (_.isString(val.options.type) && typeOfParam == val.options.type.toLowerCase()) {
+      return true;
+    } else if (_.isArray(val.options.type) && typeOfParam == 'array') {
+      //test the other type
+      var succes = true;
+      _.each(param, function(tmp) {
+        // add specific test for string, because an object id is a string too.
+        if(this.getTypeParam(tmp) !== val.options.type[0].toLowerCase() && (val.options.type[0].toLowerCase() == 'string' && this.getTypeParam(tmp) == 'string') ) {
+          succes = false;
+          return false;
+        }
+      }, this);
+
+      if (succes) {
+        return true;
+      }
+    }
+    return false;
+
+    /**
+    * TODO  : add code to object if needed
+    */
+  };
+
+/**
+ *
+ * @method getTypeParam
+ * @param  {Sting, Object, Number} param the param to get the type
+ */
+  this.getTypeParam = function(param) {
+    if(_.isArray(param)) {
+      return 'array';
+    }
+
+    //test parse object to determine his type
+    try {
+      param = JSON.parse(param);
+
+      if (_.isArray(param)) {
+        return 'array';
+      } else if (_.isString(param) ) {
+        return 'string';
+      } else if (_.isObject(param) ) {
+        return 'object';
+      } else if (_.isNumber(param)) {
+        return 'number';
+      }
+    } catch (e) {
+    }
+
+    //If parse failed, test if param is not a objectid
+    try {
+      isObjectiId(param);
+      return 'objectid';
+    } catch (e) {
+      return 'string';
+    }
+  };
+
+  /**
+  * TODO : vérifier si fonction utile ...
   * Check if the parameter 'val' described in model, should not be empty </br>
   * And if it's the case, add a validation step into mongoose to required it
   *
@@ -299,14 +395,11 @@ function Controller() {
   * @param {String} key the key of the value
   */
   this.checkModelValidation = function(val, value, key) {
-
     //Add a validation step for model
     if (!_.isUndefined(val.caster)) {
       if (!_.isUndefined(val.caster.isRequired)) {
-
         //Add a validation step for model
         value.schema.path(key).validate(function(valueToUpdate) {
-
           //test if the var is empty, and return false to show that the validation failed
           if (_.isEmpty(_.compact(valueToUpdate))) {
             return false;

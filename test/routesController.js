@@ -229,7 +229,6 @@ describe("models/Controller ", function() {
       { "varToTest" : 2, "expectValue" : false },
       { "varToTest" : true, "expectValue" : false },
       { "varToTest" : {'toto' : 'tata'}, "expectValue" : false },
-      { "varToTest" : {'toto' : 'tata'}, "expectValue" : false },
       { "expectValue" : false }
     ];
 

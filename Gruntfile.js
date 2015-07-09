@@ -76,8 +76,15 @@ module.exports = function(grunt) {
         'check-leaks'    : true,
         'bail'           : false
       },
-      all : [ 'test/*.js' ]
+      web : {
+        options : {
+          files   : ['test/web/httpRequest.js'],
+          timeout : 20000
+        }
+      },
+        all : [ 'test/*.js' ]
     }
+
   });
 
   // Load the plugins
@@ -92,4 +99,5 @@ module.exports = function(grunt) {
   grunt.registerTask('default', [ 'jshint', 'yuidoc', 'uglify']);
   grunt.registerTask('minify', ['uglify']);
   grunt.registerTask('tests', 'mochacli');
+  grunt.registerTask('testWeb', 'mochacli:web');
 };
