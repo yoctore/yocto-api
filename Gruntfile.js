@@ -83,9 +83,28 @@ module.exports = function(grunt) {
         }
       },
         all : [ 'test/*.js' ]
-    }
+    },
 
-  });
+     /**
+      * Todo process
+      */
+      todo : {
+        options : {
+          marks: [
+            { name : "TODO", pattern : /TODO/, color : "yellow" },
+            { name : "FIXME", pattern : /FIXME/, color : "red" },
+            { name : "NOTE", pattern : /NOTE/, color : "blue" }
+          ],
+          file : "REPORT.md",
+          githubBoxes : true,
+          colophon : true,
+          usePackage : true
+        },
+        src : [
+          'src/app/*/*'
+        ]
+      }
+    });
 
   // Load the plugins
   grunt.loadNpmTasks('grunt-contrib-jshint');
@@ -93,11 +112,13 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-apidoc');
   grunt.loadNpmTasks('grunt-execute');
   grunt.loadNpmTasks('grunt-contrib-uglify');
-   grunt.loadNpmTasks('grunt-mocha-cli');
+  grunt.loadNpmTasks('grunt-mocha-cli');
+  grunt.loadNpmTasks('grunt-todo');
 
   // register task
   grunt.registerTask('default', [ 'jshint', 'yuidoc', 'uglify']);
   grunt.registerTask('minify', ['uglify']);
-  grunt.registerTask('tests', 'mochacli');
+  grunt.registerTask('tests', 'mochacli:all');
   grunt.registerTask('testWeb', 'mochacli:web');
+  grunt.registerTask('report', 'todo');
 };

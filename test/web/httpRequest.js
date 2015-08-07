@@ -10,13 +10,16 @@ var status     = require('http-status');
 
 describe('httpRequests', function() {
   var app;
-  var url = 'http://localhost:8081/api';
+  var port = 8089;
+  var url = 'http://localhost:' + port + '/api';
   before(function() {
-    app = server(8081);
+    console.log('--- start server');
+    app = server(port);
   });
 
   after(function() {
     app.close();
+    console.log('--- close server');
   });
 
 
@@ -31,31 +34,30 @@ describe('httpRequests', function() {
     });
   });
 
-  it('returns username if name param is a valid user', function(done) {
+  it('returns error if param id is not a goofformat', function(done) {
 
     superagent.get(url + '/user/3').end(function(err, res) {
       assert.ifError(err);
-      assert.equal(res.status, status.OK);
+      assert.equal(res.status, 400);
 
       done();
     });
   });
-
+  
   it('returns username if name param is a valid user', function(done) {
 
     superagent.post(url + '/user')
-    .send({ name : 'totot'})
+    .send({ name : 'toto', firstname : 'tata' , email : 'toto@toto'})
+    .set('Accept', 'application/json')
     .end(function(err, res) {
       var result = JSON.parse(res.text);
-
+      console.log(result);
       assert.ifError(err);
       assert.equal(res.status, status.OK);
-      assert.equal(result.message, 'Validation failed');
+    //  assert.equal(result.message, 'Validation failed');
 
       done();
     });
   });
-
-
 
 });

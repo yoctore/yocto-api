@@ -21,6 +21,8 @@ var modelJoiSchema = joi.object().keys({
   ])
 });
 
+//NOTE  : Modif faite sur le fichier d'oscar a incorporer ici ... 
+
 /**
 * Yocto API : Models Controller
 *

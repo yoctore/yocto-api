@@ -9,7 +9,7 @@ var dm          = require('../defaultMessage.js');
 var fs          = require('fs');
 var isObjectiId    = require('mongoose').Types.ObjectId;
 
-
+// TODO : verifié toute les reponses et les armonisé comme sur Oscar
 /**
 * List of all default property in a mongodb document
 *yoct
@@ -124,10 +124,16 @@ function Controller() {
       // Find object
       model[fn](req.params[paramToGet], function(err, val) {
 
+
         if (err) {
+          console.log('err - ' + err);
+          //res.status(400).send(err);
           res.send(err);
         }
 
+
+         // FIXME : rajouter traitement pour get lorsque on retrouve pas la bonne ressource, retourné une erreru
+         // Note -> quand on test avec postman on a bien une reponse type400
         var cb = reqType ==='get' ? res.json(val) : res.status(200).send('OK');
       });
     });
@@ -186,7 +192,7 @@ function Controller() {
     model.findById(req.params[paramToGet], function(err, value) {
 
       if (err) {
-        res.send(err);
+        res.status(400).send(err);
       }
 
       var correctDataInRequest = true;
@@ -443,7 +449,7 @@ function Controller() {
           this.addHTTPRequestGets(model, path, paramToRetrieve, fn);
         } else {
 
-          //Call function by his name
+          //Call function by his name  ( POST request)
           this[fn](model, path, paramToRetrieve);
         }
       }, this);
