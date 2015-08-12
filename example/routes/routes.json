@@ -12,6 +12,19 @@
       "model"               : "user",
       "paramToRetrieve"     : ["user_id"],
       "requestExcluded"     : ["post"]
+    },
+    {
+      "path"              : "/availability",
+      "alias"             : ["/availability"],
+      "model"             : "availability",
+      "requestExcluded"   : ["put", "delete" , "patch"]
+    },
+    {
+      "path"                : "/availabilitys/:availability_id",
+      "alias"               : ["/availabilies/:availability_id"],
+      "model"               : "availability",
+      "paramToRetrieve"     : ["availability_id"],
+      "requestExcluded"     : ["post"]
     }
   ]
 }

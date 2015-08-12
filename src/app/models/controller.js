@@ -9,19 +9,38 @@ var glob        = require('glob');
 var fs          = require('fs');
 var joi         = require('joi');
 
-var listValidTypeForJoi = ['String', 'ObjectId', 'Number', 'Boolean'];
-//Define a Joi schema for test if model have a goodformat
+var LIST_VALID_TYPE_JOI = ['String', 'ObjectId', 'Number', 'Boolean'];
+
 var modelJoiSchema = joi.object().keys({
   name            : joi.string().required().min(1).trim(),
   properties      : joi.object().required().min(1).pattern(/.+/, [
     joi.object().keys({
-      type     : [joi.string().required().valid(listValidTypeForJoi), joi.array().min(1).items(joi.string().valid(listValidTypeForJoi))  ],
+      type     : [
+        joi.string().required().valid(LIST_VALID_TYPE_JOI),
+        joi.array().min(1).items(
+          joi.string().valid(LIST_VALID_TYPE_JOI)
+        )
+      ],
       required : joi.boolean().default(true)
-    }), joi.array().min(1).items(joi.string().valid(listValidTypeForJoi)), joi.string().valid(listValidTypeForJoi)
+    }),
+    joi.array().min(1).items(
+      joi.string().valid(LIST_VALID_TYPE_JOI),
+      joi.object().keys({
+        type     : [
+          joi.string().required().valid(LIST_VALID_TYPE_JOI),
+          joi.array().min(1).items(
+            joi.string().valid(LIST_VALID_TYPE_JOI)
+          )
+        ],
+        required : joi.boolean().default(true)
+      })
+    ),
+    joi.string().valid(LIST_VALID_TYPE_JOI)
   ])
 });
 
-//NOTE  : Modif faite sur le fichier d'oscar a incorporer ici ... 
+
+//NOTE  : Modif faite sur le fichier d'oscar a incorporer ici (fonction dans le model)...
 
 /**
 * Yocto API : Models Controller
@@ -56,13 +75,7 @@ function Controller() {
   this.logger   = logger;
 }
 
-/**
-* Create a new model and add it in tabModel
-*
-* @method addModel
-* @param {String} nameModel name of the model
-* @param {Object} model the model (formated in json)
-*/
+
 Controller.prototype.addModel = function(model) {
   //Execute the joi vailidation
   var result = modelJoiSchema.validate(model);
@@ -72,19 +85,27 @@ Controller.prototype.addModel = function(model) {
 
     try {
       //Instantiate a new mongodb Schema based in model
-      this.model = new Schema(model.properties);
+      var theSchema = new Schema(model.properties);
 
-      //Set the params
-      var t = [ model.name, model.properties ];
+      // Test if model have methods to implement
+      if (!_.isEmpty(model.fn)) {
+        logger.debbug('[ ControllerModel.addModel ] - external methods found for model : ' + model.name);
+        //TODO : dynamisé sa
+        var funcFile = require(base + '/app/models/' + model.name.toLowerCase() + '.js');
 
-      // Generate the mongo Model
-      var mongModel = this.mongoose.model.apply(this.mongoose, t);
+        _.each(model.fn, function(fn) {
+          theSchema.methods[fn] = funcFile[fn];
+        });
+      }
+
+      var mongModel = mongoose.model(model.name, theSchema);
 
       //Add the MongoModel in the array tabModel
       this.tabModel.push({
         name          : model.name,
         mongooseModel : mongModel
       });
+      console.log('[ ControllerModel.addModel ] - model added for : ' + model.name);
       return true;
     } catch (e) {
       this.logger.error('[ ControllerModel.addModel ] - error, more details : ' +e );
@@ -92,11 +113,11 @@ Controller.prototype.addModel = function(model) {
     }
   }
 
-  logger.error('[ ControllerModel.addModel ] - error in JOI validation ');
+  logger.error('[ ControllerModel.addModel ] - error in JOI validation for model : ' + model.name);
 
   //log each error
   _.forEach(result.error.details, function(val) {
-    this.logger.warning('[ ControllerRoutes.init ] - ' + val.message + ' at ' + val.path);
+    this.logger.warning('[ ControllerRoutes.addModel ] - ' + val.message + ' at ' + val.path);
   }, this);
   return false;
 
