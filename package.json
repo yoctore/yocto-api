@@ -48,7 +48,8 @@
     "grunt-contrib-jshint": "~0.10.0",
     "grunt-contrib-nodeunit": "~0.4.1",
     "grunt-contrib-uglify": "~0.5.0",
-    "grunt-contrib-yuidoc": "^0.7.0"
+    "grunt-contrib-yuidoc": "^0.7.0",
+    "yocto-hint": "git+ssh://git@lab.yocto.digital:yocto-node-modules/yocto-hint.git"
   },
   "apidoc": {
     "title": "Yocto Rest Api",

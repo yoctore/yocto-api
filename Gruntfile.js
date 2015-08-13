@@ -103,6 +103,17 @@ module.exports = function(grunt) {
         src : [
           'src/app/*/*'
         ]
+      },
+
+      yoctohint : {
+        options : {
+          // If you wan to override jshint rules ...
+          // prefer defined rules. But if by default you are in node mode.
+          // If you want to hint in classic mode, set node property to null
+          jshint : {}
+        },
+        // Set all your file here
+        all : [ 'src/app/models/controller.js', 'src/app/routes/controller.js', 'src/app/defaultMessage.js' ]
       }
     });
 
@@ -114,11 +125,15 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-mocha-cli');
   grunt.loadNpmTasks('grunt-todo');
+  grunt.loadNpmTasks('yoctohint');
+
 
   // register task
   grunt.registerTask('default', [ 'jshint', 'yuidoc', 'uglify']);
-  grunt.registerTask('minify', ['uglify']);
+  grunt.registerTask('build', ['uglify']);
   grunt.registerTask('tests', 'mochacli:all');
   grunt.registerTask('testWeb', 'mochacli:web');
   grunt.registerTask('report', 'todo');
+  grunt.registerTask('yhint', 'yoctohint');
+
 };
