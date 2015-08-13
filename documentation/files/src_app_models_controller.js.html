@@ -17,7 +17,7 @@
                 <h1><img src="../assets/css/logo.png" title="yocto-api" width="117" height="52"></h1>
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.1.0</em>
+            <em>API Docs for: 0.1.1</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -38,8 +38,7 @@
                 
                         <div id="api-tabview-panel">
                             <ul id="api-classes" class="apis classes">
-                                <li><a href="../classes/ControllerModels.html">ControllerModels</a></li>
-                                <li><a href="../classes/ControllerRoutes.html">ControllerRoutes</a></li>
+                                <li><a href="../classes/.html"></a></li>
                             </ul>
                 
                             <ul id="api-modules" class="apis modules">
@@ -86,85 +85,146 @@ var _           = require(&#x27;lodash&#x27;);
 var mongoose    = require(&#x27;mongoose&#x27;);
 var logger      = require(&#x27;yocto-logger&#x27;);
 var Schema      = mongoose.Schema;
-var path        = require(&#x27;path&#x27;);
 var glob        = require(&#x27;glob&#x27;);
 var fs          = require(&#x27;fs&#x27;);
+var path        = require(&#x27;path&#x27;);
+var joi         = require(&#x27;joi&#x27;);
 
+var LIST_VALID_TYPE_JOI = [&#x27;String&#x27;, &#x27;ObjectId&#x27;, &#x27;Number&#x27;, &#x27;Boolean&#x27;];
+
+var modelJoiSchema = joi.object().keys({
+  name            : joi.string().required().min(1).trim(),
+  properties      : joi.object().required().min(1).pattern(/.+/, [
+    joi.object().keys({
+      type     : [
+        joi.string().required().valid(LIST_VALID_TYPE_JOI),
+        joi.array().min(1).items(
+          joi.string().valid(LIST_VALID_TYPE_JOI)
+        )
+      ],
+      required : joi.boolean().default(true)
+    }),
+    joi.array().min(1).items(
+      joi.string().valid(LIST_VALID_TYPE_JOI),
+      joi.object().keys({
+        type     : [
+          joi.string().required().valid(LIST_VALID_TYPE_JOI),
+          joi.array().min(1).items(
+            joi.string().valid(LIST_VALID_TYPE_JOI)
+          )
+        ],
+        required : joi.boolean().default(true)
+      })
+    ),
+    joi.string().valid(LIST_VALID_TYPE_JOI)
+  ])
+});
 
 /**
- * Yocto API : Models Controller
- *
- * Controller of models, laod models from a json file
- *
- * All models are save in an array and are accessible by calling method getModel
- *
- * For more details on these dependencies read links below :
- * - LodAsh : https://lodash.com/
- * - yocto-logger : git+ssh://lab.yocto.digital:yocto-node-modules/yocto-utils.git
- * - mongoose : http://mongoosejs.com/
- *
- *
- * @date : 11/05/2015
- * @author : Cedric Balard &lt;cedric@yocto.re&gt;
- * @copyright : Yocto SAS, All right reserved
- * @class ControllerModels
- */
-function Controller() {
+* Yocto API : Models Controller
+*
+* Controller of models, laod models from a json file
+*
+* All models are save in an array and are accessible by calling method getModel
+*
+* For more details on these dependencies read links below :
+* - LodAsh : https://lodash.com/
+* - yocto-logger : git+ssh://lab.yocto.digital:yocto-node-modules/yocto-utils.git
+* - mongoose : http://mongoosejs.com/
+*
+* @date : 11/05/2015
+* @author : Cedric Balard &lt;cedric@yocto.re&gt;
+* @copyright : Yocto SAS, All right reserved
+* @class
+*/
+function Controller () {
 
   /**
-    * Array of Object that contains all models
-    *
-    * @property {Array} tabModel
-    * @default empty
-    */
+  * Array of Object that contains all models
+  *
+  * @property {Array} tabModel
+  * @default empty
+  */
   this.tabModel = [];
+
+  this.mongoose = mongoose;
+
+  this.logger   = logger;
 }
 
-/**
- * Create a new model and add it in tabModel
- *
- * @method addModel
- * @param {String} nameModel name of the model
- * @param {Object} model the model (formated in json)
- */
- Controller.prototype.addModel = function(nameModel, model) {
+Controller.prototype.addModel = function (model, pathModels) {
+  // Execute the joi vailidation
+  var result = modelJoiSchema.validate(model);
 
-  logger.info(&#x27;[ ControllerModel.addModel ] - &#x27; + nameModel);
+  // Check if have no error in joi validation
+  if (_.isEmpty(result) || _.isEmpty(result.error)) {
 
-  //Instantiate a new mongodb Schema based in model
-  this.model = new Schema(model);
+    try {
+      // Instantiate a new mongodb Schema based in model
+      var theSchema = new Schema(model.properties);
 
-  //Set the params
-  var t = [ nameModel, model ];
+      // Test if model have methods to implement
+      if (!_.isEmpty(model.fn)) {
+        logger.debbug(&#x27;[ ControllerModel.addModel ] - methods found for model : &#x27; + model.name);
+        // TODO : a téster comme dans oscar ; rajouter dans le readme ...
+        var funcFile = require(path.normalize(pathModels + model.name.toLowerCase() + &#x27;.js&#x27;));
 
-  // Generate the mongo Model
-  var mongModel = mongoose.model.apply(mongoose, t);
+        _.each(model.fn, function (fn) {
+          theSchema.methods[fn] = funcFile[fn];
+        });
+      }
 
-  //Add the MongoModel in the array tabModel
-  this.tabModel.push({
-                  name          : nameModel,
-                  mongooseModel : mongModel
-                 });
+      var mongModel = mongoose.model(model.name, theSchema);
+
+      // Add the MongoModel in the array tabModel
+      this.tabModel.push({
+        name          : model.name,
+        mongooseModel : mongModel
+      });
+      console.log(&#x27;[ ControllerModel.addModel ] - model added for : &#x27; + model.name);
+      return true;
+    } catch (e) {
+      this.logger.error(&#x27;[ ControllerModel.addModel ] - error, more details : &#x27; + e);
+      return false;
+    }
+  }
+
+  logger.error(&#x27;[ ControllerModel.addModel ] - error in JOI validation for model : &#x27; + model.name);
+
+  // log each error
+  _.forEach(result.error.details, function (val) {
+    this.logger.warning(&#x27;[ ControllerRoutes.addModel ] - &#x27; + val.message + &#x27; at &#x27; + val.path);
+  }, this);
+  return false;
+
 };
 
 /**
- * Initialise the Controller&lt;/br&gt;
- * Read models.json and load all models
- *
- * @method init
- */
-Controller.prototype.init = function(pathModels) {
+* Initialise the Controller&lt;/br&gt;
+* Retrieve all json file in folder &#x27;pathModels&#x27; and load all models
+*
+* @method init
+* @param {String} pathModels Path of folders that contains all jsonFile
+*/
+Controller.prototype.init = function (pathModels) {
 
-  logger.info(&#x27;[ ControllerModels.init ] - start&#x27;);
+  this.logger.info(&#x27;[ ControllerModels.init ] - start&#x27;);
 
-  //Get all json file in repoitory models
-  _.each(_.words(glob.sync(pathModels+&#x27;*.json&#x27;, &#x27;cwd&#x27;), /[^,,]+/g), function(file) {
+  // Get all json file in repoitory models
+  _.each(_.words(glob.sync(pathModels + &#x27;*.json&#x27;, &#x27;cwd&#x27;), /[^,,]+/g), function (file) {
 
-    //Import the file
-    var jsonFile = JSON.parse(fs.readFileSync(file), &#x27;utf-8&#x27;);
+    try {
+      // Import the file
+      var jsonFile = JSON.parse(fs.readFileSync(file), &#x27;utf-8&#x27;);
 
-    //Add the model in the main array
-    this.addModel(jsonFile.models.model.name, jsonFile.models.model.properties);
+      // Add the model in the main array
+      this.addModel(jsonFile.models.model, pathModels);
+
+    } catch (e) {
+      this.logger.error(&#x27;[ ControllerModels.init() ] - error rencountring during init,&#x27; +
+      &#x27; more details : &#x27; + e);
+    }
+
   }, this);
 };
 
@@ -172,28 +232,29 @@ Controller.prototype.init = function(pathModels) {
 * Get model from models.json and format it with mongoose
 *
 * @param {String} nameModel the name of model to retrieve
-* @return {Object} return the model if founded, or false otherwise
+* @return {Object} {Boolean} return the model if founded, or false otherwise
 */
-Controller.prototype.getModel = function(nameModel) {
+Controller.prototype.getModel = function (nameModel) {
 
   if (!_.isEmpty(nameModel) &amp;&amp; _.isString(nameModel)) {
 
     // return the model founded
-    var index = _.findIndex(this.tabModel, { &#x27;name&#x27;: nameModel });
+    var index = _.findIndex(this.tabModel, { &#x27;name&#x27; : nameModel });
 
-    //Test if a model was found
+    // Test if a model was found
     if (_.isUndefined(index) || (index &gt;= 0)) {
-      logger.info(&#x27;[ ControllerModels.getModel ] - get Model of : &#x27; + nameModel);
+      this.logger.info(&#x27;[ ControllerModels.getModel ] - get Model of : &#x27; + nameModel);
       return this.tabModel[index].mongooseModel;
     }
   }
-  logger.error(&#x27;[ ControllerModels.getModel ] - error model not found, model name is : &#x27; + nameModel);
-  return false;
+  this.logger.error(&#x27;[ ControllerModels.getModel ] - error model not found,&#x27; +
+  &#x27; model name is : &#x27; + nameModel);
+  return {};
 };
 
 /**
- * Export current Controller to use it on node
- */
+* Export current Controller to use it on node
+*/
 module.exports = new (Controller)();
 
     </pre>

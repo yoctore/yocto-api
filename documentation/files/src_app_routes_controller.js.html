@@ -17,7 +17,7 @@
                 <h1><img src="../assets/css/logo.png" title="yocto-api" width="117" height="52"></h1>
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.1.0</em>
+            <em>API Docs for: 0.1.1</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -38,8 +38,7 @@
                 
                         <div id="api-tabview-panel">
                             <ul id="api-classes" class="apis classes">
-                                <li><a href="../classes/ControllerModels.html">ControllerModels</a></li>
-                                <li><a href="../classes/ControllerRoutes.html">ControllerRoutes</a></li>
+                                <li><a href="../classes/.html"></a></li>
                             </ul>
                 
                             <ul id="api-modules" class="apis modules">
@@ -87,10 +86,8 @@ var _           = require(&#x27;lodash&#x27;);
 var logger      = require(&#x27;yocto-logger&#x27;);
 var express     = require(&#x27;express&#x27;);
 var models      = require(&#x27;../models/controller.js&#x27;);
-var dm          = require(&#x27;../defaultMessage.js&#x27;);
 var fs          = require(&#x27;fs&#x27;);
-
-
+var isObjectiId    = require(&#x27;mongoose&#x27;).Types.ObjectId;
 
 /**
 * List of all default property in a mongodb document
@@ -100,13 +97,13 @@ var fs          = require(&#x27;fs&#x27;);
 */
 var DEFAULT_PROP_MONGODB = [ &#x27;__v&#x27;, &#x27;_id&#x27; ];
 
-//Define a Joi schema for test if route have a goodformat
+// Define a Joi schema for test if route have a goodformat
 var routeJoiSchema = joi.object().keys({
-  path            : joi.string().required(),
-  alias           : joi.array().items(joi.string()),
-  model           : joi.string().required(),
-  paramToRetrieve : joi.array().items(joi.string()),
-  requestExcluded : joi.array().items(joi.string())
+  path            : joi.string().required().min(1).trim(),
+  alias           : joi.array().items(joi.string().min(1).trim()),
+  model           : joi.string().required().min(1).trim(),
+  paramToRetrieve : joi.array().items(joi.string().min(1).trim()),
+  requestExcluded : joi.array().items(joi.string().min(1).trim())
 });
 
 /**
@@ -124,14 +121,12 @@ var routeJoiSchema = joi.object().keys({
 * - express : http://expressjs.com/
 * - joi : https://github.com/hapijs/joi#array
 *
-*
-*
 * @date : 11/05/2015
 * @author : Cedric Balard &lt;cedric@yocto.re&gt;
 * @copyright : Yocto SAS, All right reserved
-* @class ControllerRoutes
+* @class
 */
-function Controller() {
+function Controller () {
 
   /**
   * List of all http request
@@ -157,312 +152,448 @@ function Controller() {
   */
   this.router = express();
 
-}
+  /**
+  * The main logger
+  *
+  * @property {Object} logger
+  */
+  this.logger = logger;
 
-/**
-* Test if string is defined &lt;/br&gt;
-* Used to dertermine if we call find() or findById()
-*
-* @method getFn
-* @param {Object} varToTest the var to test
-* @return {String} return &#x27;find&#x27; if varToTest is undefined, otherwise &#x27;findById&#x27;
-*/
-Controller.prototype.getFn = function(varToTest) {
+  /**
+  * Test if string is defined &lt;/br&gt;
+  * Used to dertermine if we call find() or findById()
+  *
+  * @method getFn
+  * @param {Object} varToTest the var to test
+  * @return {String} return &#x27;find&#x27; if varToTest is undefined, otherwise &#x27;findById&#x27;
+  */
+  this.getFunctionName = function (varToTest) {
 
-  if (_.isUndefined(varToTest)) {
-    return &#x27;find&#x27;;
-  }
-  return &#x27;findById&#x27;;
-};
+    if (_.isUndefined(varToTest)) {
+      return &#x27;find&#x27;;
+    }
+    return &#x27;findById&#x27;;
+  };
 
-/**
-* Implement the http request : GET and HEAD&lt;/br&gt;
-* Get an object &lt;/br&gt;
-* Send a error to the client if the request failed, or a json file to the client with the data requested if it&#x27;s an GET requerst &lt;/br&gt;
-* OR if it&#x27;s a head request, send a http header
-*
-* @method get
-* @param  {Object} model the data model object
-* @param  {String} path the root path
-* @param  {String} paramToGet The property to retrieve on url
-* @param  {String} reqType type of the http req (get or head)
-*/
-Controller.prototype.addHTTPRequestGets = function(model, path, paramToGet, reqType) {
+  /**
+  * Implement the http request : GET and HEAD&lt;/br&gt;
+  * Get an object &lt;/br&gt;
+  * Send a error to the client if the request failed, or a json file to the client with the data requested if it&#x27;s an GET requerst &lt;/br&gt;
+  * OR if it&#x27;s a head request, send a http header
+  *
+  * @method get
+  * @param  {Object} model the data model object
+  * @param  {String} path the root path
+  * @param  {String} paramToGet The property to retrieve on url
+  * @param  {String} reqType type of the http req (get or head)
+  */
+  this.addHTTPRequestGets = function (model, path, paramToGet, reqType) {
 
-  // Determine if paramToGet is not empty, and get good function name
-  var fn = this.getFn(paramToGet);
+    // Determine if paramToGet is not empty, and get good function name
+    var fn = this.getFunctionName(paramToGet);
 
-  // Add methode head to the route
-  this.router[reqType](path, function(req, res) {
+    // Add methode head to the route
+    this.router[reqType](path, function (req, res) {
 
-    logger.info(&#x27;[ ControllerRoutes.addHTTPRequest ] - revceiving &#x27; + reqType +&#x27; request, route is : &#x27; + path);
+      logger.info(&#x27;[ ControllerRoutes.addHTTPRequest ] - revceiving &#x27; + reqType + &#x27; request,&#x27; +
+      &#x27; route is : &#x27; + path);
 
-    // Find object
-    model[fn](req.params[paramToGet], function(err, val) {
+      // Find object
+      model[fn](req.params[paramToGet], function (err, val) {
+
+        // Default response to head request
+        var objToSend = {
+          code    : 200,
+          content : { success : &#x27;OK&#x27; }
+        };
+
+        if (err) {
+          objToSend = {
+            code    : 400,
+            content : { error : &#x27;error &#x27; + err }
+          };
+        } else if (_.isEmpty(val)) {
+          // Force to [] because by default is null
+          objToSend = {
+            code     : 200,
+            content  : []
+          };
+        } else if (reqType === &#x27;get&#x27;) {
+          objToSend = {
+            code     : 200,
+            content  : val
+          };
+        }
+
+        // Send respond to client
+        res.status(objToSend.code).jsonp(objToSend.content);
+      });
+    });
+  };
+
+  /**
+  * Implement the http request : PUT, PATCH and DELETE&lt;/br&gt;
+  * Get an object &lt;/br&gt;
+  * send a message to the client
+  *
+  * @method get
+  * @param  {Object} model the data model object
+  * @param  {String} path the root path
+  * @param  {String} paramToGet The property to retrieve on url
+  * @param  {String} reqType type of the http req (put, patch or head)
+  */
+  this.addHTTPRequest = function (model, path, paramToGet, reqType) {
+
+    // Save the scope
+    var scope = this;
+
+    // Add methode update to the route
+    this.router[reqType](path, function (req, res) {
+
+      logger.info(&#x27;[ ControllerRoutes.addHTTPRequest ] - revceiving &#x27; + reqType + &#x27; request,&#x27; +
+      &#x27; route is : &#x27; + path);
+
+      if (!_.isEmpty(paramToGet)) {
+        // determine wich cb should be called
+        if (reqType === &#x27;delete&#x27;) {
+          scope.deleteObject(model, res, req, paramToGet);
+          return;
+        }
+        scope.updateObject(model, res, req, paramToGet, scope, reqType);
+        return;
+      }
+
+      // Send an error response
+      res.status(400).jsonp({ error : &#x27;Id is not define&#x27; });
+    });
+  };
+
+  /**
+  * Update the model, it&#x27;s used for : PUT and PATCH
+  * Get an object &lt;/br&gt;
+  * send a message to the client
+  *
+  * @method get
+  * @param  {Object} model the data model object
+  * @param  {Object} res the http response
+  * @param  {Object} req the http request
+  * @param  {String} paramToGet The property to retrieve on url
+  */
+  this.updateObject = function (model, res, req, paramToGet, scope, reqType) {
+    // Find
+    model.findById(req.params[paramToGet], function (err, value) {
+
+      var updateObject = false;
+      var errorType = [];
+
+      // Default response
+      var objToSend = {
+        code    : 204,
+        content : { success : &#x27;No documents found to update&#x27; }
+      };
 
       if (err) {
-        res.send(err);
+        objToSend = {
+          code    : 400,
+          content : { error : err }
+        };
+      } else {
+        updateObject = true;
+        // Retrieve all property of the object in the current model, and omit default property of mongodb
+        _.each(_.omit(model.schema.paths, DEFAULT_PROP_MONGODB) , function (val, key) {
+
+          // Check if it&#x27;s an PUT request, if it&#x27;s an PATCH request and the val is empty we don&#x27;t set it
+          if ((reqType === &#x27;patch&#x27; &amp;&amp; !_.isUndefined(req.body[key])) || reqType === &#x27;put&#x27;) {
+
+            // Set value to save object later on db
+            value[key] = req.body[key];
+          }
+
+          // Compare data in object with model to check if it&#x27;s the good type
+          if (!_.isUndefined(req.body[key]) &amp;&amp; !scope.checkTypeValidation(val, req.body[key])) {
+
+            // Add error in an array to send to client
+            errorType.push(&#x27; &#x27; + key + &#x27; should be a : &#x27; +
+            (_.isArray(val.options.type) ? &#x27;[&#x27; + val.options.type + &#x27;]&#x27; : val.options.type));
+          }
+        });
       }
 
-      var cb = reqType ===&#x27;get&#x27; ? res.json(val) : res.status(200).send(&#x27;OK&#x27;);
+      // Save object in db
+      if (errorType.length &gt; 0) {
+        updateObject = false;
+        objToSend = {
+          code    : 400,
+          content : { error : &#x27;Error type validation for &#x27; + errorType.length +
+          &#x27; key, more details : &#x27; + errorType }
+        };
+      }
+
+      if (updateObject) {
+        scope.saveObject(value, res);
+        return;
+      }
+
+      // Send respond to client
+      res.status(objToSend.code).jsonp(objToSend.content);
     });
-  });
-};
+  };
 
-//Use for PUT, PATCH, DELETE
-/**
-* Implement the http request : PUT, PATCH and DELETE&lt;/br&gt;
-* Get an object &lt;/br&gt;
-* send a message to the client
-*
-* @method get
-* @param  {Object} model the data model object
-* @param  {String} path the root path
-* @param  {String} paramToGet The property to retrieve on url
-* @param  {String} reqType type of the http req (put, patch or head)
-*/
-Controller.prototype.addHTTPRequest = function(model, path, paramToGet, reqType) {
+  /**
+  * delete the model, it&#x27;s used for : DELETE &lt;/br&gt;
+  * Delete an object &lt;/br&gt;
+  * Send a error to the client if the request failed, otherwise a json file to the client with the data
+  *
+  * @method delete
+  * @param  {Object} model the data model object
+  * @param  {Object} res the http response
+  * @param  {Object} req the http request
+  * @param  {String} paramToGet The property to retrieve on url to delete the object
+  */
+  this.deleteObject = function (model, res, req, paramToGet) {
 
-  //Save the scope
-  var scope = this;
+    // remove the object and check for errors
+    model.remove({ _id : req.params[paramToGet] }, function (err, val) {
 
-  // Add methode update to the route
-  this.router[reqType](path, function(req, res) {
+      // Default response
+      var objToSend = {
+        code    : 400,
+        content : { error : err }
+      };
 
-    logger.info(&#x27;[ ControllerRoutes.addHTTPRequest ] - revceiving &#x27; + reqType +&#x27; request, route is : &#x27; + path);
+      if (!err) {
+        objToSend = {
+          code    : 200,
+          content : { success : val + &#x27; document(s) was deleted&#x27; }
+        };
+      }
 
-    if (_.isEmpty(paramToGet)) {
-      res.status(400).send(&#x27;Id not defined&#x27;);
-      return;
-    }
-
-    //determine wich cb is called
-    var cb = reqType === &#x27;delete&#x27; ? scope.deleteObject(model, res, req, paramToGet) : scope.updateObject(model, res, req, paramToGet, scope, reqType);
-  });
-};
-
-/**
-* Update the model, it&#x27;s used for : PUT and PATCH
-* Get an object &lt;/br&gt;
-* send a message to the client
-*
-* @method get
-* @param  {Object} model the data model object
-* @param  {Object} res the http response
-* @param  {Object} req the http request
-* @param  {String} paramToGet The property to retrieve on url
-* @param  {String} reqType type of the http req (put, patch or head)
-* @param  {Object} scope scope of the Controller
-*
-*/
-Controller.prototype.updateObject = function(model, res, req, paramToGet, scope, reqType) {
-
-  //Find
-  model.findById(req.params[paramToGet], function(err, value) {
-
-    if (err) {
-      res.send(err);
-    }
-
-    //Retrieve all property of the object in the current model, and omit default property of mongodb
-    _.each((reqType === &#x27;put&#x27;) ? _.omit(model.schema.paths, DEFAULT_PROP_MONGODB) : req.body, function(val, key) {
-
-      value[key] = req.body[key];
-
-      //Add a validation step for model
-      scope.checkModelValidation(val, value, key);
+      // Send response to client
+      res.status(objToSend.code).jsonp(objToSend.content);
     });
+  };
 
-    //save object in db
-    scope.saveObject(value, res);
-  });
-};
+  /**
+  * Save an object in db, it&#x27;s used for : PUT, PATCH and POST &lt;/br&gt;
+  * Send a error to the client if the request failed, otherwise a json file to the client with the data
+  *
+  * @method saveObject
+  * @param  {Object} obj the data model object
+  * @param  {Object} res the http response
+  */
+  this.saveObject = function (obj, res) {
 
-/**
-* delete the model, it&#x27;s used for : DELETE &lt;/br&gt;
-* Delete an object &lt;/br&gt;
-* Send a error to the client if the request failed, otherwise a json file to the client with the data
-*
-* @method delete
-* @param  {Object} model the data model object
-* @param  {Object} res the http response
-* @param  {Object} req the http request
-* @param  {String} paramToGet The property to retrieve on url to delete the object
-*/
-Controller.prototype.deleteObject = function(model, res, req, paramToGet) {
+    // save the object and check for errors
+    obj.save(function (err) {
 
-  // remove the object and check for errors
-  model.remove({_id: req.params[paramToGet]}, function(err, user) {
+      // Default response
+      var objToSend = {
+        code    : 400,
+        content : { error : err }
+      };
 
-    if (err) {
-      res.send(err);
-    }
+      if (!err) {
+        objToSend = {
+          code    : 200,
+          content : { success : &#x27;Operation success&#x27; }
+        };
+      }
 
-    //Succes so Send a jsonfile
-    res.json(dm.success);
-  });
-};
-
-/**
-* Save an object in db, it&#x27;s used for : PUT, PATCH and POST &lt;/br&gt;
-* Send a error to the client if the request failed, otherwise a json file to the client with the data
-*
-* @method delete
-* @param  {Object} model the data model object
-* @param  {Object} res the http response
-* @param  {Object} req the http request
-* @param  {String} paramToGet The property to retrieve on url to delete the object
-*/
-Controller.prototype.saveObject = function(obj, res) {
-
-  // save the object and check for errors
-  obj.save(function(err) {
-
-    if (err) {
-      res.send(err);
-    }
-
-    //Succes so Send a jsonfile
-    res.json(dm.success);
-  });
-};
-
-/**
-* Implement the http request : POST &lt;/br&gt;
-* Add a new Object in DB &lt;/br&gt;
-* Send a error to the client if the request failed, otherwise a json file to the client with the data
-*
-* @method post
-* @param  {Object} Model the data model object (Model start with an uppercase for jshint validation)
-* @param  {String} path the root path
-*/
-Controller.prototype.post = function(Model, path) {
-
-  //Save the scope
-  var scope = this;
-
-  // Add methode post to the route
-  this.router.post(path, function(req, res) {
-
-    logger.info(&#x27;[ ControllerRoutes.post ] - revceiving request, route is : &#x27; + path);
-
-    //Create a instance of model, used to save in db
-    var obj = new Model();
-
-    //Retrieve all property of the object in the current model, and omit default property of mongodb
-    _.each(_.omit(Model.schema.paths, DEFAULT_PROP_MONGODB), function(val, key) {
-
-      //Add the propriety to the new object
-      obj[key] = req.body[key];
-
-      //Add a validation step for model
-      scope.checkModelValidation(val, obj, key);
+      // Send response to client
+      res.status(objToSend.code).jsonp(objToSend.content);
     });
+  };
 
-    //Save object in db
-    scope.saveObject(obj, res);
-  });
-};
+  /**
+  * Implement the http request : POST &lt;/br&gt;
+  * Add a new Object in DB &lt;/br&gt;
+  * Send a error to the client if the request failed, otherwise a json file to the client with the data
+  *
+  * @method post
+  * @param  {Object} Model the data model object (Model start with an uppercase for jshint validation)
+  * @param  {String} path the root path
+  */
+  this.post = function (Model, path) {
 
-/**
-* Check if the parameter should not be empty &lt;/br&gt;
-* And if it&#x27;s the case, add a validation step into mongoose
-*
-* @method checkModelValidation
-* @param {Object} val the value
-* @param {Object} value the object
-* @param {String} key the key of the value
-*/
-Controller.prototype.checkModelValidation = function(val, value, key) {
+    // Save the scope
+    var scope = this;
 
-  //Add a validation step for model
-  if (!_.isUndefined(val.caster)) {
-    if (!_.isUndefined(val.caster.isRequired)) {
+    // Add methode post to the route
+    this.router.post(path, function (req, res) {
 
-      //Add a validation step for model
-      value.schema.path(key).validate(function(valueToUpdate) {
+      logger.debug(&#x27;[ ControllerRoutes.post ] - revceiving request, route is : &#x27; + path);
 
-        //test if the var is empty, and return false to show that the validation failed
-        if (_.isEmpty(_.compact(valueToUpdate))) {
+      // Create a instance of model, used to save in db
+      var obj                   = new Model();
+      var errorType             = [];
+
+      // Retrieve all property of the object in the current model, and omit default property of mongodb
+      _.each(_.omit(Model.schema.paths, DEFAULT_PROP_MONGODB), function (val, key) {
+
+        // Compare data in object with model to check if it&#x27;s the good type
+        if (!_.isUndefined(req.body[key]) &amp;&amp; !scope.checkTypeValidation(val, req.body[key])) {
+          errorType.push(&#x27; &#x27; + key + &#x27; should be a &#x27; +
+          (_.isArray(val.options.type) ? &#x27;[&#x27; + val.options.type + &#x27;]&#x27; : val.options.type));
+        }
+
+        // Add the propriety to the new object
+        obj[key] = req.body[key];
+      });
+
+      // Save object in db
+      if (_.isEmpty(errorType)) {
+        scope.saveObject(obj, res);
+        return;
+      }
+
+      // Send respond to client
+      res.status(400).jsonp({ error : &#x27;Error type validation for &#x27; + errorType.length +
+      &#x27; key, more details : &#x27; + errorType });
+    });
+  };
+
+  /**
+  * Compare data in object with model to check if it&#x27;s the good type
+  *
+  * @method checkTypeValidation
+  * @param {Object} val the mongoose model
+  * @param {Object} param the param to compare
+  * @return {Boolean} to success
+  */
+  this.checkTypeValidation = function (val, param) {
+
+    // Add a validation step for model
+    var typeOfParam = this.getTypeParam(param);
+    // Test is is string
+    if (_.isString(val.options.type) &amp;&amp; typeOfParam === val.options.type.toLowerCase()) {
+      return true;
+    } else if (_.isArray(val.options.type) &amp;&amp; typeOfParam === &#x27;array&#x27;) {
+      // test the other type
+      var succes = true;
+      _.each(param, function (tmp) {
+        // add specific test for string, because an object id is a string too.
+        if (this.getTypeParam(tmp) !== val.options.type[0].toLowerCase() &amp;&amp;
+        (val.options.type[0].toLowerCase() === &#x27;string&#x27; &amp;&amp; this.getTypeParam(tmp) === &#x27;string&#x27;)) {
+          succes = false;
           return false;
         }
-      });
+      }, this);
+
+      if (succes) {
+        return true;
+      }
     }
-  }
-};
+    return false;
+  };
 
-/**
-* Add a route to the main router
-*
-* @method addRoute
-* @param {String} path route to add
-* @param {String} nameModel name of the model object to retrieve into the controller of model
-* @param {Array} reqExcluded array of excluded request
-* @param {String} paramToRetrieve name of the param to retrieve
-*/
-Controller.prototype.addRoute = function(path, nameModel, reqExcluded, paramToRetrieve) {
+  /**
+  *
+  * @method getTypeParam
+  * @param  {Object} param the param to get the type
+  */
+  this.getTypeParam = function (param) {
+    if (_.isArray(param)) {
+      return &#x27;array&#x27;;
+    }
 
-  logger.info(&quot;[ ControllerRoutes.addRoute ] - new route found, path : &quot; + path);
+    // test parse object to determine his type
+    try {
+      param = JSON.parse(param);
 
-  //retrieve the model
-  var model = this.models.getModel(nameModel);
-
-  //check if model is not false
-  if (model !== false) {
-    logger.info(&quot;[ ControllerRoutes.addRoute ] - adding new route, path : &quot; + path);
-
-    //Handle wich requests are implemented
-    //Retrieve the difference betwenn ALL_HTTP_REQUESTS and all requests excluded
-    _.each(_.difference(this.ALL_HTTP_REQUESTS, reqExcluded), function(fn) {
-
-      if (fn ===&#x27;patch&#x27; || fn ===&#x27;put&#x27; || fn ===&#x27;delete&#x27;) {
-
-        //add request
-        this.addHTTPRequest(model, path, paramToRetrieve, fn);
-      } else if (fn ===&#x27;get&#x27; || fn ===&#x27;head&#x27;) {
-
-        //add request
-        this.addHTTPRequestGets(model, path, paramToRetrieve, fn);
-      } else {
-
-        //Call function by his name
-        this[fn](model, path, paramToRetrieve);
+      if (_.isArray(param)) {
+        return &#x27;array&#x27;;
+      } else if (_.isString(param)) {
+        return &#x27;string&#x27;;
+      } else if (_.isObject(param)) {
+        return &#x27;object&#x27;;
+      } else if (_.isNumber(param)) {
+        return &#x27;number&#x27;;
       }
-    }, this);
-    return true;
-  }
-  logger.warning(&#x27;[ ControllerRoutes.addRoute ] - can\&#x27;t add route : \&#x27;&#x27; + path + &#x27;\&#x27; ,because model is not defined&#x27;);
-  return false;
-};
+    } catch (e) {
+    }
 
-/**
-* Add a middleware
-*
-* @method addMidlleware
-*/
-Controller.prototype.addMidlleware = function() {
+    // If parse failed, test if param is not a objectid
+    try {
+      isObjectiId(param);
+      return &#x27;objectid&#x27;;
+    } catch (e) {
+      return &#x27;string&#x27;;
+    }
+  };
 
-  this.router.use(function(req, res, next) {
+  /**
+  * Add a route to the main router
+  *
+  * @method addRoute
+  * @param {String} path route to add
+  * @param {String} nameModel name of the model object to retrieve into the controller of model
+  * @param {Array} reqExcluded array of excluded request
+  * @param {String} paramToRetrieve name of the param to retrieve
+  */
+  this.addRoute = function (path, nameModel, reqExcluded, paramToRetrieve) {
 
-    logger.debug(&#x27;[ ControllerRoutes.Middleware ] - incoming request&#x27;);
+    logger.info(&#x27;[ ControllerRoutes.addRoute ] - new route found, path : &#x27; + path);
 
-    // Enable exoress CORS
-    res.header(&quot;Access-Control-Allow-Origin&quot;, &quot;*&quot;);
-    res.header(&quot;Access-Control-Allow-Headers&quot;, &quot;Origin, X-Requested-With, Content-Type, Accept&quot;);
-    res.header(&quot;Access-Control-Allow-Methods&quot;, &quot;GET, POST, PUT, DELETE, PATCH, OPTIONS&quot;);
+    // retrieve the model
+    var model = this.models.getModel(nameModel);
 
-    //Read all property of the request and delete all property that have an empty value
-    _.each(req.body, function(value, key) {
+    // check if model is not false
+    if (model !== false) {
+      logger.info(&#x27;[ ControllerRoutes.addRoute ] - adding new route, path : &#x27; + path);
 
-      if(_.isEmpty(value))
-      {
-        delete req.body[key];
-      }
+      // Handle wich requests are implemented
+      // Retrieve the difference betwenn ALL_HTTP_REQUESTS and all requests excluded
+      _.each(_.difference(this.ALL_HTTP_REQUESTS, reqExcluded), function (fn) {
+
+        if (fn === &#x27;patch&#x27; || fn === &#x27;put&#x27; || fn === &#x27;delete&#x27;) {
+
+          // add request
+          this.addHTTPRequest(model, path, paramToRetrieve, fn);
+        } else if (fn === &#x27;get&#x27; || fn === &#x27;head&#x27;) {
+
+          // add request
+          this.addHTTPRequestGets(model, path, paramToRetrieve, fn);
+        } else {
+
+          // Call function by his name  ( POST request)
+          this[fn](model, path, paramToRetrieve);
+        }
+      }, this);
+      return true;
+    }
+    logger.warning(&#x27;[ ControllerRoutes.addRoute ] - can\&#x27;t add route : \&#x27;&#x27; +
+    path + &#x27;\&#x27; ,because model is not defined&#x27;);
+    return false;
+  };
+
+  /**
+  * Add a middleware
+  *
+  * @method addMidlleware
+  */
+  this.addMidlleware = function () {
+
+    this.router.use(function (req, res, next) {
+
+      logger.debug(&#x27;[ ControllerRoutes.Middleware ] - incoming request&#x27;);
+
+      // Enable exoress CORS
+      res.header(&#x27;Access-Control-Allow-Origin&#x27;, &#x27;*&#x27;);
+      res.header(&#x27;Access-Control-Allow-Headers&#x27;, &#x27;Origin, X-Requested-With, Content-Type, Accept&#x27;);
+      res.header(&#x27;Access-Control-Allow-Methods&#x27;, &#x27;GET, POST, PUT, DELETE, PATCH, OPTIONS&#x27;);
+
+      // Read all property of the request and delete all property that have an empty value
+      _.each(req.body, function (value, key) {
+
+        if (_.isEmpty(value)) {
+          delete req.body[key];
+        }
+      });
+
+      next(); // make sure we go to the next routes and don&#x27;t stop here
     });
-
-    next(); // make sure we go to the next routes and don&#x27;t stop here
-  });
-};
+  };
+}
 
 /**
 * Initialise the controller &lt;/br&gt;
@@ -470,55 +601,69 @@ Controller.prototype.addMidlleware = function() {
 *
 * @method init
 */
-Controller.prototype.init = function(pathRoutes, pathModels) {
-  logger.info(&#x27;[ ControllerRoutes.init ] - start&#x27;);
+Controller.prototype.init = function (pathRoutes, pathModels) {
+  logger.debug(&#x27;[ ControllerRoutes.init ] - start&#x27;);
 
+  // test if string
   if (!_.isString(pathRoutes) || !_.isString(pathModels)) {
     return false;
   }
 
-  var routes = JSON.parse(fs.readFileSync(pathRoutes, &#x27;utf-8&#x27;));
+  var routes = {};
 
-  //Init models Controller
+  // Test if file exist and retrive routes file
+  try {
+    fs.accessSync(pathRoutes);
+    fs.accessSync(pathModels);
+    routes = JSON.parse(fs.readFileSync(pathRoutes, &#x27;utf-8&#x27;));
+  } catch (e) {
+    logger.error(&#x27;[ ControllerRoutes.init ] - error during loading files, more details : &#x27; + e);
+    return false;
+  }
+
+  // Init models Controller
   this.models.init(pathModels);
 
-  //Ass middleware
+  // Ass middleware
   this.addMidlleware();
 
-  // read json file and add routes
-  _.each(routes.routes, function(route) {
+  // read json file and add each routes
+  _.each(routes.routes, function (route) {
 
-    //Execute the joi vailidation
+    // Execute the joi vailidation
     var result = routeJoiSchema.validate(route);
 
-    //Check if have no error in joi validation
+    // Check if have no error in joi validation
     if (_.isEmpty(result) || _.isEmpty(result.error)) {
 
-      //create a array that contains the main route, and all thoose aliases
+      // create a array that contains the main route, and all thoose aliases
       var routeAndAlias = [];
       routeAndAlias.push(route.path);
 
-      //Add alias if exists
+      // Add alias if exists
       if (!_.isEmpty(route.alias)) {
         routeAndAlias.push(route.alias);
         routeAndAlias = _.flatten(routeAndAlias);
       }
 
-      //add Main route
-      _.each(routeAndAlias, function(val) {
+      // add Main route
+      _.each(routeAndAlias, function (val) {
         this.addRoute(val, route.model, route.requestExcluded, route.paramToRetrieve);
       }, this);
 
     } else {
-      logger.error(&#x27;[ ControllerRoutes.init ] - error when trying to add a new route, please check the file : \&#x27;routes.json\&#x27;&#x27;);
+      logger.error(&#x27;[ ControllerRoutes.init ] - error when trying to add a new route,&#x27; +
+      &#x27; please check the file : \&#x27;routes.json\&#x27;&#x27;);
 
-      //log each error
-      _.forEach(result.error.details, function(val) {
+      // log each error
+      _.forEach(result.error.details, function (val) {
 
         logger.warning(&#x27;[ ControllerRoutes.init ] - &#x27; + val.message + &#x27; at &#x27; + val.path);
       });
     }
   }, this);
+
+  return true;
 };
 
 /**

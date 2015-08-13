@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>src/app/defaultMessage.js - yocto-api</title>
+    <title>test/web/httpRequest.js - yocto-api</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -17,7 +17,7 @@
                 <h1><img src="../assets/css/logo.png" title="yocto-api" width="117" height="52"></h1>
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.1.0</em>
+            <em>API Docs for: 0.1.1</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -38,8 +38,7 @@
                 
                         <div id="api-tabview-panel">
                             <ul id="api-classes" class="apis classes">
-                                <li><a href="../classes/ControllerModels.html">ControllerModels</a></li>
-                                <li><a href="../classes/ControllerRoutes.html">ControllerRoutes</a></li>
+                                <li><a href="../classes/.html"></a></li>
                             </ul>
                 
                             <ul id="api-modules" class="apis modules">
@@ -76,43 +75,73 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-<h1 class="file-heading">File: src/app/defaultMessage.js</h1>
+<h1 class="file-heading">File: test/web/httpRequest.js</h1>
 
 <div class="file">
     <pre class="code prettyprint linenums">
 /**
- * Creator of message
- */
+* Unit tests
+*/
+var expect     = require(&quot;chai&quot;).expect;
+var _          = require(&#x27;lodash&#x27;);
+var server     = require(&#x27;../../example/server-with-exports.js&#x27;);
+var superagent = require(&#x27;superagent&#x27;);
+var assert     = require(&#x27;assert&#x27;);
+var status     = require(&#x27;http-status&#x27;);
 
-var _   = require(&#x27;lodash&#x27;);
+describe(&#x27;httpRequests&#x27;, function() {
+  var app;
+  var port = 8089;
+  var url = &#x27;http://localhost:&#x27; + port + &#x27;/api&#x27;;
+  before(function() {
+    console.log(&#x27;--- start server&#x27;);
+    app = server(port);
+  });
 
-var defaultMessage = {
-    code    : &#x27;&#x27;,
-    message : &#x27;&#x27;,
-    data    : {}
-};
-
-var code200 = _.merge(defaultMessage, { code : &#x27;200&#x27; });
-
-var newMessage = function(codeMessage, messageText) {
-    var codeTemp = _.clone(codeMessage);
-    return _.merge(codeTemp, { message : messageText });
-};
-
-var welcome     = newMessage(code200, &#x27;Welcome to the api&#x27;);
-var userCreated = newMessage(code200, &#x27;User was created with success&#x27;);
-var userUpdated = newMessage(code200, &#x27;User was updated with success&#x27;);
-var userDeleted = newMessage(code200, &#x27;User was deleted with success&#x27;);
-var success     = newMessage(code200, &#x27;Operation success&#x27;);
+  after(function() {
+    app.close();
+    console.log(&#x27;--- close server&#x27;);
+  });
 
 
-module.exports = {
-    welcome             : welcome,
-    userCreatedSucces   : userCreated,
-    userUpdated         : userUpdated,
-    userDeleted         : userDeleted,
-    success             : success
-};
+  it(&#x27;returns all user - should return 200 and json object&#x27;, function(done) {
+
+    superagent.get(url + &#x27;/user&#x27;).end(function(err, res) {
+      assert.ifError(err);
+      assert.equal(res.status, status.OK);
+
+      var result = JSON.parse(res.text);
+      done();
+    });
+  });
+
+  it(&#x27;returns error if param id is not a goofformat&#x27;, function(done) {
+
+    superagent.get(url + &#x27;/user/3&#x27;).end(function(err, res) {
+      assert.ifError(err);
+      assert.equal(res.status, 400);
+
+      done();
+    });
+  });
+  
+  it(&#x27;returns username if name param is a valid user&#x27;, function(done) {
+
+    superagent.post(url + &#x27;/user&#x27;)
+    .send({ name : &#x27;toto&#x27;, firstname : &#x27;tata&#x27; , email : &#x27;toto@toto&#x27;})
+    .set(&#x27;Accept&#x27;, &#x27;application/json&#x27;)
+    .end(function(err, res) {
+      var result = JSON.parse(res.text);
+      console.log(result);
+      assert.ifError(err);
+      assert.equal(res.status, status.OK);
+    //  assert.equal(result.message, &#x27;Validation failed&#x27;);
+
+      done();
+    });
+  });
+
+});
 
     </pre>
 </div>

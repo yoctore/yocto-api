@@ -1,8 +1,7 @@
 YUI.add("yuidoc-meta", function(Y) {
    Y.YUIDoc = { meta: {
     "classes": [
-        "ControllerModels",
-        "ControllerRoutes"
+        null
     ],
     "modules": [],
     "allModules": []
