@@ -39,8 +39,7 @@ module.exports = function(grunt) {
       my_target : {
         files : {
            'dist/app/models/controller.js' : ['src/app/models/controller.js'],
-           'dist/app/routes/controller.js' : ['src/app/routes/controller.js'],
-           'dist/app/defaultMessage.js' : ['src/app/defaultMessage.js']
+           'dist/app/routes/controller.js' : ['src/app/routes/controller.js']
         }
       }
      },
@@ -113,7 +112,7 @@ module.exports = function(grunt) {
           jshint : {}
         },
         // Set all your file here
-        all : [ 'src/app/models/controller.js', 'src/app/routes/controller.js', 'src/app/defaultMessage.js' ]
+        all : [ 'src/app/models/controller.js', 'src/app/routes/controller.js' ]
       }
     });
 

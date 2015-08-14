@@ -351,7 +351,7 @@
         },
         {
             "file": "src/app/routes/controller.js",
-            "line": 408,
+            "line": 416,
             "itemtype": "method",
             "name": "getTypeParam",
             "params": [
@@ -365,7 +365,7 @@
         },
         {
             "file": "src/app/routes/controller.js",
-            "line": 443,
+            "line": 452,
             "description": "Add a route to the main router",
             "itemtype": "method",
             "name": "addRoute",
@@ -395,7 +395,7 @@
         },
         {
             "file": "src/app/routes/controller.js",
-            "line": 488,
+            "line": 497,
             "description": "Add a middleware",
             "itemtype": "method",
             "name": "addMidlleware",
@@ -403,7 +403,7 @@
         },
         {
             "file": "src/app/routes/controller.js",
-            "line": 517,
+            "line": 526,
             "description": "Initialise the controller </br>\nRetrieve all routes and thoose alias and add there into router",
             "itemtype": "method",
             "name": "init",
@@ -411,7 +411,7 @@
         },
         {
             "file": "src/app/routes/controller.js",
-            "line": 588,
+            "line": 597,
             "description": "Export current Controller to use it on node",
             "class": ""
         },
@@ -455,7 +455,7 @@
         },
         {
             "message": "Missing item type\nExport current Controller to use it on node",
-            "line": " src/app/routes/controller.js:588"
+            "line": " src/app/routes/controller.js:597"
         },
         {
             "message": "Missing item type\nUnit tests",
