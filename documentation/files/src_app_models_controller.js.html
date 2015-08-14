@@ -90,8 +90,14 @@ var fs          = require(&#x27;fs&#x27;);
 var path        = require(&#x27;path&#x27;);
 var joi         = require(&#x27;joi&#x27;);
 
+/**
+ * List of valid type that can use with yocto-api
+ * @type {Array}
+ * @default [&#x27;String&#x27;, &#x27;ObjectId&#x27;, &#x27;Number&#x27;, &#x27;Boolean&#x27;]
+ */
 var LIST_VALID_TYPE_JOI = [&#x27;String&#x27;, &#x27;ObjectId&#x27;, &#x27;Number&#x27;, &#x27;Boolean&#x27;];
 
+// Schema of joi validation, each models should pass this validation
 var modelJoiSchema = joi.object().keys({
   name            : joi.string().required().min(1).trim(),
   properties      : joi.object().required().min(1).pattern(/.+/, [
@@ -140,19 +146,37 @@ var modelJoiSchema = joi.object().keys({
 function Controller () {
 
   /**
-  * Array of Object that contains all models
+  * Array of Object that contains all models found in folder
   *
   * @property {Array} tabModel
   * @default empty
   */
   this.tabModel = [];
 
+  /**
+   * Load mongoose controller to execute operation on database
+   * @type {Object}
+   */
   this.mongoose = mongoose;
 
+  /**
+   * Default logger
+   * @type {Object}
+   */
   this.logger   = logger;
 }
 
+/**
+ * Add model in @tabModel
+ * To be added, the model should before pass with success the joi validation
+ * If model.fn isn&#x27;t empty, all methods specified will be added in model.methods
+ *
+ * @method addModel
+ * @param {Object} model      [description]
+ * @param {String} pathModels [description]
+ */
 Controller.prototype.addModel = function (model, pathModels) {
+
   // Execute the joi vailidation
   var result = modelJoiSchema.validate(model);
 
@@ -163,17 +187,21 @@ Controller.prototype.addModel = function (model, pathModels) {
       // Instantiate a new mongodb Schema based in model
       var theSchema = new Schema(model.properties);
 
+      // TODO : a téster comme dans oscar ; rajouter dans le readme ...
       // Test if model have methods to implement
       if (!_.isEmpty(model.fn)) {
         logger.debbug(&#x27;[ ControllerModel.addModel ] - methods found for model : &#x27; + model.name);
-        // TODO : a téster comme dans oscar ; rajouter dans le readme ...
+
+        // Load corresponded file to retrieve function
         var funcFile = require(path.normalize(pathModels + model.name.toLowerCase() + &#x27;.js&#x27;));
 
+        // Read each propety to retrievethe fn (function name) of each function
         _.each(model.fn, function (fn) {
           theSchema.methods[fn] = funcFile[fn];
         });
       }
 
+      // Create mongobd model based on the json model file
       var mongModel = mongoose.model(model.name, theSchema);
 
       // Add the MongoModel in the array tabModel
@@ -181,9 +209,11 @@ Controller.prototype.addModel = function (model, pathModels) {
         name          : model.name,
         mongooseModel : mongModel
       });
-      console.log(&#x27;[ ControllerModel.addModel ] - model added for : &#x27; + model.name);
+
+      this.logger.debug(&#x27;[ ControllerModel.addModel ] - model added for : &#x27; + model.name);
       return true;
     } catch (e) {
+
       this.logger.error(&#x27;[ ControllerModel.addModel ] - error, more details : &#x27; + e);
       return false;
     }
@@ -196,7 +226,6 @@ Controller.prototype.addModel = function (model, pathModels) {
     this.logger.warning(&#x27;[ ControllerRoutes.addModel ] - &#x27; + val.message + &#x27; at &#x27; + val.path);
   }, this);
   return false;
-
 };
 
 /**
@@ -221,10 +250,10 @@ Controller.prototype.init = function (pathModels) {
       this.addModel(jsonFile.models.model, pathModels);
 
     } catch (e) {
+
       this.logger.error(&#x27;[ ControllerModels.init() ] - error rencountring during init,&#x27; +
       &#x27; more details : &#x27; + e);
     }
-
   }, this);
 };
 

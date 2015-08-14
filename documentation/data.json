@@ -51,8 +51,16 @@
     "classitems": [
         {
             "file": "src/app/models/controller.js",
-            "line": 61,
-            "description": "Array of Object that contains all models",
+            "line": 12,
+            "description": "List of valid type that can use with yocto-api",
+            "type": "{Array}",
+            "default": "['String', 'ObjectId', 'Number', 'Boolean']",
+            "class": ""
+        },
+        {
+            "file": "src/app/models/controller.js",
+            "line": 67,
+            "description": "Array of Object that contains all models found in folder",
             "itemtype": "property",
             "name": "tabModel",
             "type": "Array",
@@ -61,7 +69,41 @@
         },
         {
             "file": "src/app/models/controller.js",
-            "line": 121,
+            "line": 75,
+            "description": "Load mongoose controller to execute operation on database",
+            "type": "{Object}",
+            "class": ""
+        },
+        {
+            "file": "src/app/models/controller.js",
+            "line": 81,
+            "description": "Default logger",
+            "type": "{Object}",
+            "class": ""
+        },
+        {
+            "file": "src/app/models/controller.js",
+            "line": 88,
+            "description": "Add model in @tabModel\nTo be added, the model should before pass with success the joi validation\nIf model.fn isn't empty, all methods specified will be added in model.methods",
+            "itemtype": "method",
+            "name": "addModel",
+            "params": [
+                {
+                    "name": "model",
+                    "description": "[description]",
+                    "type": "Object"
+                },
+                {
+                    "name": "pathModels",
+                    "description": "[description]",
+                    "type": "String"
+                }
+            ],
+            "class": ""
+        },
+        {
+            "file": "src/app/models/controller.js",
+            "line": 150,
             "description": "Initialise the Controller</br>\nRetrieve all json file in folder 'pathModels' and load all models",
             "itemtype": "method",
             "name": "init",
@@ -76,7 +118,7 @@
         },
         {
             "file": "src/app/models/controller.js",
-            "line": 150,
+            "line": 179,
             "description": "Get model from models.json and format it with mongoose",
             "params": [
                 {
@@ -93,14 +135,14 @@
         },
         {
             "file": "src/app/models/controller.js",
-            "line": 174,
+            "line": 203,
             "description": "Export current Controller to use it on node",
             "class": ""
         },
         {
             "file": "src/app/routes/controller.js",
-            "line": 11,
-            "description": "List of all default property in a mongodb document\nyoct",
+            "line": 10,
+            "description": "List of all default property in a mongodb document <br>\nThis list define all property that we don't want retrive",
             "itemtype": "property",
             "name": "DEFAULT_PROP_MONGODB",
             "type": "Array",
@@ -110,7 +152,7 @@
         {
             "file": "src/app/routes/controller.js",
             "line": 50,
-            "description": "List of all http request",
+            "description": "List of all http request that supported by api",
             "itemtype": "property",
             "name": "ALL_HTTP_REQUESTS",
             "type": "Array",
@@ -149,28 +191,9 @@
         {
             "file": "src/app/routes/controller.js",
             "line": 81,
-            "description": "Test if string is defined </br>\nUsed to dertermine if we call find() or findById()",
-            "itemtype": "method",
-            "name": "getFn",
-            "params": [
-                {
-                    "name": "varToTest",
-                    "description": "the var to test",
-                    "type": "Object"
-                }
-            ],
-            "return": {
-                "description": "return 'find' if varToTest is undefined, otherwise 'findById'",
-                "type": "String"
-            },
-            "class": ""
-        },
-        {
-            "file": "src/app/routes/controller.js",
-            "line": 97,
             "description": "Implement the http request : GET and HEAD</br>\nGet an object </br>\nSend a error to the client if the request failed, or a json file to the client with the data requested if it's an GET requerst </br>\nOR if it's a head request, send a http header",
             "itemtype": "method",
-            "name": "get",
+            "name": "addHTTPRequestGets",
             "params": [
                 {
                     "name": "model",
@@ -197,7 +220,7 @@
         },
         {
             "file": "src/app/routes/controller.js",
-            "line": 153,
+            "line": 132,
             "description": "Implement the http request : PUT, PATCH and DELETE</br>\nGet an object </br>\nsend a message to the client",
             "itemtype": "method",
             "name": "get",
@@ -227,7 +250,7 @@
         },
         {
             "file": "src/app/routes/controller.js",
-            "line": 190,
+            "line": 167,
             "description": "Update the model, it's used for : PUT and PATCH\nGet an object </br>\nsend a message to the client",
             "itemtype": "method",
             "name": "get",
@@ -257,7 +280,7 @@
         },
         {
             "file": "src/app/routes/controller.js",
-            "line": 261,
+            "line": 237,
             "description": "delete the model, it's used for : DELETE </br>\nDelete an object </br>\nSend a error to the client if the request failed, otherwise a json file to the client with the data",
             "itemtype": "method",
             "name": "delete",
@@ -287,7 +310,7 @@
         },
         {
             "file": "src/app/routes/controller.js",
-            "line": 295,
+            "line": 269,
             "description": "Save an object in db, it's used for : PUT, PATCH and POST </br>\nSend a error to the client if the request failed, otherwise a json file to the client with the data",
             "itemtype": "method",
             "name": "saveObject",
@@ -307,7 +330,7 @@
         },
         {
             "file": "src/app/routes/controller.js",
-            "line": 326,
+            "line": 298,
             "description": "Implement the http request : POST </br>\nAdd a new Object in DB </br>\nSend a error to the client if the request failed, otherwise a json file to the client with the data",
             "itemtype": "method",
             "name": "post",
@@ -327,7 +350,7 @@
         },
         {
             "file": "src/app/routes/controller.js",
-            "line": 374,
+            "line": 345,
             "description": "Compare data in object with model to check if it's the good type",
             "itemtype": "method",
             "name": "checkTypeValidation",
@@ -351,7 +374,8 @@
         },
         {
             "file": "src/app/routes/controller.js",
-            "line": 416,
+            "line": 383,
+            "description": "Return the type of param",
             "itemtype": "method",
             "name": "getTypeParam",
             "params": [
@@ -365,7 +389,7 @@
         },
         {
             "file": "src/app/routes/controller.js",
-            "line": 452,
+            "line": 403,
             "description": "Add a route to the main router",
             "itemtype": "method",
             "name": "addRoute",
@@ -395,15 +419,15 @@
         },
         {
             "file": "src/app/routes/controller.js",
-            "line": 497,
-            "description": "Add a middleware",
+            "line": 448,
+            "description": "Add a middleware that enables CORS",
             "itemtype": "method",
             "name": "addMidlleware",
             "class": ""
         },
         {
             "file": "src/app/routes/controller.js",
-            "line": 526,
+            "line": 470,
             "description": "Initialise the controller </br>\nRetrieve all routes and thoose alias and add there into router",
             "itemtype": "method",
             "name": "init",
@@ -411,7 +435,7 @@
         },
         {
             "file": "src/app/routes/controller.js",
-            "line": 597,
+            "line": 547,
             "description": "Export current Controller to use it on node",
             "class": ""
         },
@@ -431,11 +455,11 @@
     "warnings": [
         {
             "message": "unknown tag: date",
-            "line": " src/app/models/controller.js:42"
+            "line": " src/app/models/controller.js:48"
         },
         {
             "message": "unknown tag: copyright",
-            "line": " src/app/models/controller.js:42"
+            "line": " src/app/models/controller.js:48"
         },
         {
             "message": "unknown tag: date",
@@ -446,16 +470,28 @@
             "line": " src/app/routes/controller.js:28"
         },
         {
+            "message": "Missing item type\nList of valid type that can use with yocto-api",
+            "line": " src/app/models/controller.js:12"
+        },
+        {
+            "message": "Missing item type\nLoad mongoose controller to execute operation on database",
+            "line": " src/app/models/controller.js:75"
+        },
+        {
+            "message": "Missing item type\nDefault logger",
+            "line": " src/app/models/controller.js:81"
+        },
+        {
             "message": "Missing item type\nGet model from models.json and format it with mongoose",
-            "line": " src/app/models/controller.js:150"
+            "line": " src/app/models/controller.js:179"
         },
         {
             "message": "Missing item type\nExport current Controller to use it on node",
-            "line": " src/app/models/controller.js:174"
+            "line": " src/app/models/controller.js:203"
         },
         {
             "message": "Missing item type\nExport current Controller to use it on node",
-            "line": " src/app/routes/controller.js:597"
+            "line": " src/app/routes/controller.js:547"
         },
         {
             "message": "Missing item type\nUnit tests",

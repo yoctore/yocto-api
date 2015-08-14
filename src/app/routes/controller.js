@@ -6,11 +6,11 @@ var logger      = require('yocto-logger');
 var express     = require('express');
 var models      = require('../models/controller.js');
 var fs          = require('fs');
-var isObjectiId    = require('mongoose').Types.ObjectId;
 
 /**
-* List of all default property in a mongodb document
-*yoct
+* List of all default property in a mongodb document <br>
+* This list define all property that we don't want retrive
+*
 * @property {Array} DEFAULT_PROP_MONGODB
 * @default [ '__v', '_id']
 */
@@ -48,7 +48,7 @@ var routeJoiSchema = joi.object().keys({
 function Controller () {
 
   /**
-  * List of all http request
+  * List of all http request that supported by api
   *
   * @property {Array} ALL_HTTP_REQUESTS
   * @default [ 'post', 'get', 'put', 'patch', 'delete', 'head']
@@ -79,28 +79,12 @@ function Controller () {
   this.logger = logger;
 
   /**
-  * Test if string is defined </br>
-  * Used to dertermine if we call find() or findById()
-  *
-  * @method getFn
-  * @param {Object} varToTest the var to test
-  * @return {String} return 'find' if varToTest is undefined, otherwise 'findById'
-  */
-  this.getFunctionName = function (varToTest) {
-
-    if (_.isUndefined(varToTest)) {
-      return 'find';
-    }
-    return 'findById';
-  };
-
-  /**
   * Implement the http request : GET and HEAD</br>
   * Get an object </br>
   * Send a error to the client if the request failed, or a json file to the client with the data requested if it's an GET requerst </br>
   * OR if it's a head request, send a http header
   *
-  * @method get
+  * @method addHTTPRequestGets
   * @param  {Object} model the data model object
   * @param  {String} path the root path
   * @param  {String} paramToGet The property to retrieve on url
@@ -108,8 +92,8 @@ function Controller () {
   */
   this.addHTTPRequestGets = function (model, path, paramToGet, reqType) {
 
-    // Determine if paramToGet is not empty, and get good function name
-    var fn = this.getFunctionName(paramToGet);
+    // Determine if paramToGet is not empty, and get good function name. If is empty, find all documents
+    var fn = _.isUndefined(paramToGet) ? 'find' : 'findById';
 
     // Add methode head to the route
     this.router[reqType](path, function (req, res) {
@@ -120,28 +104,23 @@ function Controller () {
       // Find object
       model[fn](req.params[paramToGet], function (err, val) {
 
-        // Default response to head request
+        // Default object
         var objToSend = {
           code    : 200,
-          content : { success : 'OK' }
+          content : {
+            success : _.isEmpty(val) ? [] : val
+          }
         };
 
+        // Test if an error occured
         if (err) {
-          objToSend = {
-            code    : 400,
-            content : { error : 'error ' + err }
-          };
-        } else if (_.isEmpty(val)) {
-          // Force to [] because by default is null
-          objToSend = {
-            code     : 200,
-            content  : []
-          };
-        } else if (reqType === 'get') {
-          objToSend = {
-            code     : 200,
-            content  : val
-          };
+          objToSend.code    = 400;
+          objToSend.content = { error : 'error ' + err };
+        }
+
+        // If it's an HEAD querry, send only header
+        if (reqType === 'head') {
+          return res.status(objToSend.code).end();
         }
 
         // Send respond to client
@@ -172,18 +151,16 @@ function Controller () {
       logger.info('[ ControllerRoutes.addHTTPRequest ] - revceiving ' + reqType + ' request,' +
       ' route is : ' + path);
 
-      if (!_.isEmpty(paramToGet)) {
-        // determine wich cb should be called
-        if (reqType === 'delete') {
-          scope.deleteObject(model, res, req, paramToGet);
-          return;
-        }
-        scope.updateObject(model, res, req, paramToGet, scope, reqType);
-        return;
+      if (_.isEmpty(paramToGet)) {
+        // Send an error response
+        return res.status(400).jsonp({ error : 'Id is not define' });
       }
 
-      // Send an error response
-      res.status(400).jsonp({ error : 'Id is not define' });
+      // determine wich cb should be called
+      if (reqType === 'delete') {
+        return scope.deleteObject(model, res, req, paramToGet);
+      }
+      scope.updateObject(model, res, req, paramToGet, scope, reqType);
     });
   };
 
@@ -199,11 +176,12 @@ function Controller () {
   * @param  {String} paramToGet The property to retrieve on url
   */
   this.updateObject = function (model, res, req, paramToGet, scope, reqType) {
-    // Find
+
+    // Find in database
     model.findById(req.params[paramToGet], function (err, value) {
 
-      var updateObject = false;
-      var errorType = [];
+      var updateObject  = false;
+      var errorType     = [];
 
       // Default response
       var objToSend = {
@@ -212,12 +190,11 @@ function Controller () {
       };
 
       if (err) {
-        objToSend = {
-          code    : 400,
-          content : { error : err }
-        };
+        objToSend.code    = 400;
+        objToSend.content = { error : err };
       } else {
         updateObject = true;
+
         // Retrieve all property of the object in the current model, and omit default property of mongodb
         _.each(_.omit(model.schema.paths, DEFAULT_PROP_MONGODB) , function (val, key) {
 
@@ -238,22 +215,21 @@ function Controller () {
         });
       }
 
-      // Save object in db
+      // Check if the validation type failed
       if (errorType.length > 0) {
         updateObject = false;
-        objToSend = {
-          code    : 400,
-          content : { error : 'Error type validation for ' + errorType.length +
-          ' key, more details : ' + errorType }
-        };
+
+        objToSend.code    = 400;
+        objToSend.content = { error : 'Error type validation for ' + errorType.length +
+        ' key, more details : ' + errorType };
       }
 
+      // If no error occured, save object in db
       if (updateObject) {
-        scope.saveObject(value, res);
-        return;
+        return scope.saveObject(value, res);
       }
 
-      // Send respond to client
+      // At least one error occured so Send respond to client
       res.status(objToSend.code).jsonp(objToSend.content);
     });
   };
@@ -281,10 +257,8 @@ function Controller () {
       };
 
       if (!err) {
-        objToSend = {
-          code    : 200,
-          content : { success : val + ' document(s) was deleted' }
-        };
+        objToSend.code    = 200;
+        objToSend.content = { success : val + ' document(s) was deleted' };
       }
 
       // Send response to client
@@ -312,10 +286,8 @@ function Controller () {
       };
 
       if (!err) {
-        objToSend = {
-          code    : 200,
-          content : { success : 'Operation success' }
-        };
+        objToSend.code    = 200;
+        objToSend.content = { success : 'Operation success' };
       }
 
       // Send response to client
@@ -343,8 +315,8 @@ function Controller () {
       logger.debug('[ ControllerRoutes.post ] - revceiving request, route is : ' + path);
 
       // Create a instance of model, used to save in db
-      var obj                   = new Model();
-      var errorType             = [];
+      var obj       = new Model();
+      var errorType = [];
 
       // Retrieve all property of the object in the current model, and omit default property of mongodb
       _.each(_.omit(Model.schema.paths, DEFAULT_PROP_MONGODB), function (val, key) {
@@ -361,8 +333,7 @@ function Controller () {
 
       // Save object in db
       if (_.isEmpty(errorType)) {
-        scope.saveObject(obj, res);
-        return;
+        return scope.saveObject(obj, res);
       }
 
       // Send respond to client
@@ -383,69 +354,49 @@ function Controller () {
 
     // Add a validation step for model
     var typeOfParam = this.getTypeParam(param);
+    var success     = false;
+
     // Test is is string
     if (_.isString(val.options.type) && typeOfParam === val.options.type.toLowerCase()) {
-      return true;
+      success = true;
     } else if (_.isArray(val.options.type) && typeOfParam === 'array') {
-      // test the other type
-      var succes = true;
+      success = true;
 
-      // Test each value in array
+      // Retrieve required type for comparaison
+      var typeRequired = _.isUndefined(val.options.type[0].type) ?
+      val.options.type[0].toLowerCase() :
+      val.options.type[0].type.toLowerCase();
+
+      // Test each value in array to check if all parms match
       _.each(param, function (tmp) {
-
-        // Retrieve required type
-        var typeRequired = _.isUndefined(val.options.type[0].type) ?
-        val.options.type[0].toLowerCase() :
-        val.options.type[0].type.toLowerCase();
 
         // add specific test for string, because an object id is a string too.
         if (this.getTypeParam(tmp) !== typeRequired &&
         (typeRequired === 'string' && this.getTypeParam(tmp) === 'string')) {
-          succes = false;
-          return false;
+          success = false;
         }
       }, this);
-
-      if (succes) {
-        return true;
-      }
     }
-    return false;
+    return success;
   };
 
   /**
+  * Return the type of param
   *
   * @method getTypeParam
   * @param  {Object} param the param to get the type
   */
   this.getTypeParam = function (param) {
-    if (_.isArray(param)) {
-      return 'array';
-    }
 
-    // test parse object to determine his type
+    // Try parse param to JSON to retrive good type
     try {
-      param = JSON.parse(param);
 
-      if (_.isArray(param)) {
-        return 'array';
-      } else if (_.isString(param)) {
-        return 'string';
-      } else if (_.isObject(param)) {
-        return 'object';
-      } else if (_.isNumber(param)) {
-        return 'number';
-      }
+      var paramParse = JSON.parse(param);
+      return _.isArray(paramParse) ? 'array' : typeof paramParse;
     } catch (e) {
-    }
 
-    // If parse failed, test if param is not a objectid
-    try {
-      isObjectiId(param);
-
-      return 'objectid';
-    } catch (e) {
-      return 'string';
+      logger.debug('[ ControllerRoutes.getTypeParam ] - error when parsing Param');
+      return _.isArray(param) ? 'array' : typeof param;
     }
   };
 
@@ -495,7 +446,7 @@ function Controller () {
   };
 
   /**
-  * Add a middleware
+  * Add a middleware that enables CORS
   *
   * @method addMidlleware
   */
@@ -510,15 +461,8 @@ function Controller () {
       res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
       res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
 
-      // Read all property of the request and delete all property that have an empty value
-      _.each(req.body, function (value, key) {
-
-        if (_.isEmpty(value)) {
-          delete req.body[key];
-        }
-      });
-
-      next(); // make sure we go to the next routes and don't stop here
+      // make sure we go to the next routes and don't stop here
+      next();
     });
   };
 }
@@ -530,19 +474,25 @@ function Controller () {
 * @method init
 */
 Controller.prototype.init = function (pathRoutes, pathModels) {
-  logger.debug('[ ControllerRoutes.init ] - start');
 
-  // test if string
-  if (!_.isString(pathRoutes) || !_.isString(pathModels)) {
-    return false;
-  }
+  logger.debug('[ ControllerRoutes.init ] - start');
 
   var routes = {};
 
-  // Test if file exist and retrive routes file
+  // test if the two params are string and not empty
+  if (!_.isString(pathRoutes) || !_.isString(pathModels) ||
+  _.isEmpty(pathRoutes) || _.isEmpty(pathModels)) {
+    return false;
+  }
+
+  // Test if the config files exist and retrive routes files
   try {
+
+    // Use fs.accessSync in try/catch because fs.accessSync throw an exception if one file doesn't exist
     fs.accessSync(pathRoutes);
     fs.accessSync(pathModels);
+
+    // Load route config file
     routes = JSON.parse(fs.readFileSync(pathRoutes, 'utf-8'));
   } catch (e) {
     logger.error('[ ControllerRoutes.init ] - error during loading files, more details : ' + e);
@@ -584,7 +534,7 @@ Controller.prototype.init = function (pathRoutes, pathModels) {
       ' please check the file : \'routes.json\'');
 
       // log each error
-      _.forEach(result.error.details, function (val) {
+      _.each(result.error.details, function (val) {
 
         logger.warning('[ ControllerRoutes.init ] - ' + val.message + ' at ' + val.path);
       });
