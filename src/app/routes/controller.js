@@ -389,10 +389,18 @@ function Controller () {
     } else if (_.isArray(val.options.type) && typeOfParam === 'array') {
       // test the other type
       var succes = true;
+
+      // Test each value in array
       _.each(param, function (tmp) {
+
+        // Retrieve required type
+        var typeRequired = _.isUndefined(val.options.type[0].type) ?
+        val.options.type[0].toLowerCase() :
+        val.options.type[0].type.toLowerCase();
+
         // add specific test for string, because an object id is a string too.
-        if (this.getTypeParam(tmp) !== val.options.type[0].toLowerCase() &&
-        (val.options.type[0].toLowerCase() === 'string' && this.getTypeParam(tmp) === 'string')) {
+        if (this.getTypeParam(tmp) !== typeRequired &&
+        (typeRequired === 'string' && this.getTypeParam(tmp) === 'string')) {
           succes = false;
           return false;
         }
@@ -434,6 +442,7 @@ function Controller () {
     // If parse failed, test if param is not a objectid
     try {
       isObjectiId(param);
+
       return 'objectid';
     } catch (e) {
       return 'string';

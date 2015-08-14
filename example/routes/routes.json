@@ -25,6 +25,19 @@
       "model"               : "availability",
       "paramToRetrieve"     : ["availability_id"],
       "requestExcluded"     : ["post"]
+    },
+    {
+      "path"              : "/storebrand",
+      "alias"             : ["/storebrand"],
+      "model"             : "storeBrand",
+      "requestExcluded"   : ["put", "delete" , "patch"]
+    },
+    {
+      "path"                : "/storebrand/:storebrand_id",
+      "alias"               : ["/storebrand/:storebrand_id"],
+      "model"               : "storeBrand",
+      "paramToRetrieve"     : ["storebrand_id"],
+      "requestExcluded"     : ["post"]
     }
   ]
 }
