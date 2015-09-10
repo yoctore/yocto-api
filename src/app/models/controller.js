@@ -14,7 +14,7 @@ var joi         = require('joi');
  * @type {Array}
  * @default ['String', 'ObjectId', 'Number', 'Boolean']
  */
-var LIST_VALID_TYPE_JOI = ['String', 'ObjectId', 'Number', 'Boolean'];
+var LIST_VALID_TYPE_JOI = ['String', 'ObjectId', 'Number', 'Boolean', 'Date', 'Object', 'time'];
 
 // Schema of joi validation, each models should pass this validation
 var modelJoiSchema = joi.object().keys({

@@ -36,3 +36,7 @@ app.use('/api', routes.router);
 app.listen(port);
 
 console.log(' server start on port : ' + port );
+
+console.log('get cat model');
+
+console.log( routes.models.getModel('cat'));

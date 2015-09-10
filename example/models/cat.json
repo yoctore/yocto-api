@@ -1,0 +1,14 @@
+{
+  "models" : {
+    "model" : {
+      "name"      : "cat",
+      "properties" : {
+        "name"        : {
+          "type" : "String",
+          "required" : true
+        },
+        "birthdate"  : "Date"
+      }
+    }
+  }
+}
