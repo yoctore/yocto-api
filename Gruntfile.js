@@ -56,7 +56,7 @@ module.exports = function(grunt) {
         version     : '<%= pkg.version %>',
         url         : '<%= pkg.homepage %>',
         options     : {
-          paths   : '.',
+          paths   : 'src',
           outdir  : 'documentation',
           exclude : 'Gruntfile.js, example, dist, documentation, node_modules'
         }
@@ -81,7 +81,7 @@ module.exports = function(grunt) {
           timeout : 20000
         }
       },
-        all : [ 'test/*.js' ]
+        all : [ 'test/routesController.js' ]
     },
 
      /**
@@ -119,13 +119,10 @@ module.exports = function(grunt) {
   // Load the plugins
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-yuidoc');
-  grunt.loadNpmTasks('grunt-apidoc');
-  grunt.loadNpmTasks('grunt-execute');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-mocha-cli');
   grunt.loadNpmTasks('grunt-todo');
   grunt.loadNpmTasks('yoctohint');
-
 
   // register task
   grunt.registerTask('default', ['yoctohint', 'yuidoc', 'uglify']);

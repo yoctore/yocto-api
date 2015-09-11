@@ -101,26 +101,6 @@ describe("routes/Controller ", function() {
       });
     });
   });
-
-  describe("getFunctionName()", function() {
-    var data = [
-      { "message" : "valid dataformat, but fake value", "varToTest" : "thisIsAGreatFakeValue", "expectValue" : 'findById' },
-      { "varToTest" : 2, "expectValue" : 'findById' },
-      { "varToTest" : true, "expectValue" : 'findById' },
-      { "varToTest" : {'toto' : 'tata'}, "expectValue" : 'findById' },
-      { "varToTest" : {'toto' : 'tata'}, "expectValue" : 'findById' },
-      { "expectValue" : 'find' }
-    ];
-
-    _.each(data, function(val) {
-      it('test this value : ' + JSON.stringify(val) + ' - should return ' + val.expectValue , function() {
-        var fnToTest = routes.getFunctionName(val.varToTest);
-        expect(fnToTest).to.equal(val.expectValue);
-      });
-    });
-  });
-
-
 });
 
 describe("models/Controller ", function() {

@@ -11,7 +11,8 @@ var fs          = require('fs');
 * List of all default property in a mongodb document <br>
 * This list define all property that we don't want retrive
 *
-* @property {Array} DEFAULT_PROP_MONGODB
+* @property DEFAULT_PROP_MONGODB
+* @type array
 * @default [ '__v', '_id']
 */
 var DEFAULT_PROP_MONGODB = [ '__v', '_id' ];
@@ -30,7 +31,7 @@ var routeJoiSchema = joi.object().keys({
 *
 * Controller of routes based on Express
 *
-* It read a jsonfile and create each route
+* It read a jsonfile and create each routenode
 *
 * Cors Express is enable to permit test with apidocjs
 *
@@ -38,19 +39,19 @@ var routeJoiSchema = joi.object().keys({
 * - LodAsh : https://lodash.com/
 * - yocto-logger : git+ssh://lab.yocto.digital:yocto-node-modules/yocto-utils.git
 * - express : http://expressjs.com/
-* - joi : https://github.com/hapijs/joi#array
+* - joi : https://github.com/hapijs/joi
 *
 * @date : 11/05/2015
 * @author : Cedric Balard <cedric@yocto.re>
 * @copyright : Yocto SAS, All right reserved
-* @class
+* @class RouteController
 */
-function Controller () {
-
+function RouteController () {
   /**
   * List of all http request that supported by api
   *
-  * @property {Array} ALL_HTTP_REQUESTS
+  * @property ALL_HTTP_REQUESTS
+  * @type Array of String
   * @default [ 'post', 'get', 'put', 'patch', 'delete', 'head']
   */
   this.ALL_HTTP_REQUESTS = [ 'post', 'get', 'put', 'patch', 'delete', 'head' ];
@@ -58,7 +59,8 @@ function Controller () {
   /**
   * Model's Controller, is the controller that will use to retrieve a model
   *
-  * @property {Object} models
+  * @property models
+  * @type Object
   * @default require '../models/controller.js'
   */
   this.models = models;
@@ -66,15 +68,16 @@ function Controller () {
   /**
   * The main router
   *
-  * @property {Object} router
-  * @default require '../models/controller.js'
+  * @property router
+  * @type Object
   */
   this.router = express();
 
   /**
   * The main logger
   *
-  * @property {Object} logger
+  * @property logger
+  * @type Object
   */
   this.logger = logger;
 
@@ -98,7 +101,7 @@ function Controller () {
     // Add methode head to the route
     this.router[reqType](path, function (req, res) {
 
-      logger.info('[ ControllerRoutes.addHTTPRequest ] - revceiving ' + reqType + ' request,' +
+      logger.debug('[ ControllerRoutes.addHTTPRequest ] - revceiving ' + reqType + ' request,' +
       ' route is : ' + path);
 
       // Find object
@@ -134,7 +137,7 @@ function Controller () {
   * Get an object </br>
   * send a message to the client
   *
-  * @method get
+  * @method addHTTPRequest
   * @param  {Object} model the data model object
   * @param  {String} path the root path
   * @param  {String} paramToGet The property to retrieve on url
@@ -148,7 +151,7 @@ function Controller () {
     // Add methode update to the route
     this.router[reqType](path, function (req, res) {
 
-      logger.info('[ ControllerRoutes.addHTTPRequest ] - revceiving ' + reqType + ' request,' +
+      logger.debug('[ ControllerRoutes.addHTTPRequest ] - revceiving ' + reqType + ' request,' +
       ' route is : ' + path);
 
       if (_.isEmpty(paramToGet)) {
@@ -156,10 +159,13 @@ function Controller () {
         return res.status(400).jsonp({ error : 'Id is not define' });
       }
 
+      // if (reqType === 'delete') {
+      //   return scope.deleteObject(model, res, req, paramToGet);
+      // }
+      // scope.updateObject(model, res, req, paramToGet, scope, reqType);
+
       // determine wich cb should be called
-      if (reqType === 'delete') {
-        return scope.deleteObject(model, res, req, paramToGet);
-      }
+      return reqType === 'delete' ? scope.deleteObject(model, res, req, paramToGet) :
       scope.updateObject(model, res, req, paramToGet, scope, reqType);
     });
   };
@@ -169,11 +175,13 @@ function Controller () {
   * Get an object </br>
   * send a message to the client
   *
-  * @method get
-  * @param  {Object} model the data model object
-  * @param  {Object} res the http response
-  * @param  {Object} req the http request
-  * @param  {String} paramToGet The property to retrieve on url
+  * @method updateObject
+  * @param {Object} model the data model object
+  * @param {Object} res the http response
+  * @param {Object} req the http request
+  * @param {String} paramToGet The property to retrieve on url
+  * @param {Object} scope the scope of pervious function
+  * @param {String} reqType the type of the current request
   */
   this.updateObject = function (model, res, req, paramToGet, scope, reqType) {
 
@@ -223,23 +231,23 @@ function Controller () {
         objToSend.content = { error : 'Error type validation for ' + errorType.length +
         ' key, more details : ' + errorType };
       }
+      // // If no error occured, save object in db
+      // if (updateObject) {
+      //   return scope.saveObject(value, res);
+      // // At least one error occured so Send respond to client
+      // res.status(objToSend.code).jsonp(objToSend.content);
 
-      // If no error occured, save object in db
-      if (updateObject) {
-        return scope.saveObject(value, res);
-      }
-
-      // At least one error occured so Send respond to client
+      // Execute callback
+      return updateObject ? scope.saveObject(value, res) :
       res.status(objToSend.code).jsonp(objToSend.content);
     });
   };
 
   /**
-  * delete the model, it's used for : DELETE </br>
-  * Delete an object </br>
+  * Delete one object, it's used for http method : DELETE </br>
   * Send a error to the client if the request failed, otherwise a json file to the client with the data
   *
-  * @method delete
+  * @method deleteObject
   * @param  {Object} model the data model object
   * @param  {Object} res the http response
   * @param  {Object} req the http request
@@ -302,7 +310,7 @@ function Controller () {
   *
   * @method post
   * @param  {Object} Model the data model object (Model start with an uppercase for jshint validation)
-  * @param  {String} path the root path
+  * @param  {String} path The root path of model
   */
   this.post = function (Model, path) {
 
@@ -348,7 +356,7 @@ function Controller () {
   * @method checkTypeValidation
   * @param {Object} val the mongoose model
   * @param {Object} param the param to compare
-  * @return {Boolean} to success
+  * @return {Boolean} IF success return true, otherwise false
   */
   this.checkTypeValidation = function (val, param) {
 
@@ -408,17 +416,18 @@ function Controller () {
   * @param {String} nameModel name of the model object to retrieve into the controller of model
   * @param {Array} reqExcluded array of excluded request
   * @param {String} paramToRetrieve name of the param to retrieve
+  * @return {Boolean} If success return true, otherwise false
   */
   this.addRoute = function (path, nameModel, reqExcluded, paramToRetrieve) {
 
-    logger.info('[ ControllerRoutes.addRoute ] - new route found, path : ' + path);
+    logger.debug('[ ControllerRoutes.addRoute ] - new route found, path : ' + path);
 
     // retrieve the model
     var model = this.models.getModel(nameModel);
 
     // check if model is not false
-    if (model !== false) {
-      logger.info('[ ControllerRoutes.addRoute ] - adding new route, path : ' + path);
+    if (model) {
+      logger.debug('[ ControllerRoutes.addRoute ] - adding new route, path : ' + path);
 
       // Handle wich requests are implemented
       // Retrieve the difference betwenn ALL_HTTP_REQUESTS and all requests excluded
@@ -446,15 +455,13 @@ function Controller () {
   };
 
   /**
-  * Add a middleware that enables CORS
+  * Add a middleware that enables CORS for all routes
   *
   * @method addMidlleware
   */
   this.addMidlleware = function () {
 
     this.router.use(function (req, res, next) {
-
-      logger.debug('[ ControllerRoutes.Middleware ] - incoming request');
 
       // Enable exoress CORS
       res.header('Access-Control-Allow-Origin', '*');
@@ -472,8 +479,11 @@ function Controller () {
 * Retrieve all routes and thoose alias and add there into router
 *
 * @method init
+* @param {String} pathRoutes the path of the file route.json
+* @param {String} pathModels the path of folder that contains all models.json
+* @return {Boolean} If success return true, otherwise false
 */
-Controller.prototype.init = function (pathRoutes, pathModels) {
+RouteController.prototype.init = function (pathRoutes, pathModels) {
 
   logger.debug('[ ControllerRoutes.init ] - start');
 
@@ -547,4 +557,4 @@ Controller.prototype.init = function (pathRoutes, pathModels) {
 /**
 * Export current Controller to use it on node
 */
-module.exports = new (Controller)();
+module.exports = new (RouteController)();

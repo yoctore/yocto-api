@@ -2,6 +2,9 @@
   "models" : {
     "model" : {
       "name"      : "user",
+      "fn" : [
+        "create"
+      ],
       "properties" : {
         "name"      : {
           "type" : "String",

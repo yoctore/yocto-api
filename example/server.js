@@ -5,7 +5,7 @@ var bodyParser = require('body-parser'); // load bodyparser
 var mongoose   = require('mongoose'); // Load the mongodb driver
 var routes     = require('../src/app/routes/controller.js'); // Load the api
 var app        = express(); // Create app
-var path     = require('path');
+var path      = require('path');
 var fs        = require('fs');
 
 var base = path.normalize(process.cwd());
@@ -37,6 +37,5 @@ app.listen(port);
 
 console.log(' server start on port : ' + port );
 
-console.log('get cat model');
-
-console.log( routes.models.getModel('cat'));
+//
+console.log( routes.models.getModel('user').schema.methods.create.toString());
