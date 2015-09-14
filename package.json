@@ -1,6 +1,6 @@
 {
   "name": "yocto-api",
-  "main": "dist/app/routes/controller.js",
+  "main": "src/app/routes/controller.js",
   "version": "0.1.1",
   "private": true,
   "description": "Yocto REST API ",
@@ -24,7 +24,7 @@
     "node": ">=0.12.2"
   },
   "files": [
-    "dist",
+    "src",
     "documentation",
     "example"
   ],

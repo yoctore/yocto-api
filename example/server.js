@@ -30,7 +30,7 @@ var port = process.env.PORT || 8080;
 routes.init(base+'/example/routes/routes.json', base +'/example/models/');
 
 //Use the router
-app.use('/api', routes.router);
+app.use('/', routes.router);
 
 // START THE SERVER
 app.listen(port);

@@ -7,6 +7,12 @@
       "requestExcluded"   : ["put", "delete" , "patch"]
     },
     {
+      "path"              : "/account",
+      "alias"             : ["/account"],
+      "model"             : "account",
+      "requestExcluded"   : ["put", "delete" , "patch"]
+    },
+    {
       "path"                : "/users/:user_id",
       "alias"               : ["/user/:user_id"],
       "model"               : "user",
