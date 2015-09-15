@@ -7,9 +7,9 @@
       "requestExcluded"   : ["put", "delete" , "patch"]
     },
     {
-      "path"              : "/account",
+      "path"              : "/account-sync",
       "alias"             : ["/account"],
-      "model"             : "account",
+      "model"             : "AccountSync",
       "requestExcluded"   : ["put", "delete" , "patch"]
     },
     {
