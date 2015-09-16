@@ -122,7 +122,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-mocha-cli');
   grunt.loadNpmTasks('grunt-todo');
-  grunt.loadNpmTasks('yoctohint');
+  grunt.loadNpmTasks('yocto-hint');
 
   // register task
   grunt.registerTask('default', ['yoctohint', 'yuidoc', 'uglify']);
@@ -130,6 +130,6 @@ module.exports = function(grunt) {
   grunt.registerTask('tests', 'mochacli:all');
   grunt.registerTask('testWeb', 'mochacli:web');
   grunt.registerTask('report', 'todo');
-  grunt.registerTask('yhint', 'yoctohint');
+  grunt.registerTask('yhint', 'yocto-hint');
 
 };

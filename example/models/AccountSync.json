@@ -2,6 +2,9 @@
   "models" : {
     "model" : {
       "name"      : "AccountSync",
+      "fn" : [
+        "addAcountSync"
+      ],
       "properties" : {
         "status"      : {
           "type" : "String",

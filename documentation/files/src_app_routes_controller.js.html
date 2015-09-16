@@ -88,6 +88,7 @@ var logger      = require(&#x27;yocto-logger&#x27;);
 var express     = require(&#x27;express&#x27;);
 var models      = require(&#x27;../models/controller.js&#x27;);
 var fs          = require(&#x27;fs&#x27;);
+var path        = require(&#x27;path&#x27;);
 
 /**
 * List of all default property in a mongodb document &lt;br&gt;
@@ -104,9 +105,32 @@ var routeJoiSchema = joi.object().keys({
   path            : joi.string().required().min(1).trim(),
   alias           : joi.array().items(joi.string().min(1).trim()),
   model           : joi.string().required().min(1).trim(),
-  paramToRetrieve : joi.array().items(joi.string().min(1).trim()),
-  requestExcluded : joi.array().items(joi.string().min(1).trim())
+  paramToRetrieve : joi.array().items(joi.string().min(1).trim().allow(
+    &#x27;post&#x27;, &#x27;get&#x27;, &#x27;put&#x27;, &#x27;patch&#x27;, &#x27;delete&#x27;, &#x27;head&#x27;)),
+  excluded        : joi.array().items(joi.string().min(1).trim()),
+  methods         : joi.array().items(
+    joi.object().keys({
+      method : joi.string().required().allow(&#x27;post&#x27;, &#x27;get&#x27;, &#x27;put&#x27;, &#x27;patch&#x27;, &#x27;delete&#x27;, &#x27;head&#x27;),
+      path   : joi.string().required().min(1),
+      fn     : joi.string().required().min(1)
+    }))
 });
+
+/**
+* Bind of all http methods to request
+*
+* @property FUNC_TO_BIND
+* @type Object
+* @default  { patch   : &#x27;addHTTPRequest&#x27;, put     : &#x27;addHTTPRequest&#x27;, delete  : &#x27;addHTTPRequest&#x27;, get     : &#x27;addHTTPRequestGets&#x27;, head    : &#x27;addHTTPRequestGets&#x27;, post    : &#x27;post&#x27; }
+*/
+var FUNC_TO_BIND = {
+  patch   : &#x27;addHTTPRequest&#x27;,
+  put     : &#x27;addHTTPRequest&#x27;,
+  delete  : &#x27;addHTTPRequest&#x27;,
+  get     : &#x27;addHTTPRequestGets&#x27;,
+  head    : &#x27;addHTTPRequestGets&#x27;,
+  post    : &#x27;post&#x27;
+};
 
 /**
 * Yocto API : Routes Controller
@@ -494,45 +518,57 @@ function RouteController () {
   * Add a route to the main router
   *
   * @method addRoute
-  * @param {String} path route to add
+  * @param {String} pathRequest route to add
   * @param {String} nameModel name of the model object to retrieve into the controller of model
   * @param {Array} reqExcluded array of excluded request
   * @param {String} paramToRetrieve name of the param to retrieve
+  * @param {Object} theRoute the current route
   * @return {Boolean} If success return true, otherwise false
   */
-  this.addRoute = function (path, nameModel, reqExcluded, paramToRetrieve) {
+  this.addRoute = function (pathRequest, nameModel, reqExcluded, paramToRetrieve, theRoute) {
 
-    logger.debug(&#x27;[ ControllerRoutes.addRoute ] - new route found, path : &#x27; + path);
+    logger.debug(&#x27;[ ControllerRoutes.addRoute ] - new route found, path : &#x27; + pathRequest);
 
     // retrieve the model
     var model = this.models.getModel(nameModel);
 
     // check if model is not false
     if (model) {
-      logger.debug(&#x27;[ ControllerRoutes.addRoute ] - adding new route, path : &#x27; + path);
+      logger.debug(&#x27;[ ControllerRoutes.addRoute ] - adding new route, path : &#x27; + pathRequest);
 
       // Handle wich requests are implemented
       // Retrieve the difference betwenn ALL_HTTP_REQUESTS and all requests excluded
       _.each(_.difference(this.ALL_HTTP_REQUESTS, reqExcluded), function (fn) {
 
-        if (fn === &#x27;patch&#x27; || fn === &#x27;put&#x27; || fn === &#x27;delete&#x27;) {
+        this[FUNC_TO_BIND[fn]](model, pathRequest, paramToRetrieve, fn);
+      }, this);
 
-          // add request
-          this.addHTTPRequest(model, path, paramToRetrieve, fn);
-        } else if (fn === &#x27;get&#x27; || fn === &#x27;head&#x27;) {
+      // retrieve specifiq route in model
+      _.each(theRoute.methods, function (method) {
 
-          // add request
-          this.addHTTPRequestGets(model, path, paramToRetrieve, fn);
-        } else {
+        try {
+          var pathSubReq = path.normalize(pathRequest + &#x27;/&#x27; + method.path);
 
-          // Call function by his name  ( POST request)
-          this[fn](model, path, paramToRetrieve);
+          if (!_.isUndefined(model.schema.methods[method.fn])) {
+
+            // Bing method to the route
+            this.router[method.method](pathSubReq, function (req, res, next) {
+              model.schema.methods[method.fn](req, res, next);
+            });
+          } else {
+            throw &#x27; Function \&#x27;&#x27; + method.fn + &#x27;\&#x27; not found&#x27;;
+          }
+
+        } catch (e) {
+          logger.error(&#x27;[ ControllerRoutes.addRoute ] - can\&#x27;t add specifiq route : \&#x27;&#x27; +
+          method.sync + &#x27;\&#x27; , more details : &#x27; + e);
         }
       }, this);
+
       return true;
     }
-    logger.warning(&#x27;[ ControllerRoutes.addRoute ] - can\&#x27;t add route : \&#x27;&#x27; +
-    path + &#x27;\&#x27; ,because model is not defined&#x27;);
+    logger.error(&#x27;[ ControllerRoutes.addRoute ] - can\&#x27;t add route : \&#x27;&#x27; +
+    pathRequest + &#x27;\&#x27; ,because model is not defined&#x27;);
     return false;
   };
 
@@ -618,12 +654,12 @@ RouteController.prototype.init = function (pathRoutes, pathModels) {
 
       // add Main route
       _.each(routeAndAlias, function (val) {
-        this.addRoute(val, route.model, route.requestExcluded, route.paramToRetrieve);
+        this.addRoute(val, route.model, route.excluded, route.paramToRetrieve, route);
       }, this);
 
     } else {
-      logger.error(&#x27;[ ControllerRoutes.init ] - error when trying to add a new route,&#x27; +
-      &#x27; please check the file : \&#x27;routes.json\&#x27;&#x27;);
+      logger.error(&#x27;[ ControllerRoutes.init ] - Joi Validation failed ; error when trying to add &#x27; +
+      &#x27;a new route, please check the file : \&#x27;routes.json\&#x27;&#x27;);
 
       // log each error
       _.each(result.error.details, function (val) {

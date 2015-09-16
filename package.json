@@ -51,7 +51,7 @@
     "grunt-contrib-uglify": "~0.5.0",
     "grunt-contrib-yuidoc": "^0.7.0",
     "grunt-mocha-cli": "^1.14.0",
-    "yocto-hint": "git+ssh://git@gitlab.com:yocto-grunt-modules/yocto-hint.git"
+    "yocto-hint": "latest"
   },
   "apidoc": {
     "title": "Yocto Rest Api",

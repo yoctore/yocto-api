@@ -4,46 +4,53 @@
       "path"              : "/users",
       "alias"             : ["/user"],
       "model"             : "user",
-      "requestExcluded"   : ["put", "delete" , "patch"]
+      "excluded"   : ["put", "delete" , "patch"]
     },
     {
       "path"              : "/account-sync",
-      "alias"             : ["/account"],
+      "alias"             : [],
       "model"             : "AccountSync",
-      "requestExcluded"   : ["put", "delete" , "patch"]
+      "excluded"   : ["put"],
+      "methods" : [
+        {
+          "method"   : "post",
+          "path"     : "sync",
+          "fn"     : "addAcountSync"
+        }
+      ]
     },
     {
       "path"                : "/users/:user_id",
       "alias"               : ["/user/:user_id"],
       "model"               : "user",
       "paramToRetrieve"     : ["user_id"],
-      "requestExcluded"     : ["post"]
+      "excluded"     : ["post"]
     },
     {
       "path"              : "/availability",
       "alias"             : ["/availability"],
       "model"             : "availability",
-      "requestExcluded"   : ["put", "delete" , "patch"]
+      "excluded"   : ["put", "delete" , "patch"]
     },
     {
       "path"                : "/availabilitys/:availability_id",
       "alias"               : ["/availabilies/:availability_id"],
       "model"               : "availability",
       "paramToRetrieve"     : ["availability_id"],
-      "requestExcluded"     : ["post"]
+      "excluded"     : ["post"]
     },
     {
       "path"              : "/storebrand",
       "alias"             : ["/storebrand"],
       "model"             : "storeBrand",
-      "requestExcluded"   : ["put", "delete" , "patch"]
+      "excluded"   : ["put", "delete" , "patch"]
     },
     {
       "path"                : "/storebrand/:storebrand_id",
       "alias"               : ["/storebrand/:storebrand_id"],
       "model"               : "storeBrand",
       "paramToRetrieve"     : ["storebrand_id"],
-      "requestExcluded"     : ["post"]
+      "excluded"     : ["post"]
     }
   ]
 }
