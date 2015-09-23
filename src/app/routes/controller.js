@@ -305,7 +305,7 @@ RouteController.prototype.addRoute = function (pathRequest, nameModel, reqExclud
 
           // Bing method to the route
           scope.router[method.method](pathSubReq, function (req, res, next) {
-            model.schema.methods.crud[method.fn](req, res, next, model, models);
+            model.schema.methods[method.fn](req, res, next, model, models);
           });
         } else {
           throw ' Function \'' + method.fn + '\' not found';

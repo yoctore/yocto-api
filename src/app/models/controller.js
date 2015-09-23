@@ -8,7 +8,7 @@ var glob        = require('glob');
 var fs          = require('fs');
 var path        = require('path');
 var Promise     = require('promise');
-var crud        = require('./crud-methods.js');
+var Crud        = require('./crud-methods.js');
 
 /**
 * List of all default property in a mongodb document <br>
@@ -96,27 +96,10 @@ ModelController.prototype.addModel = function (model, pathModels) {
     // Create mongobd model based on the json model file
     var mongModel = mongoose.model(model.name, schema);
 
-
-    // Init model
+    // Create a new Crud object for default Method
+    var crud = new Crud();
     crud.init(mongModel);
     mongModel.schema.methods.crud = crud;
-
-    //  var crudA = new Crud (mongModel);
-
-    //  console.log(crudA);
-    // console.log(crud.model.modelName);
-
-    //  console.log(crud.get);
-    // Add default methods in current model
-    // mongModel.schema.methods.post   = crudA.create;
-    // mongModel.schema.methods.delete = crudA.delete;
-
-    //addDefaultMethods(mongModel);
-
-    // mongModel.schema.methods.get = function (id) {
-    //   crud.get(mongModel, id);
-    // };
-
 
     // Add the MongoModel in the array tabModel
     this.tabModel.push({

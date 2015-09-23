@@ -101,6 +101,8 @@ Crud.prototype.delete = function (id) {
  */
 Crud.prototype.create = function (data) {
 
+  console.log('\n-------------- crud.model =', this.model.schema);
+
   // Save scope
   var scope = this;
 
@@ -174,4 +176,4 @@ Crud.prototype.init = function (model) {
   this.model = model;
 };
 
-module.exports = new (Crud) ();
+module.exports = (Crud);
