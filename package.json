@@ -50,8 +50,7 @@
     "grunt-contrib-nodeunit": "~0.4.1",
     "grunt-contrib-uglify": "~0.5.0",
     "grunt-contrib-yuidoc": "^0.7.0",
-    "grunt-mocha-cli": "^1.14.0",
-    "yocto-hint": "latest"
+    "grunt-mocha-cli": "^1.14.0"
   },
   "apidoc": {
     "title": "Yocto Rest Api",
