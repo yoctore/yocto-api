@@ -112,7 +112,7 @@ module.exports = function(grunt) {
           jshint : {}
         },
         // Set all your file here
-        all : [ 'src/app/models/controller.js', 'src/app/routes/controller.js' ]
+        all : [ 'src/app/models/controller.js', 'src/app/routes/controller.js', 'src/app/routes/crud-methods.js' ]
       }
     });
 
@@ -130,6 +130,6 @@ module.exports = function(grunt) {
   grunt.registerTask('tests', 'mochacli:all');
   grunt.registerTask('testWeb', 'mochacli:web');
   grunt.registerTask('report', 'todo');
-  grunt.registerTask('yhint', 'yocto-hint');
+  grunt.registerTask('yhint', 'yoctohint');
 
 };

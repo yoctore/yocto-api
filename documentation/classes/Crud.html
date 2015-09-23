@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>ModelController - yocto-api</title>
+    <title>Crud - yocto-api</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -78,12 +78,12 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-<h1>ModelController Class</h1>
+<h1>Crud Class</h1>
 <div class="box meta">
 
 
         <div class="foundat">
-            Defined in: <a href="../files/src_app_models_controller.js.html#l12"><code>src&#x2F;app&#x2F;models&#x2F;controller.js:12</code></a>
+            Defined in: <a href="../files/src_app_models_crud-methods.js.html#l16"><code>src&#x2F;app&#x2F;models&#x2F;crud-methods.js:16</code></a>
         </div>
 
 
@@ -91,17 +91,11 @@
 
 
 <div class="box intro">
-    <p>Yocto API : Models Controller</p>
-<p>Controller of models, laod models from a json file</p>
-<p>All models are save in an array and are accessible by calling method getModel</p>
+    <p>Yocto API : crud methods Controller</p>
+<p>Controller that give default methods</p>
 <p>For more details on these dependencies read links below :</p>
 <ul>
 <li>LodAsh : <a href="https://lodash.com/">https://lodash.com/</a></li>
-<li>yocto-logger : git+ssh://lab.yocto.digital:yocto-node-modules/yocto-utils.git</li>
-<li>mongoose : <a href="http://mongoosejs.com/">http://mongoosejs.com/</a></li>
-<li>glob : <a href="https://www.npmjs.com/package/glob">https://www.npmjs.com/package/glob</a></li>
-<li>fs : <a href="https://nodejs.org/api/fs.html">https://nodejs.org/api/fs.html</a></li>
-<li>path : <a href="https://nodejs.org/api/path.html">https://nodejs.org/api/path.html</a></li>
 </ul>
 
 </div>
@@ -124,11 +118,19 @@
 
                     <ul class="index-list methods">
                             <li class="index-item method">
-                                <a href="#method_addModel">addModel</a>
+                                <a href="#method_create">create</a>
 
                             </li>
                             <li class="index-item method">
-                                <a href="#method_init">init</a>
+                                <a href="#method_delete">delete</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_get">get</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_update">update</a>
 
                             </li>
                     </ul>
@@ -139,15 +141,11 @@
 
                     <ul class="index-list properties">
                             <li class="index-item property">
-                                <a href="#property_logger">logger</a>
+                                <a href="#property_DEFAULT_PROP_MONGODB">DEFAULT_PROP_MONGODB</a>
 
                             </li>
                             <li class="index-item property">
-                                <a href="#property_mongoose">mongoose</a>
-
-                            </li>
-                            <li class="index-item property">
-                                <a href="#property_tabModel">tabModel</a>
+                                <a href="#property_model">model</a>
 
                             </li>
                     </ul>
@@ -159,22 +157,19 @@
             <div id="methods" class="api-class-tabpanel">
                 <h2 class="off-left">Methods</h2>
 
-<div id="method_addModel" class="method item">
-    <h3 class="name"><code>addModel</code></h3>
+<div id="method_create" class="method item">
+    <h3 class="name"><code>create</code></h3>
 
         <div class="args">
             <span class="paren">(</span><ul class="args-list inline commas">
                 <li class="arg">
-                        <code>model</code>
-                </li>
-                <li class="arg">
-                        <code>pathModels</code>
+                        <code>data</code>
                 </li>
             </ul><span class="paren">)</span>
         </div>
 
         <span class="returns-inline">
-            <span class="type">Boolean</span>
+            <span class="type">Function</span>
         </span>
 
 
@@ -186,7 +181,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_models_controller.js.html#l60"><code>src&#x2F;app&#x2F;models&#x2F;controller.js:60</code></a>
+        <a href="../files/src_app_models_crud-methods.js.html#l100"><code>src&#x2F;app&#x2F;models&#x2F;crud-methods.js:100</code></a>
         </p>
 
 
@@ -194,8 +189,7 @@
     </div>
 
     <div class="description">
-        <p>Add model in @tabModel
-If model.fn isn't empty, all methods specified will be added in model.methods</p>
+        <p>Create an object in db</p>
 
     </div>
 
@@ -204,23 +198,12 @@ If model.fn isn't empty, all methods specified will be added in model.methods</p
 
             <ul class="params-list">
                 <li class="param">
-                        <code class="param-name">model</code>
+                        <code class="param-name">data</code>
                         <span class="type">Object</span>
 
 
                     <div class="param-description">
-                        <p>the current model found in json file</p>
-
-                    </div>
-
-                </li>
-                <li class="param">
-                        <code class="param-name">pathModels</code>
-                        <span class="type">String</span>
-
-
-                    <div class="param-description">
-                        <p>path of the current model on server</p>
+                        <p>the data to create object</p>
 
                     </div>
 
@@ -232,25 +215,28 @@ If model.fn isn't empty, all methods specified will be added in model.methods</p
             <h4>Returns:</h4>
 
             <div class="returns-description">
-                        <span class="type">Boolean</span>:
-                    <p>True if current model was added in tabModel, otherwise false</p>
+                        <span class="type">Function</span>:
+                    <p>return a promise</p>
 
             </div>
         </div>
 
 
 </div>
-<div id="method_init" class="method item">
-    <h3 class="name"><code>init</code></h3>
+<div id="method_delete" class="method item">
+    <h3 class="name"><code>delete</code></h3>
 
         <div class="args">
             <span class="paren">(</span><ul class="args-list inline commas">
                 <li class="arg">
-                        <code>pathModels</code>
+                        <code>id</code>
                 </li>
             </ul><span class="paren">)</span>
         </div>
 
+        <span class="returns-inline">
+            <span class="type">Function</span>
+        </span>
 
 
 
@@ -261,7 +247,7 @@ If model.fn isn't empty, all methods specified will be added in model.methods</p
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_models_controller.js.html#l111"><code>src&#x2F;app&#x2F;models&#x2F;controller.js:111</code></a>
+        <a href="../files/src_app_models_crud-methods.js.html#l75"><code>src&#x2F;app&#x2F;models&#x2F;crud-methods.js:75</code></a>
         </p>
 
 
@@ -269,8 +255,7 @@ If model.fn isn't empty, all methods specified will be added in model.methods</p
     </div>
 
     <div class="description">
-        <p>Initialise the Controller</br>
-Retrieve all json file in folder 'pathModels' and load all models</p>
+        <p>Delete an object in db</p>
 
     </div>
 
@@ -279,12 +264,12 @@ Retrieve all json file in folder 'pathModels' and load all models</p>
 
             <ul class="params-list">
                 <li class="param">
-                        <code class="param-name">pathModels</code>
+                        <code class="param-name">id</code>
                         <span class="type">String</span>
 
 
                     <div class="param-description">
-                        <p>Path of the folder that contains all model '.json'</p>
+                        <p>the id of the item should be delete</p>
 
                     </div>
 
@@ -292,6 +277,175 @@ Retrieve all json file in folder 'pathModels' and load all models</p>
             </ul>
         </div>
 
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">Function</span>:
+                    <p>return a promise</p>
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_get" class="method item">
+    <h3 class="name"><code>get</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>id</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type">Function</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_app_models_crud-methods.js.html#l41"><code>src&#x2F;app&#x2F;models&#x2F;crud-methods.js:41</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Function that get element in db</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">id</code>
+                        <span class="type">Objet, String</span>
+
+
+                    <div class="param-description">
+                        <p>THe id or antoher object to Retrieve in db</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">Function</span>:
+                    <p>return a promise</p>
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_update" class="method item">
+    <h3 class="name"><code>update</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>id</code>
+                </li>
+                <li class="arg">
+                        <code>data</code>
+                </li>
+                <li class="arg">
+                        <code>method</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type">Function</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_app_models_crud-methods.js.html#l132"><code>src&#x2F;app&#x2F;models&#x2F;crud-methods.js:132</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Update an object in db</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">id</code>
+                        <span class="type">String</span>
+
+
+                    <div class="param-description">
+                        <p>the id of object</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">data</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>the new data</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">method</code>
+                        <span class="type">String</span>
+
+
+                    <div class="param-description">
+                        <p>the http method that use this function (PUT or PATCH)</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">Function</span>:
+                    <p>return a promise</p>
+
+            </div>
+        </div>
 
 
 </div>
@@ -300,8 +454,35 @@ Retrieve all json file in folder 'pathModels' and load all models</p>
             <div id="properties" class="api-class-tabpanel">
                 <h2 class="off-left">Properties</h2>
 
-<div id="property_logger" class="property item">
-    <h3 class="name"><code>logger</code></h3>
+<div id="property_DEFAULT_PROP_MONGODB" class="property item">
+    <h3 class="name"><code>DEFAULT_PROP_MONGODB</code></h3>
+    <span class="type">Array</span>
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_app_models_crud-methods.js.html#l6"><code>src&#x2F;app&#x2F;models&#x2F;crud-methods.js:6</code></a>
+        </p>
+
+
+    </div>
+
+    <div class="description">
+        <p>List of all default property in a mongodb document <br>
+This list define all property that we don't want retrive</p>
+
+    </div>
+
+        <p><strong>Default:</strong> [ &#x27;__v&#x27;, &#x27;_id&#x27;]</p>
+
+
+</div>
+<div id="property_model" class="property item">
+    <h3 class="name"><code>model</code></h3>
     <span class="type">Object</span>
 
 
@@ -311,64 +492,14 @@ Retrieve all json file in folder 'pathModels' and load all models</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_models_controller.js.html#l51"><code>src&#x2F;app&#x2F;models&#x2F;controller.js:51</code></a>
+        <a href="../files/src_app_models_crud-methods.js.html#l31"><code>src&#x2F;app&#x2F;models&#x2F;crud-methods.js:31</code></a>
         </p>
 
 
     </div>
 
     <div class="description">
-        <p>Default yocto-logger</p>
-
-    </div>
-
-
-
-</div>
-<div id="property_mongoose" class="property item">
-    <h3 class="name"><code>mongoose</code></h3>
-    <span class="type">Object</span>
-
-
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_app_models_controller.js.html#l43"><code>src&#x2F;app&#x2F;models&#x2F;controller.js:43</code></a>
-        </p>
-
-
-    </div>
-
-    <div class="description">
-        <p>Load mongoose controller to execute operation on database</p>
-
-    </div>
-
-
-
-</div>
-<div id="property_tabModel" class="property item">
-    <h3 class="name"><code>tabModel</code></h3>
-    <span class="type">Array of Object</span>
-
-
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_app_models_controller.js.html#l34"><code>src&#x2F;app&#x2F;models&#x2F;controller.js:34</code></a>
-        </p>
-
-
-    </div>
-
-    <div class="description">
-        <p>Array of Object that contains all models found in folder</p>
+        <p>Object that contains the current model</p>
 
     </div>
 

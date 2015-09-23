@@ -38,9 +38,11 @@
                 
                         <div id="api-tabview-panel">
                             <ul id="api-classes" class="apis classes">
+                                <li><a href="../classes/Crud.html">Crud</a></li>
                                 <li><a href="../classes/ModelController.html">ModelController</a></li>
                                 <li><a href="../classes/RouteController.html">RouteController</a></li>
                             </ul>
+                
                 
                             <ul id="api-modules" class="apis modules">
                             </ul>
@@ -89,6 +91,7 @@ var Schema      = mongoose.Schema;
 var glob        = require(&#x27;glob&#x27;);
 var fs          = require(&#x27;fs&#x27;);
 var path        = require(&#x27;path&#x27;);
+var Crud        = require(&#x27;./crud-methods.js&#x27;);
 
 /**
 * Yocto API : Models Controller
@@ -151,20 +154,27 @@ ModelController.prototype.addModel = function (model, pathModels) {
 
   try {
     // Instantiate a new mongodb Schema based in model
-    var theSchema = new Schema(model.properties);
+    var schema = new Schema(model.properties);
 
     if (!_.isEmpty(model.fn)) {
 
       // Load corresponded file to retrieve function
-      var funcFile = require(path.normalize(pathModels + model.name.toLowerCase() + &#x27;.js&#x27;));
+      var funcFile = require(path.normalize(pathModels +
+      &#x27;/../&#x27; + model.name.toLowerCase() + &#x27;.js&#x27;));
+
       // Read each propety to retrievethe fn (function name) of each function
       _.each(model.fn, function (fn) {
-        theSchema.methods[fn] = funcFile[fn];
+        schema.methods[fn] = funcFile[fn];
       });
     }
 
     // Create mongobd model based on the json model file
-    var mongModel = mongoose.model(model.name, theSchema);
+    var mongModel = mongoose.model(model.name, schema);
+
+    // Create a new Crud object for default Method
+    var crud = new Crud();
+    crud.init(mongModel);
+    mongModel.schema.methods.crud = crud;
 
     // Add the MongoModel in the array tabModel
     this.tabModel.push({
@@ -194,7 +204,7 @@ ModelController.prototype.init = function (pathModels) {
   this.logger.debug(&#x27;[ ControllerModels.init ] - start&#x27;);
 
   // Get all json file in repoitory models
-  _.each(_.words(glob.sync(pathModels + &#x27;*.json&#x27;, &#x27;cwd&#x27;), /[^,,]+/g), function (file) {
+  _.each(glob.sync(pathModels + &#x27;*.json&#x27;, &#x27;cwd&#x27;), function (file) {
 
     try {
       // Import the file

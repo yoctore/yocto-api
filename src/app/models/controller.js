@@ -7,18 +7,7 @@ var Schema      = mongoose.Schema;
 var glob        = require('glob');
 var fs          = require('fs');
 var path        = require('path');
-var Promise     = require('promise');
 var Crud        = require('./crud-methods.js');
-
-/**
-* List of all default property in a mongodb document <br>
-* This list define all property that we don't want retrive
-*
-* @property DEFAULT_PROP_MONGODB
-* @type array
-* @default [ '__v', '_id']
-*/
-var DEFAULT_PROP_MONGODB = [ '__v', '_id' ];
 
 /**
 * Yocto API : Models Controller
@@ -86,7 +75,9 @@ ModelController.prototype.addModel = function (model, pathModels) {
     if (!_.isEmpty(model.fn)) {
 
       // Load corresponded file to retrieve function
-      var funcFile = require(path.normalize(pathModels + '/../'+ model.name.toLowerCase() + '.js'));
+      var funcFile = require(path.normalize(pathModels +
+      '/../' + model.name.toLowerCase() + '.js'));
+
       // Read each propety to retrievethe fn (function name) of each function
       _.each(model.fn, function (fn) {
         schema.methods[fn] = funcFile[fn];
@@ -117,149 +108,60 @@ ModelController.prototype.addModel = function (model, pathModels) {
   }
 };
 
-function addDefaultMethods(Model) {
+/**
+* Initialise the Controller</br>
+* Retrieve all json file in folder 'pathModels' and load all models
+*
+* @method init
+* @param {String} pathModels Path of the folder that contains all model '.json'
+*/
+ModelController.prototype.init = function (pathModels) {
 
-  // Create Method in model
-  Model.schema.methods.get = function (id) {
+  this.logger.debug('[ ControllerModels.init ] - start');
 
-    // Determine if paramToGet is not empty, and get good function name. If is empty, find all documents
-    var fn = 'find';
+  // Get all json file in repoitory models
+  _.each(glob.sync(pathModels + '*.json', 'cwd'), function (file) {
 
-    if (!_.isUndefined(id) && _.isString(id)) {
-      fn = 'findById';
-    } else if (!_.isUndefined(id) && _.isObject(id)) {
-      fn = 'findOne';
+    try {
+      // Import the file
+      var jsonFile = JSON.parse(fs.readFileSync(file), 'utf-8');
+
+      // Add the model in the main array
+      this.addModel(jsonFile.models.model, pathModels);
+
+    } catch (e) {
+
+      this.logger.error('[ ControllerModels.init() ] - error rencountring during init,' +
+      ' more details : ' + e);
     }
+  }, this);
+};
 
-    return new Promise (function (fulfill, reject) {
-      // Find object
-      Model[fn]((!_.isUndefined(id) ? id : ''), function (err, val) {
-        if (err) reject(err);
-        else fulfill(val);
-      });
-    });
-  };
+/**
+* Get model from tabModel
+*
+* @param {String} nameModel the name of model to retrieve
+* @return {Boolean} return false if model not found otherwise return the model
+*/
+ModelController.prototype.getModel = function (nameModel) {
 
-  // Create Method in model
-  Model.schema.methods.delete = function (id) {
+  if (!_.isEmpty(nameModel) && _.isString(nameModel)) {
 
-    return new Promise (function (fulfill, reject) {
+    // return the model founded
+    var index = _.findIndex(this.tabModel, { 'name' : nameModel });
 
-      // Find object
-      Model.remove({ _id : id }, function (err, val) {
-        if (err) reject(err);
-        else fulfill(val);
-      });
-    });
-  };
-
-  // Method that create an object into database
-  Model.schema.methods.create = function (data) {
-
-    return new Promise (function (fulfill, reject) {
-      var obj = new Model();
-
-      // Retrieve all property of the object in the current model, and omit default property of mongodb
-      _.each(_.omit(Model.schema.paths, DEFAULT_PROP_MONGODB), function (val, key) {
-
-        // Add the propriety to the new object
-        obj[key] = data[key];
-      });
-
-      obj.save(function (err, val) {
-        if (err) reject(err);
-        else fulfill(val);
-      });
-
-    });
-  };
-
-  // Méthode to put or patch element in database
-  Model.schema.methods.update = function (id, data, method) {
-
-    return new Promise (function (fulfill, reject) {
-
-      // Find in database
-      Model.findById(id, function (err, objFound) {
-
-        if (err) {
-          reject(err);
-        } else {
-
-          // Retrieve all property of the object in the current model, and omit default property of mongodb
-          _.each(_.omit(Model.schema.paths, DEFAULT_PROP_MONGODB) , function (val, key) {
-
-            // Check if it's an PUT request, if it's an PATCH request and the val is empty we don't set it
-            if ((method === 'patch' && !_.isUndefined(data[key])) || method === 'put') {
-
-              // Set value to save object later on db
-              objFound[key] = data[key];
-            }
-          });
-
-          objFound.save(function (err, val) {
-            if (err) reject(err);
-            else fulfill(val);
-          });
-        }
-      });
-    });
-  };
-}
-  /**
-  * Initialise the Controller</br>
-  * Retrieve all json file in folder 'pathModels' and load all models
-  *
-  * @method init
-  * @param {String} pathModels Path of the folder that contains all model '.json'
-  */
-  ModelController.prototype.init = function (pathModels) {
-
-    this.logger.debug('[ ControllerModels.init ] - start');
-
-    // Get all json file in repoitory models
-    _.each(glob.sync(pathModels + '*.json', 'cwd'), function (file) {
-
-      try {
-        // Import the file
-        var jsonFile = JSON.parse(fs.readFileSync(file), 'utf-8');
-
-        // Add the model in the main array
-        this.addModel(jsonFile.models.model, pathModels);
-
-      } catch (e) {
-
-        this.logger.error('[ ControllerModels.init() ] - error rencountring during init,' +
-        ' more details : ' + e);
-      }
-    }, this);
-  };
-
-  /**
-  * Get model from tabModel
-  *
-  * @param {String} nameModel the name of model to retrieve
-  * @return {Boolean} return false if model not found otherwise return the model
-  */
-  ModelController.prototype.getModel = function (nameModel) {
-
-    if (!_.isEmpty(nameModel) && _.isString(nameModel)) {
-
-      // return the model founded
-      var index = _.findIndex(this.tabModel, { 'name' : nameModel });
-
-      // Test if a model was found
-      if (_.isUndefined(index) || (index >= 0)) {
-        this.logger.debug('[ ControllerModels.getModel ] - get Model of : ' + nameModel);
-        return this.tabModel[index].mongooseModel;
-      }
+    // Test if a model was found
+    if (_.isUndefined(index) || (index >= 0)) {
+      this.logger.debug('[ ControllerModels.getModel ] - get Model of : ' + nameModel);
+      return this.tabModel[index].mongooseModel;
     }
-    this.logger.error('[ ControllerModels.getModel ] - error model not found,' +
-    ' model name is : ' + nameModel);
-    return false;
-  };
+  }
+  this.logger.error('[ ControllerModels.getModel ] - error model not found,' +
+  ' model name is : ' + nameModel);
+  return false;
+};
 
-  /**
-  * Export current Controller to use it on node
-  */
-  module.exports = new (ModelController)();
+/**
+* Export current Controller to use it on node
+*/
+module.exports = new (ModelController)();

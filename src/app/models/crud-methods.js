@@ -4,6 +4,16 @@ var _           = require('lodash');
 var Promise     = require('promise');
 
 /**
+* List of all default property in a mongodb document <br>
+* This list define all property that we don't want retrive
+*
+* @property DEFAULT_PROP_MONGODB
+* @type array
+* @default [ '__v', '_id']
+*/
+var DEFAULT_PROP_MONGODB = [ '__v', '_id' ];
+
+/**
 * Yocto API : crud methods Controller
 *
 * Controller that give default methods
@@ -16,34 +26,25 @@ var Promise     = require('promise');
 * @copyright : Yocto SAS, All right reserved
 * @class Crud
 */
-
-/**
-* List of all default property in a mongodb document <br>
-* This list define all property that we don't want retrive
-*
-* @property DEFAULT_PROP_MONGODB
-* @type array
-* @default [ '__v', '_id']
-*/
-var DEFAULT_PROP_MONGODB = [ '__v', '_id' ];
-
 function Crud () {
 
   /**
   * Object that contains the current model
   *
-  * @property tabModel
-  * @type Array of Object
+  * @property model
+  * @type Object
   * @default empty
   */
   this.model = {};
 }
 
 /**
- * [get description]
- * @param  {[type]} id [description]
- * @return {[type]}    [description]
- */
+* Function that get element in db
+*
+* @method get
+* @param  {Objet, String} id THe id or antoher object to Retrieve in db
+* @return {Function} return a promise
+*/
 Crud.prototype.get = function (id) {
 
   // Save scope
@@ -60,7 +61,7 @@ Crud.prototype.get = function (id) {
 
   return new Promise (function (fulfill, reject) {
     // Find object
-  //  console.log(' INTO PROMISE ID = ', id);
+    //  console.log(' INTO PROMISE ID = ', id);
     scope.model[fn]((!_.isUndefined(id) ? id : ''), function (err, val) {
       if (err) {
         reject(err);
@@ -72,10 +73,12 @@ Crud.prototype.get = function (id) {
 };
 
 /**
- * [delete description]
- * @param  {[type]} id [description]
- * @return {[type]}    [description]
- */
+* Delete an object in db
+*
+* @method delete
+* @param  {String} id the id of the item should be delete
+* @return {Function} return a promise
+*/
 Crud.prototype.delete = function (id) {
 
   // Save scope
@@ -95,13 +98,13 @@ Crud.prototype.delete = function (id) {
 };
 
 /**
- * [create description]
- * @param  {[type]} data [description]
- * @return {[type]}      [description]
- */
+* Create an object in db
+*
+* @method create
+* @param  {Object} data the data to create object
+* @return {Function} return a promise
+*/
 Crud.prototype.create = function (data) {
-
-  console.log('\n-------------- crud.model =', this.model.schema);
 
   // Save scope
   var scope = this;
@@ -127,12 +130,14 @@ Crud.prototype.create = function (data) {
 };
 
 /**
- * [update description]
- * @param  {[type]} id     [description]
- * @param  {[type]} data   [description]
- * @param  {[type]} method [description]
- * @return {[type]}        [description]
- */
+* Update an object in db
+*
+* @method update
+* @param  {String} id the id of object
+* @param  {Object} data the new data
+* @param  {String} method the http method that use this function (PUT or PATCH)
+* @return {Function} return a promise
+*/
 Crud.prototype.update = function (id, data, method) {
 
   // Save scope
@@ -168,10 +173,10 @@ Crud.prototype.update = function (id, data, method) {
 };
 
 /**
- * Initialise object, set model
- *
- * @param  {Object} model the Mongoose Model
- */
+* Initialise object, set model
+*
+* @param  {Object} model the Mongoose Model
+*/
 Crud.prototype.init = function (model) {
   this.model = model;
 };

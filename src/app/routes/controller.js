@@ -7,17 +7,6 @@ var express     = require('express');
 var models      = require('../models/controller.js');
 var fs          = require('fs');
 var path        = require('path');
-var Promise     = require('promise');
-
-/**
-* List of all default property in a mongodb document <br>
-* This list define all property that we don't want retrive
-*
-* @property DEFAULT_PROP_MONGODB
-* @type array
-* @default [ '__v', '_id']
-*/
-var DEFAULT_PROP_MONGODB = [ '__v', '_id' ];
 
 // Define a Joi schema for test if route have a goodformat
 var routeJoiSchema = joi.object().keys({
@@ -98,11 +87,11 @@ function RouteController () {
 * @param {String} pathRequest route to add
 * @param {String} nameModel name of the model object to retrieve into the controller of model
 * @param {Array} reqExcluded array of excluded request
-* @param {String} paramToRetrieve name of the param to retrieve
-* @param {Object} theRoute the current route
+* @param {String} param name of the param to retrieve
+* @param {Object} route the current route
 * @return {Boolean} If success return true, otherwise false
 */
-RouteController.prototype.addRoute = function (pathRequest, nameModel, reqExcluded, paramToRetrieve, theRoute) {
+RouteController.prototype.addRoute = function (pathRequest, nameModel, reqExcluded, param, route) {
 
   // Save scope
   var scope = this;
@@ -121,7 +110,6 @@ RouteController.prototype.addRoute = function (pathRequest, nameModel, reqExclud
   * @param  {Object} model the data model object
   * @param  {String} path the root path
   * @param  {String} param The property to retrieve on url
-  * @param  {String} reqType type of the http req (get or head)
   */
   httpMethods.get = function (model, path, param) {
 
@@ -134,18 +122,18 @@ RouteController.prototype.addRoute = function (pathRequest, nameModel, reqExclud
       model.schema.methods.crud.get(req.params[param]).then(function (result) {
         // Send respond to client
         res.status(200).jsonp({
-          status  : "success",
-          code    : "200000",
-          message : "Default GET method",
+          status  : 'success',
+          code    : '200000',
+          message : 'Default GET method',
           data    : _.isEmpty(result) ? [] : result
         });
 
       }).catch(function (err) {
 
         res.status(400).jsonp({
-          status  : "error",
-          code    : "400000",
-          message : "Default GET method, error geting object",
+          status  : 'error',
+          code    : '400000',
+          message : 'Default GET method, error geting object',
           data    : err
         });
       });
@@ -170,17 +158,17 @@ RouteController.prototype.addRoute = function (pathRequest, nameModel, reqExclud
       model.schema.methods.crud.delete(req.params[param]).then(function (value) {
 
         res.status(200).jsonp({
-          status  : "success",
-          code    : "200000",
-          message : "Default DELETE method",
+          status  : 'success',
+          code    : '200000',
+          message : 'Default DELETE method',
           data    : value + ' document(s) was deleted'
         });
       }).catch(function (err) {
 
         res.status(400).jsonp({
-          status  : "error",
-          code    : "400000",
-          message : "Default DELETE method, error delete object",
+          status  : 'error',
+          code    : '400000',
+          message : 'Default DELETE method, error delete object',
           data    : err
         });
       });
@@ -197,17 +185,17 @@ RouteController.prototype.addRoute = function (pathRequest, nameModel, reqExclud
       model.schema.methods.crud.update(req.params[param], req.body, 'patch').then(function (value) {
 
         res.status(200).jsonp({
-          status  : "success",
-          code    : "200000",
-          message : "Default PATCH method",
+          status  : 'success',
+          code    : '200000',
+          message : 'Default PATCH method',
           data    : value + ' document(s) was modified'
         });
       }).catch(function (err) {
 
         res.status(400).jsonp({
-          status  : "error",
-          code    : "400000",
-          message : "Default PATCH method, error modifing object",
+          status  : 'error',
+          code    : '400000',
+          message : 'Default PATCH method, error modifing object',
           data    : err
         });
       });
@@ -224,17 +212,17 @@ RouteController.prototype.addRoute = function (pathRequest, nameModel, reqExclud
       model.schema.methods.crud.update(req.params[param], req.body, 'put').then(function (value) {
 
         res.status(200).jsonp({
-          status  : "success",
-          code    : "200000",
-          message : "Default PUT method",
+          status  : 'success',
+          code    : '200000',
+          message : 'Default PUT method',
           data    : value + ' document(s) was modified'
         });
       }).catch(function (err) {
 
         res.status(400).jsonp({
-          status  : "error",
-          code    : "400000",
-          message : "Default PUT method, error modifing object",
+          status  : 'error',
+          code    : '400000',
+          message : 'Default PUT method, error modifing object',
           data    : err
         });
       });
@@ -258,22 +246,22 @@ RouteController.prototype.addRoute = function (pathRequest, nameModel, reqExclud
       logger.debug('[ ControllerRoutes.post ] - revceiving request, route is : ' + path);
 
       // TODO : ajouter validation JOI_SCHEMA
-      Model.schema.methods.crud.create(req.body).then(function (value){
+      Model.schema.methods.crud.create(req.body).then(function (value) {
 
         // Objet created
         res.status(200).jsonp({
-          status  : "success",
-          code    : "200000",
-          message : "Default POST method, object created in data",
+          status  : 'success',
+          code    : '200000',
+          message : 'Default POST method, object created in data',
           data    : value
         });
       }).catch(function (err) {
 
         // Error creating object
         res.status(400).jsonp({
-          status  : "error",
-          code    : "400000",
-          message : "Default POST method, error creating object",
+          status  : 'error',
+          code    : '400000',
+          message : 'Default POST method, error creating object',
           data    : err
         });
       });
@@ -292,11 +280,11 @@ RouteController.prototype.addRoute = function (pathRequest, nameModel, reqExclud
     _.each(_.difference(scope.ALL_HTTP_REQUESTS, reqExcluded), function (fn) {
 
       // Bind routes to model
-      httpMethods[fn](model, pathRequest, paramToRetrieve, fn);
+      httpMethods[fn](model, pathRequest, param, fn);
     }, this);
 
     // retrieve specifiq route in model
-    _.each(theRoute.methods, function (method) {
+    _.each(route.methods, function (method) {
 
       try {
         var pathSubReq = path.normalize(pathRequest + '/' + method.path);
@@ -343,7 +331,7 @@ RouteController.prototype.init = function (pathRoutes, pathModels) {
   *
   * @method addMidlleware
   */
-   var addMidlleware = function () {
+  var addMidlleware = function () {
 
     // TODO : tester si cors() résou le probleme
     scope.router.use(function (req, res, next) {
@@ -407,7 +395,7 @@ RouteController.prototype.init = function (pathRoutes, pathModels) {
 
       // add Main route
       _.each(routeAndAlias, function (val) {
-        this.addRoute(val, route.model, route.excluded, route.paramToRetrieve, route);
+        this.addRoute(val, route.model, route.excluded, route.param, route);
       }, this);
 
     } else {

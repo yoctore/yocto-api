@@ -15,6 +15,15 @@
             "fors": {},
             "namespaces": {}
         },
+        "src/app/models/crud-methods.js": {
+            "name": "src/app/models/crud-methods.js",
+            "modules": {},
+            "classes": {
+                "Crud": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
         "src/app/routes/controller.js": {
             "name": "src/app/routes/controller.js",
             "modules": {},
@@ -36,9 +45,24 @@
             "plugin_for": [],
             "extension_for": [],
             "file": "src/app/models/controller.js",
-            "line": 11,
+            "line": 12,
             "description": "Yocto API : Models Controller\n\nController of models, laod models from a json file\n\nAll models are save in an array and are accessible by calling method getModel\n\nFor more details on these dependencies read links below :\n- LodAsh : https://lodash.com/\n- yocto-logger : git+ssh://lab.yocto.digital:yocto-node-modules/yocto-utils.git\n- mongoose : http://mongoosejs.com/\n- glob : https://www.npmjs.com/package/glob\n- fs : https://nodejs.org/api/fs.html\n- path : https://nodejs.org/api/path.html",
             "date": ": 11/05/2015",
+            "author": ": Cedric Balard <cedric@yocto.re>",
+            "copyright": ": Yocto SAS, All right reserved"
+        },
+        "Crud": {
+            "name": "Crud",
+            "shortname": "Crud",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "file": "src/app/models/crud-methods.js",
+            "line": 16,
+            "description": "Yocto API : crud methods Controller\n\nController that give default methods\n\nFor more details on these dependencies read links below :\n- LodAsh : https://lodash.com/",
+            "date": ": 22/09/2015",
             "author": ": Cedric Balard <cedric@yocto.re>",
             "copyright": ": Yocto SAS, All right reserved"
         },
@@ -51,17 +75,18 @@
             "plugin_for": [],
             "extension_for": [],
             "file": "src/app/routes/controller.js",
-            "line": 53,
+            "line": 27,
             "description": "Yocto API : Routes Controller\n\nController of routes based on Express\n\nIt read a jsonfile and create each routenode\n\nCors Express is enable to permit test with apidocjs\n\nFor more details on these dependencies read links below :\n- LodAsh : https://lodash.com/\n- yocto-logger : git+ssh://lab.yocto.digital:yocto-node-modules/yocto-utils.git\n- express : http://expressjs.com/\n- joi : https://github.com/hapijs/joi",
             "date": ": 11/05/2015",
             "author": ": Cedric Balard <cedric@yocto.re>",
             "copyright": ": Yocto SAS, All right reserved"
         }
     },
+    "elements": {},
     "classitems": [
         {
             "file": "src/app/models/controller.js",
-            "line": 33,
+            "line": 34,
             "description": "Array of Object that contains all models found in folder",
             "itemtype": "property",
             "name": "tabModel",
@@ -71,7 +96,7 @@
         },
         {
             "file": "src/app/models/controller.js",
-            "line": 42,
+            "line": 43,
             "description": "Load mongoose controller to execute operation on database",
             "itemtype": "property",
             "name": "mongoose",
@@ -80,7 +105,7 @@
         },
         {
             "file": "src/app/models/controller.js",
-            "line": 50,
+            "line": 51,
             "description": "Default yocto-logger",
             "itemtype": "property",
             "name": "logger",
@@ -89,7 +114,7 @@
         },
         {
             "file": "src/app/models/controller.js",
-            "line": 59,
+            "line": 60,
             "description": "Add model in @tabModel\nIf model.fn isn't empty, all methods specified will be added in model.methods",
             "itemtype": "method",
             "name": "addModel",
@@ -113,7 +138,7 @@
         },
         {
             "file": "src/app/models/controller.js",
-            "line": 103,
+            "line": 111,
             "description": "Initialise the Controller</br>\nRetrieve all json file in folder 'pathModels' and load all models",
             "itemtype": "method",
             "name": "init",
@@ -128,7 +153,7 @@
         },
         {
             "file": "src/app/models/controller.js",
-            "line": 132,
+            "line": 140,
             "description": "Get model from tabModel",
             "params": [
                 {
@@ -145,33 +170,132 @@
         },
         {
             "file": "src/app/models/controller.js",
-            "line": 156,
+            "line": 164,
             "description": "Export current Controller to use it on node",
             "class": "ModelController"
         },
         {
-            "file": "src/app/routes/controller.js",
-            "line": 11,
+            "file": "src/app/models/crud-methods.js",
+            "line": 6,
             "description": "List of all default property in a mongodb document <br>\nThis list define all property that we don't want retrive",
             "itemtype": "property",
             "name": "DEFAULT_PROP_MONGODB",
             "type": "array",
             "default": "[ '__v', '_id']",
-            "class": "RouteController"
+            "class": "Crud"
         },
         {
-            "file": "src/app/routes/controller.js",
-            "line": 37,
-            "description": "Bind of all http methods to request",
+            "file": "src/app/models/crud-methods.js",
+            "line": 31,
+            "description": "Object that contains the current model",
             "itemtype": "property",
-            "name": "FUNC_TO_BIND",
+            "name": "model",
             "type": "Object",
-            "default": "{ patch   : 'addHTTPRequest', put     : 'addHTTPRequest', delete  : 'addHTTPRequest', get     : 'addHTTPRequestGets', head    : 'addHTTPRequestGets', post    : 'post' }",
-            "class": "RouteController"
+            "default": "empty",
+            "class": "Crud"
+        },
+        {
+            "file": "src/app/models/crud-methods.js",
+            "line": 41,
+            "description": "Function that get element in db",
+            "itemtype": "method",
+            "name": "get",
+            "params": [
+                {
+                    "name": "id",
+                    "description": "THe id or antoher object to Retrieve in db",
+                    "type": "Objet, String"
+                }
+            ],
+            "return": {
+                "description": "return a promise",
+                "type": "Function"
+            },
+            "class": "Crud"
+        },
+        {
+            "file": "src/app/models/crud-methods.js",
+            "line": 75,
+            "description": "Delete an object in db",
+            "itemtype": "method",
+            "name": "delete",
+            "params": [
+                {
+                    "name": "id",
+                    "description": "the id of the item should be delete",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "return a promise",
+                "type": "Function"
+            },
+            "class": "Crud"
+        },
+        {
+            "file": "src/app/models/crud-methods.js",
+            "line": 100,
+            "description": "Create an object in db",
+            "itemtype": "method",
+            "name": "create",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "the data to create object",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "return a promise",
+                "type": "Function"
+            },
+            "class": "Crud"
+        },
+        {
+            "file": "src/app/models/crud-methods.js",
+            "line": 132,
+            "description": "Update an object in db",
+            "itemtype": "method",
+            "name": "update",
+            "params": [
+                {
+                    "name": "id",
+                    "description": "the id of object",
+                    "type": "String"
+                },
+                {
+                    "name": "data",
+                    "description": "the new data",
+                    "type": "Object"
+                },
+                {
+                    "name": "method",
+                    "description": "the http method that use this function (PUT or PATCH)",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "return a promise",
+                "type": "Function"
+            },
+            "class": "Crud"
+        },
+        {
+            "file": "src/app/models/crud-methods.js",
+            "line": 175,
+            "description": "Initialise object, set model",
+            "params": [
+                {
+                    "name": "model",
+                    "description": "the Mongoose Model",
+                    "type": "Object"
+                }
+            ],
+            "class": "Crud"
         },
         {
             "file": "src/app/routes/controller.js",
-            "line": 74,
+            "line": 48,
             "description": "List of all http request that supported by api",
             "itemtype": "property",
             "name": "ALL_HTTP_REQUESTS",
@@ -181,7 +305,7 @@
         },
         {
             "file": "src/app/routes/controller.js",
-            "line": 83,
+            "line": 57,
             "description": "Model's Controller, is the controller that will use to retrieve a model",
             "itemtype": "property",
             "name": "models",
@@ -191,7 +315,7 @@
         },
         {
             "file": "src/app/routes/controller.js",
-            "line": 92,
+            "line": 66,
             "description": "The main router",
             "itemtype": "property",
             "name": "router",
@@ -200,7 +324,7 @@
         },
         {
             "file": "src/app/routes/controller.js",
-            "line": 100,
+            "line": 74,
             "description": "The main logger",
             "itemtype": "property",
             "name": "logger",
@@ -209,216 +333,7 @@
         },
         {
             "file": "src/app/routes/controller.js",
-            "line": 108,
-            "description": "Implement the http request : GET and HEAD</br>\nGet an object </br>\nSend a error to the client if the request failed, or a json file to the client with the data requested if it's an GET requerst </br>\nOR if it's a head request, send a http header",
-            "itemtype": "method",
-            "name": "addHTTPRequestGets",
-            "params": [
-                {
-                    "name": "model",
-                    "description": "the data model object",
-                    "type": "Object"
-                },
-                {
-                    "name": "path",
-                    "description": "the root path",
-                    "type": "String"
-                },
-                {
-                    "name": "paramToGet",
-                    "description": "The property to retrieve on url",
-                    "type": "String"
-                },
-                {
-                    "name": "reqType",
-                    "description": "type of the http req (get or head)",
-                    "type": "String"
-                }
-            ],
-            "class": "RouteController"
-        },
-        {
-            "file": "src/app/routes/controller.js",
-            "line": 159,
-            "description": "Implement the http request : PUT, PATCH and DELETE</br>\nGet an object </br>\nsend a message to the client",
-            "itemtype": "method",
-            "name": "addHTTPRequest",
-            "params": [
-                {
-                    "name": "model",
-                    "description": "the data model object",
-                    "type": "Object"
-                },
-                {
-                    "name": "path",
-                    "description": "the root path",
-                    "type": "String"
-                },
-                {
-                    "name": "paramToGet",
-                    "description": "The property to retrieve on url",
-                    "type": "String"
-                },
-                {
-                    "name": "reqType",
-                    "description": "type of the http req (put, patch or head)",
-                    "type": "String"
-                }
-            ],
-            "class": "RouteController"
-        },
-        {
-            "file": "src/app/routes/controller.js",
-            "line": 197,
-            "description": "Update the model, it's used for : PUT and PATCH\nGet an object </br>\nsend a message to the client",
-            "itemtype": "method",
-            "name": "updateObject",
-            "params": [
-                {
-                    "name": "model",
-                    "description": "the data model object",
-                    "type": "Object"
-                },
-                {
-                    "name": "res",
-                    "description": "the http response",
-                    "type": "Object"
-                },
-                {
-                    "name": "req",
-                    "description": "the http request",
-                    "type": "Object"
-                },
-                {
-                    "name": "paramToGet",
-                    "description": "The property to retrieve on url",
-                    "type": "String"
-                },
-                {
-                    "name": "scope",
-                    "description": "the scope of pervious function",
-                    "type": "Object"
-                },
-                {
-                    "name": "reqType",
-                    "description": "the type of the current request",
-                    "type": "String"
-                }
-            ],
-            "class": "RouteController"
-        },
-        {
-            "file": "src/app/routes/controller.js",
-            "line": 270,
-            "description": "Delete one object, it's used for http method : DELETE </br>\nSend a error to the client if the request failed, otherwise a json file to the client with the data",
-            "itemtype": "method",
-            "name": "deleteObject",
-            "params": [
-                {
-                    "name": "model",
-                    "description": "the data model object",
-                    "type": "Object"
-                },
-                {
-                    "name": "res",
-                    "description": "the http response",
-                    "type": "Object"
-                },
-                {
-                    "name": "req",
-                    "description": "the http request",
-                    "type": "Object"
-                },
-                {
-                    "name": "paramToGet",
-                    "description": "The property to retrieve on url to delete the object",
-                    "type": "String"
-                }
-            ],
-            "class": "RouteController"
-        },
-        {
-            "file": "src/app/routes/controller.js",
-            "line": 301,
-            "description": "Save an object in db, it's used for : PUT, PATCH and POST </br>\nSend a error to the client if the request failed, otherwise a json file to the client with the data",
-            "itemtype": "method",
-            "name": "saveObject",
-            "params": [
-                {
-                    "name": "obj",
-                    "description": "the data model object",
-                    "type": "Object"
-                },
-                {
-                    "name": "res",
-                    "description": "the http response",
-                    "type": "Object"
-                }
-            ],
-            "class": "RouteController"
-        },
-        {
-            "file": "src/app/routes/controller.js",
-            "line": 330,
-            "description": "Implement the http request : POST </br>\nAdd a new Object in DB </br>\nSend a error to the client if the request failed, otherwise a json file to the client with the data",
-            "itemtype": "method",
-            "name": "post",
-            "params": [
-                {
-                    "name": "Model",
-                    "description": "the data model object (Model start with an uppercase for jshint validation)",
-                    "type": "Object"
-                },
-                {
-                    "name": "path",
-                    "description": "The root path of model",
-                    "type": "String"
-                }
-            ],
-            "class": "RouteController"
-        },
-        {
-            "file": "src/app/routes/controller.js",
-            "line": 377,
-            "description": "Compare data in object with model to check if it's the good type",
-            "itemtype": "method",
-            "name": "checkTypeValidation",
-            "params": [
-                {
-                    "name": "val",
-                    "description": "the mongoose model",
-                    "type": "Object"
-                },
-                {
-                    "name": "param",
-                    "description": "the param to compare",
-                    "type": "Object"
-                }
-            ],
-            "return": {
-                "description": "IF success return true, otherwise false",
-                "type": "Boolean"
-            },
-            "class": "RouteController"
-        },
-        {
-            "file": "src/app/routes/controller.js",
-            "line": 415,
-            "description": "Return the type of param",
-            "itemtype": "method",
-            "name": "getTypeParam",
-            "params": [
-                {
-                    "name": "param",
-                    "description": "the param to get the type",
-                    "type": "Object"
-                }
-            ],
-            "class": "RouteController"
-        },
-        {
-            "file": "src/app/routes/controller.js",
-            "line": 435,
+            "line": 83,
             "description": "Add a route to the main router",
             "itemtype": "method",
             "name": "addRoute",
@@ -439,12 +354,12 @@
                     "type": "Array"
                 },
                 {
-                    "name": "paramToRetrieve",
+                    "name": "param",
                     "description": "name of the param to retrieve",
                     "type": "String"
                 },
                 {
-                    "name": "theRoute",
+                    "name": "route",
                     "description": "the current route",
                     "type": "Object"
                 }
@@ -457,15 +372,52 @@
         },
         {
             "file": "src/app/routes/controller.js",
-            "line": 493,
-            "description": "Add a middleware that enables CORS for all routes",
+            "line": 103,
+            "description": "Implement the http request : GET and HEAD</br>\nGet an object </br>\nSend a error to the client if the request failed, or a json file to the client with the data requested if it's an GET requerst </br>\nOR if it's a head request, send a http header",
             "itemtype": "method",
-            "name": "addMidlleware",
+            "name": "addHTTPRequestGets",
+            "params": [
+                {
+                    "name": "model",
+                    "description": "the data model object",
+                    "type": "Object"
+                },
+                {
+                    "name": "path",
+                    "description": "the root path",
+                    "type": "String"
+                },
+                {
+                    "name": "param",
+                    "description": "The property to retrieve on url",
+                    "type": "String"
+                }
+            ],
             "class": "RouteController"
         },
         {
             "file": "src/app/routes/controller.js",
-            "line": 513,
+            "line": 232,
+            "description": "Implement the http request : POST </br>\nAdd a new Object in DB </br>\nSend a error to the client if the request failed, otherwise a json file to the client with the data",
+            "itemtype": "method",
+            "name": "post",
+            "params": [
+                {
+                    "name": "Model",
+                    "description": "the data model object (Model start with an uppercase for jshint validation)",
+                    "type": "Object"
+                },
+                {
+                    "name": "path",
+                    "description": "The root path of model",
+                    "type": "String"
+                }
+            ],
+            "class": "RouteController"
+        },
+        {
+            "file": "src/app/routes/controller.js",
+            "line": 315,
             "description": "Initialise the controller </br>\nRetrieve all routes and thoose alias and add there into router",
             "itemtype": "method",
             "name": "init",
@@ -489,7 +441,15 @@
         },
         {
             "file": "src/app/routes/controller.js",
-            "line": 593,
+            "line": 329,
+            "description": "Add a middleware that enables CORS for all routes",
+            "itemtype": "method",
+            "name": "addMidlleware",
+            "class": "RouteController"
+        },
+        {
+            "file": "src/app/routes/controller.js",
+            "line": 416,
             "description": "Export current Controller to use it on node",
             "class": "RouteController"
         }
@@ -497,31 +457,43 @@
     "warnings": [
         {
             "message": "unknown tag: date",
-            "line": " src/app/models/controller.js:11"
+            "line": " src/app/models/controller.js:12"
         },
         {
             "message": "unknown tag: copyright",
-            "line": " src/app/models/controller.js:11"
+            "line": " src/app/models/controller.js:12"
         },
         {
             "message": "unknown tag: date",
-            "line": " src/app/routes/controller.js:53"
+            "line": " src/app/models/crud-methods.js:16"
         },
         {
             "message": "unknown tag: copyright",
-            "line": " src/app/routes/controller.js:53"
+            "line": " src/app/models/crud-methods.js:16"
+        },
+        {
+            "message": "unknown tag: date",
+            "line": " src/app/routes/controller.js:27"
+        },
+        {
+            "message": "unknown tag: copyright",
+            "line": " src/app/routes/controller.js:27"
         },
         {
             "message": "Missing item type\nGet model from tabModel",
-            "line": " src/app/models/controller.js:132"
+            "line": " src/app/models/controller.js:140"
         },
         {
             "message": "Missing item type\nExport current Controller to use it on node",
-            "line": " src/app/models/controller.js:156"
+            "line": " src/app/models/controller.js:164"
+        },
+        {
+            "message": "Missing item type\nInitialise object, set model",
+            "line": " src/app/models/crud-methods.js:175"
         },
         {
             "message": "Missing item type\nExport current Controller to use it on node",
-            "line": " src/app/routes/controller.js:593"
+            "line": " src/app/routes/controller.js:416"
         }
     ]
 }
