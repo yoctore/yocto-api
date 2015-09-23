@@ -40,7 +40,11 @@ function Crud () {
   this.model = {};
 }
 
-// Create Method in model
+/**
+ * [get description]
+ * @param  {[type]} id [description]
+ * @return {[type]}    [description]
+ */
 Crud.prototype.get = function (id) {
 
   // Save scope
@@ -68,7 +72,11 @@ Crud.prototype.get = function (id) {
   });
 };
 
-// Create Method in model
+/**
+ * [delete description]
+ * @param  {[type]} id [description]
+ * @return {[type]}    [description]
+ */
 Crud.prototype.delete = function (id) {
 
   // Save scope
@@ -87,7 +95,11 @@ Crud.prototype.delete = function (id) {
   });
 };
 
-// Method that create an object into database
+/**
+ * [create description]
+ * @param  {[type]} data [description]
+ * @return {[type]}      [description]
+ */
 Crud.prototype.create = function (data) {
 
   // Save scope
@@ -113,7 +125,13 @@ Crud.prototype.create = function (data) {
   });
 };
 
-// Méthode to put or patch element in database
+/**
+ * [update description]
+ * @param  {[type]} id     [description]
+ * @param  {[type]} data   [description]
+ * @param  {[type]} method [description]
+ * @return {[type]}        [description]
+ */
 Crud.prototype.update = function (id, data, method) {
 
   // Save scope
@@ -148,6 +166,11 @@ Crud.prototype.update = function (id, data, method) {
   });
 };
 
+/**
+ * Initialise object, set model
+ *
+ * @param  {Object} model the Mongoose Model
+ */
 Crud.prototype.init = function (model) {
   this.model = model;
 };
