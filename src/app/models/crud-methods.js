@@ -3,7 +3,6 @@
 var _           = require('lodash');
 var Promise     = require('promise');
 
-
 /**
 * Yocto API : crud methods Controller
 *
