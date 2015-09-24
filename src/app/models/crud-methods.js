@@ -112,20 +112,33 @@ Crud.prototype.create = function (data) {
   return new Promise (function (fulfill, reject) {
     var obj = new scope.model();
 
-    // Retrieve all property of the object in the current model, and omit default property of mongodb
-    _.each(_.omit(scope.model.schema.paths, DEFAULT_PROP_MONGODB), function (val, key) {
+    // Check if validateObject is define, and execute a joi validation for the current object
+     var result = !_.isUndefined(scope.model.schema.methods.validateObject) ?
+     scope.model.schema.methods.validateObject(data) : {};
 
-      // Add the propriety to the new object
-      obj[key] = data[key];
-    });
+    // If validation success or function validateObject is not define, add object in db
+    if (_.isEmpty(result.error)) {
 
-    obj.save(function (err, val) {
-      if (err) {
-        reject(err);
-      } else {
-        fulfill(val);
-      }
-    });
+      // Retrieve all property of the object in the current model, and omit default property of mongodb
+      _.each(_.omit(scope.model.schema.paths, DEFAULT_PROP_MONGODB), function (val, key) {
+
+        // Add the propriety to the new object
+        obj[key] = data[key];
+      });
+
+      // Save obj in db
+      obj.save(function (err, val) {
+        if (err) {
+          reject(err);
+        } else {
+          fulfill(val);
+        }
+      });
+    } else {
+      
+      // Joi validation failed, so return the errors
+      reject(result.error);
+    }
   });
 };
 

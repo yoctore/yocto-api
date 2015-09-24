@@ -253,7 +253,7 @@
         },
         {
             "file": "src/app/models/crud-methods.js",
-            "line": 132,
+            "line": 145,
             "description": "Update an object in db",
             "itemtype": "method",
             "name": "update",
@@ -282,7 +282,7 @@
         },
         {
             "file": "src/app/models/crud-methods.js",
-            "line": 175,
+            "line": 188,
             "description": "Initialise object, set model",
             "params": [
                 {
@@ -441,15 +441,7 @@
         },
         {
             "file": "src/app/routes/controller.js",
-            "line": 329,
-            "description": "Add a middleware that enables CORS for all routes",
-            "itemtype": "method",
-            "name": "addMidlleware",
-            "class": "RouteController"
-        },
-        {
-            "file": "src/app/routes/controller.js",
-            "line": 416,
+            "line": 392,
             "description": "Export current Controller to use it on node",
             "class": "RouteController"
         }
@@ -489,11 +481,11 @@
         },
         {
             "message": "Missing item type\nInitialise object, set model",
-            "line": " src/app/models/crud-methods.js:175"
+            "line": " src/app/models/crud-methods.js:188"
         },
         {
             "message": "Missing item type\nExport current Controller to use it on node",
-            "line": " src/app/routes/controller.js:416"
+            "line": " src/app/routes/controller.js:392"
         }
     ]
 }

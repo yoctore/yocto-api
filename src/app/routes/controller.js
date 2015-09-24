@@ -13,7 +13,7 @@ var routeJoiSchema = joi.object().keys({
   path            : joi.string().required().min(1).trim(),
   alias           : joi.array().items(joi.string().min(1).trim()),
   model           : joi.string().required().min(1).trim(),
-  paramToRetrieve : joi.array().items(joi.string().min(1).trim().allow(
+  param           : joi.array().items(joi.string().min(1).trim().allow(
     'post', 'get', 'put', 'patch', 'delete', 'head')),
   excluded        : joi.array().items(joi.string().min(1).trim()),
   methods         : joi.array().items(
@@ -291,7 +291,7 @@ RouteController.prototype.addRoute = function (pathRequest, nameModel, reqExclud
 
         if (!_.isUndefined(model.schema.methods[method.fn])) {
 
-          // Bing method to the route
+          // Bind method to the route
           scope.router[method.method](pathSubReq, function (req, res, next) {
             model.schema.methods[method.fn](req, res, next, model, models);
           });
@@ -323,28 +323,7 @@ RouteController.prototype.addRoute = function (pathRequest, nameModel, reqExclud
 */
 RouteController.prototype.init = function (pathRoutes, pathModels) {
 
-  var scope = this;
   logger.debug('[ ControllerRoutes.init ] - start');
-
-  /**
-  * Add a middleware that enables CORS for all routes
-  *
-  * @method addMidlleware
-  */
-  var addMidlleware = function () {
-
-    // TODO : tester si cors() résou le probleme
-    scope.router.use(function (req, res, next) {
-
-      // Enable exoress CORS
-      res.header('Access-Control-Allow-Origin', '*');
-      res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-      res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-
-      // make sure we go to the next routes and don't stop here
-      next();
-    });
-  };
 
   var routes = {};
 
@@ -370,9 +349,6 @@ RouteController.prototype.init = function (pathRoutes, pathModels) {
 
   // Init models Controller
   this.models.init(pathModels);
-
-  // Ass middleware
-  addMidlleware();
 
   // read json file and add each routes
   _.each(routes.routes, function (route) {

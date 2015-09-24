@@ -10,6 +10,7 @@ All http requests that are implemented by the yocto rest api :
   - patch : update a property of object that is specified
   - delete : delete an object
 
+Important : to use yocto-api, you should use the midlleware cors for express : https://www.npmjs.com/package/cors 
 
 ## apidoc
 

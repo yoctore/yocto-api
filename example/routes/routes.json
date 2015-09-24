@@ -36,7 +36,7 @@
       "path"                : "/availabilitys/:availability_id",
       "alias"               : ["/availabilies/:availability_id"],
       "model"               : "availability",
-      "paramToRetrieve"     : ["availability_id"],
+      "param"     : ["availability_id"],
       "excluded"     : ["post"]
     },
     {
@@ -49,7 +49,7 @@
       "path"                : "/storebrand/:storebrand_id",
       "alias"               : ["/storebrand/:storebrand_id"],
       "model"               : "storeBrand",
-      "paramToRetrieve"     : ["storebrand_id"],
+      "param"     : ["storebrand_id"],
       "excluded"     : ["post"]
     }
   ]
