@@ -4,7 +4,6 @@ var joi         = require('joi');
 var _           = require('lodash');
 var logger      = require('yocto-logger');
 var express     = require('express');
-var models      = require('../models/controller.js');
 var fs          = require('fs');
 var path        = require('path');
 
@@ -59,7 +58,6 @@ function RouteController () {
   *
   * @property models
   * @type Object
-  * @default require '../models/controller.js'
   */
   this.models = {};
 
