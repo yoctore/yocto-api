@@ -61,7 +61,7 @@ function RouteController () {
   * @type Object
   * @default require '../models/controller.js'
   */
-  this.models = models;
+  this.models = {};
 
   /**
   * The main router
@@ -91,7 +91,8 @@ function RouteController () {
 * @param {Object} route the current route
 * @return {Boolean} If success return true, otherwise false
 */
-RouteController.prototype.addRoute = function (pathRequest, nameModel, reqExcluded, param, route) {
+RouteController.prototype.addRoute = function (pathRequest, nameModel, reqExcluded, param, route,
+pathCallback) {
 
   // Save scope
   var scope = this;
@@ -119,7 +120,7 @@ RouteController.prototype.addRoute = function (pathRequest, nameModel, reqExclud
       logger.debug('[ ControllerRoutes.get ] - revceiving request,' +
       ' route is : ' + path);
 
-      model.schema.methods.crud.get(req.params[param]).then(function (result) {
+      model.read(req.params[param]).then(function (result) {
         // Send respond to client
         res.status(200).jsonp({
           status  : 'success',
@@ -137,6 +138,7 @@ RouteController.prototype.addRoute = function (pathRequest, nameModel, reqExclud
           data    : err
         });
       });
+
     });
   };
 
@@ -155,7 +157,7 @@ RouteController.prototype.addRoute = function (pathRequest, nameModel, reqExclud
       logger.debug('[ ControllerRoutes.delete ] - revceiving request,' +
       ' route is : ' + path);
 
-      model.schema.methods.crud.delete(req.params[param]).then(function (value) {
+      model.delete(req.params[param]).then(function (value) {
 
         res.status(200).jsonp({
           status  : 'success',
@@ -175,6 +177,7 @@ RouteController.prototype.addRoute = function (pathRequest, nameModel, reqExclud
     });
   };
 
+  // patch method update only param given
   httpMethods.patch = function (model, path, param) {
 
     scope.router.patch(path, function (req, res) {
@@ -182,7 +185,7 @@ RouteController.prototype.addRoute = function (pathRequest, nameModel, reqExclud
       logger.debug('[ ControllerRoutes.patch ] - revceiving request,' +
       ' route is : ' + path);
 
-      model.schema.methods.crud.update(req.params[param], req.body, 'patch').then(function (value) {
+      model.update(req.params[param], req.body, 'patch').then(function (value) {
 
         res.status(200).jsonp({
           status  : 'success',
@@ -202,6 +205,8 @@ RouteController.prototype.addRoute = function (pathRequest, nameModel, reqExclud
     });
   };
 
+  // NOTE : vérifier fonctionnement put()
+  // put should update the whole object with data given ..
   httpMethods.put = function (model, path, param) {
 
     scope.router.put(path, function (req, res) {
@@ -209,7 +214,7 @@ RouteController.prototype.addRoute = function (pathRequest, nameModel, reqExclud
       logger.debug('[ ControllerRoutes.put ] - revceiving request,' +
       ' route is : ' + path);
 
-      model.schema.methods.crud.update(req.params[param], req.body, 'put').then(function (value) {
+      model.update(req.params[param], req.body, 'put').then(function (value) {
 
         res.status(200).jsonp({
           status  : 'success',
@@ -238,15 +243,15 @@ RouteController.prototype.addRoute = function (pathRequest, nameModel, reqExclud
   * @param  {Object} Model the data model object (Model start with an uppercase for jshint validation)
   * @param  {String} path The root path of model
   */
-  httpMethods.post = function (Model, path) {
+  httpMethods.post = function (model, path) {
 
     // Add methode post to the route
     scope.router.post(path, function (req, res) {
 
       logger.debug('[ ControllerRoutes.post ] - revceiving request, route is : ' + path);
 
-      // TODO : ajouter validation JOI_SCHEMA
-      Model.schema.methods.crud.create(req.body).then(function (value) {
+      // NOTE : effectuer pour détérminer si une fonction override le create ???
+      model.create(req.body).then(function (value) {
 
         // Objet created
         res.status(200).jsonp({
@@ -268,8 +273,9 @@ RouteController.prototype.addRoute = function (pathRequest, nameModel, reqExclud
     });
   };
 
+  console.log(' *** find model : ' + nameModel);
   // retrieve the model
-  var model = scope.models.getModel(nameModel);
+  var model = scope.models.db.getModel(nameModel);
 
   // check if model is not false
   if (model) {
@@ -289,19 +295,23 @@ RouteController.prototype.addRoute = function (pathRequest, nameModel, reqExclud
       try {
         var pathSubReq = path.normalize(pathRequest + '/' + method.path);
 
-        if (!_.isUndefined(model.schema.methods[method.fn])) {
+        // Load corresponded callback file to retrieve function
+        var callbackFile = require(path.normalize(pathCallback + nameModel.toLowerCase() + '.js'));
+
+        if (!_.isUndefined(callbackFile[method.fn])) {
 
           // Bind method to the route
           scope.router[method.method](pathSubReq, function (req, res, next) {
-            model.schema.methods[method.fn](req, res, next, model, models);
+            callbackFile[method.fn](req, res, next, model);
           });
+
         } else {
           throw ' Function \'' + method.fn + '\' not found';
         }
 
       } catch (e) {
         logger.error('[ ControllerRoutes.addRoute ] - can\'t add specifiq route : \'' +
-        method.sync + '\' , more details : ' + e);
+        method.sync + '\' for model : \'' + nameModel + '\', more details : ' + e);
       }
     });
 
@@ -321,15 +331,15 @@ RouteController.prototype.addRoute = function (pathRequest, nameModel, reqExclud
 * @param {String} pathModels the path of folder that contains all models.json
 * @return {Boolean} If success return true, otherwise false
 */
-RouteController.prototype.init = function (pathRoutes, pathModels) {
+RouteController.prototype.init = function (pathRoutes, ecrmDatabase, pathCallback) {
 
   logger.debug('[ ControllerRoutes.init ] - start');
 
   var routes = {};
 
   // test if the two params are string and not empty
-  if (!_.isString(pathRoutes) || !_.isString(pathModels) ||
-  _.isEmpty(pathRoutes) || _.isEmpty(pathModels)) {
+  if (!_.isString(pathRoutes) || !_.isString(pathCallback) ||
+  _.isEmpty(pathRoutes) || _.isEmpty(pathCallback)) {
     return false;
   }
 
@@ -338,7 +348,6 @@ RouteController.prototype.init = function (pathRoutes, pathModels) {
 
     // Use fs.accessSync in try/catch because fs.accessSync throw an exception if one file doesn't exist
     fs.accessSync(pathRoutes);
-    fs.accessSync(pathModels);
 
     // Load route config file
     routes = JSON.parse(fs.readFileSync(pathRoutes, 'utf-8'));
@@ -347,9 +356,7 @@ RouteController.prototype.init = function (pathRoutes, pathModels) {
     return false;
   }
 
-  // Init models Controller
-  this.models.init(pathModels);
-
+  this.models = ecrmDatabase;
   // read json file and add each routes
   _.each(routes.routes, function (route) {
 
@@ -371,7 +378,7 @@ RouteController.prototype.init = function (pathRoutes, pathModels) {
 
       // add Main route
       _.each(routeAndAlias, function (val) {
-        this.addRoute(val, route.model, route.excluded, route.param, route);
+        this.addRoute(val, route.model, route.excluded, route.param, route, pathCallback);
       }, this);
 
     } else {
