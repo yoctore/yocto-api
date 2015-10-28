@@ -123,20 +123,21 @@ pathCallback) {
         res.status(200).jsonp({
           status  : 'success',
           code    : '200000',
-          message : 'Default GET method',
+          message : 'Document(s) are found',
           data    : _.isEmpty(result) ? [] : result
         });
 
-      }).catch(function (err) {
+      }).catch(function (error) {
 
         res.status(400).jsonp({
           status  : 'error',
           code    : '400000',
-          message : 'Default GET method, error geting object',
-          data    : err
+          message : 'An error occured when retrieving document',
+          data    : {}
         });
-      });
 
+        logger.error('[ ControllerRoutes.patch ] - error : ' + error);
+      });
     });
   };
 
@@ -160,17 +161,19 @@ pathCallback) {
         res.status(200).jsonp({
           status  : 'success',
           code    : '200000',
-          message : 'Default DELETE method',
-          data    : value + ' document(s) was deleted'
+          message : 'The document(s) was deleted',
+          data    : {}
         });
-      }).catch(function (err) {
+      }).catch(function (error) {
 
         res.status(400).jsonp({
           status  : 'error',
           code    : '400000',
-          message : 'Default DELETE method, error delete object',
-          data    : err
+          message : 'An error occured, the document was not deleted',
+          data    : {}
         });
+
+        logger.error('[ ControllerRoutes.delete ] - error : ' + error);
       });
     });
   };
@@ -188,17 +191,19 @@ pathCallback) {
         res.status(200).jsonp({
           status  : 'success',
           code    : '200000',
-          message : 'Default PATCH method',
-          data    : value + ' document(s) was modified'
+          message : 'The document(s) was patched',
+          data    : {}
         });
-      }).catch(function (err) {
+      }).catch(function (error) {
 
         res.status(400).jsonp({
           status  : 'error',
           code    : '400000',
-          message : 'Default PATCH method, error modifing object',
-          data    : err
+          message : 'An error occured, the document was not updated',
+          data    : {}
         });
+
+        logger.error('[ ControllerRoutes.patch ] - error : ' + error);
       });
     });
   };
@@ -217,17 +222,19 @@ pathCallback) {
         res.status(200).jsonp({
           status  : 'success',
           code    : '200000',
-          message : 'Default PUT method',
-          data    : value + ' document(s) was modified'
+          message : 'The document(s) was updated',
+          data    : {}
         });
-      }).catch(function (err) {
+      }).catch(function (error) {
 
         res.status(400).jsonp({
           status  : 'error',
           code    : '400000',
-          message : 'Default PUT method, error modifing object',
-          data    : err
+          message : 'An error occured, the document was not updated',
+          data    : {}
         });
+
+        logger.error('[ ControllerRoutes.put ] - error : ' + error);
       });
     });
   };
@@ -255,23 +262,24 @@ pathCallback) {
         res.status(200).jsonp({
           status  : 'success',
           code    : '200000',
-          message : 'Default POST method, object created in data',
+          message : 'The document(s) was created',
           data    : value
         });
-      }).catch(function (err) {
+      }).catch(function (error) {
 
         // Error creating object
         res.status(400).jsonp({
           status  : 'error',
           code    : '400000',
-          message : 'Default POST method, error creating object',
-          data    : err
+          message : 'An error occured, the document was not created',
+          data    : {}
         });
+
+        logger.error('[ ControllerRoutes.post ] - error : ' + error);
       });
     });
   };
 
-  console.log(' *** find model : ' + nameModel);
   // retrieve the model
   var model = scope.models.db.getModel(nameModel);
 
