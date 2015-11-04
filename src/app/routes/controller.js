@@ -99,6 +99,45 @@ pathCallback) {
 
   logger.debug('[ ControllerRoutes.addRoute ] - new route found, path : ' + pathRequest);
 
+  // array that contains all subroot for filtering route
+  var methods = [];
+
+  /**
+   * Check if the request is valid : if = 24 characters and/or if the request is an subrequest of an model
+   *
+   * @param  {Object}   req        Default req from express
+   * @param  {Object}   res        Default res from express
+   * @param  {Function} next       Default next from express
+   * @param  {Array}    subMethods  List of subMethods of the route (ex: /account/sync)
+   * @return {Boolean}              Return true if the request is valid otherwise the function that should be called
+   */
+  var isValidRequest = function (req, res, next, subMethods) {
+
+    if (!_.isUndefined(req.params.id)) {
+
+      // Test if is an subroute method
+      if (_.indexOf(subMethods, req.params.id) >= 0) {
+
+        // call next to the good root will be called
+        return next();
+      }
+
+      // check if the params id have 24 characters
+      if (!req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
+
+        // Return to the user an special error
+        return res.status(400).jsonp({
+          status  : 'error',
+          code    : '400000',
+          message : 'You have an error in your request, an Id should be compose ' +
+          'by 24 digit and/or characters',
+          data    : {}
+        });
+      }
+    }
+    return true;
+  };
+
   /**
   * Implement the http request : GET and HEAD</br>
   * Get an object </br>
@@ -113,7 +152,13 @@ pathCallback) {
   httpMethods.get = function (model, path, param) {
 
     // Add methode head to the route
-    scope.router.get(path, function (req, res) {
+    scope.router.get(path, function (req, res, next) {
+
+      // Check if this root is valid for this request
+      var checkRequest = isValidRequest(req, res, next, methods);
+      if (!checkRequest) {
+        return checkRequest;
+      }
 
       logger.debug('[ ControllerRoutes.get ] - revceiving request,' +
       ' route is : ' + path);
@@ -136,7 +181,7 @@ pathCallback) {
           data    : {}
         });
 
-        logger.error('[ ControllerRoutes.patch ] - error : ' + error);
+        logger.error('[ ControllerRoutes.get ] - error : ' + error);
       });
     });
   };
@@ -144,19 +189,24 @@ pathCallback) {
   httpMethods.head = function (model, path, param, method) {
 
     httpMethods.get(model, path, param, method);
-
   };
 
   // Is for delete methods
   httpMethods.delete = function (model, path, param) {
 
     // Add methode update to the route
-    scope.router.delete(path, function (req, res) {
+    scope.router.delete(path, function (req, res, next) {
+
+      // Check if this root is valid for this request
+      var checkRequest = isValidRequest(req, res, next, methods);
+      if (!checkRequest) {
+        return checkRequest;
+      }
 
       logger.debug('[ ControllerRoutes.delete ] - revceiving request,' +
       ' route is : ' + path);
 
-      model.delete(req.params[param]).then(function (value) {
+      model.delete(req.params[param]).then(function () {
 
         res.status(200).jsonp({
           status  : 'success',
@@ -181,12 +231,18 @@ pathCallback) {
   // patch method update only param given
   httpMethods.patch = function (model, path, param) {
 
-    scope.router.patch(path, function (req, res) {
+    scope.router.patch(path, function (req, res, next) {
+
+      // Check if this root is valid for this request
+      var checkRequest = isValidRequest(req, res, next, methods);
+      if (!checkRequest) {
+        return checkRequest;
+      }
 
       logger.debug('[ ControllerRoutes.patch ] - revceiving request,' +
       ' route is : ' + path);
 
-      model.update(req.params[param], req.body, 'patch').then(function (value) {
+      model.update(req.params[param], req.body, 'patch').then(function () {
 
         res.status(200).jsonp({
           status  : 'success',
@@ -212,12 +268,18 @@ pathCallback) {
   // put should update the whole object with data given ..
   httpMethods.put = function (model, path, param) {
 
-    scope.router.put(path, function (req, res) {
+    scope.router.put(path, function (req, res, next) {
+
+      // Check if this root is valid for this request
+      var checkRequest = isValidRequest(req, res, next, methods);
+      if (!checkRequest) {
+        return checkRequest;
+      }
 
       logger.debug('[ ControllerRoutes.put ] - revceiving request,' +
       ' route is : ' + path);
 
-      model.update(req.params[param], req.body, 'put').then(function (value) {
+      model.update(req.params[param], req.body, 'put').then(function () {
 
         res.status(200).jsonp({
           status  : 'success',
@@ -245,17 +307,22 @@ pathCallback) {
   * Send a error to the client if the request failed, otherwise a json file to the client with the data
   *
   * @method post
-  * @param  {Object} Model the data model object (Model start with an uppercase for jshint validation)
+  * @param  {Object} model the data model object (Model start with an uppercase for jshint validation)
   * @param  {String} path The root path of model
   */
   httpMethods.post = function (model, path) {
 
     // Add methode post to the route
-    scope.router.post(path, function (req, res) {
+    scope.router.post(path, function (req, res, next) {
+
+      // Check if this root is valid for this request
+      var checkRequest = isValidRequest(req, res, next, methods);
+      if (!checkRequest) {
+        return checkRequest;
+      }
 
       logger.debug('[ ControllerRoutes.post ] - revceiving request, route is : ' + path);
 
-      // NOTE : effectuer pour détérminer si une fonction override le create ???
       model.create(req.body).then(function (value) {
 
         // Objet created
@@ -287,16 +354,12 @@ pathCallback) {
   if (model) {
     logger.debug('[ ControllerRoutes.addRoute ] - adding new route, path : ' + pathRequest);
 
-    // Handle wich requests are implemented
-    // Retrieve the difference betwenn ALL_HTTP_REQUESTS and all requests excluded
-    _.each(_.difference(scope.ALL_HTTP_REQUESTS, reqExcluded), function (fn) {
-
-      // Bind routes to model
-      httpMethods[fn](model, pathRequest, param, fn);
-    }, this);
-
     // retrieve specifiq route in model
     _.each(route.methods, function (method) {
+
+      // Push first subroot of the path
+      var splited = method.path.split('/');
+      methods.push(_.first(splited));
 
       try {
         var pathSubReq = path.normalize(pathRequest + '/' + method.path);
@@ -321,6 +384,14 @@ pathCallback) {
       }
     });
 
+    // Handle wich requests are implemented
+    // Retrieve the difference betwenn ALL_HTTP_REQUESTS and all requests excluded
+    _.each(_.difference(scope.ALL_HTTP_REQUESTS, reqExcluded), function (fn) {
+
+      // Bind routes to model
+      httpMethods[fn](model, pathRequest, param, fn);
+    }, this);
+
     return true;
   }
   logger.error('[ ControllerRoutes.addRoute ] - can\'t add route : \'' +
@@ -334,7 +405,8 @@ pathCallback) {
 *
 * @method init
 * @param {String} pathRoutes the path of the file route.json
-* @param {String} pathModels the path of folder that contains all models.json
+* @param {Object} ecrmDatabase The whole database model, it's an yocto-mongoose object
+* @param {String} pathCallback the path folder where all the callback are
 * @return {Boolean} If success return true, otherwise false
 */
 RouteController.prototype.init = function (pathRoutes, ecrmDatabase, pathCallback) {

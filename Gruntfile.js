@@ -131,5 +131,4 @@ module.exports = function(grunt) {
   grunt.registerTask('testWeb', 'mochacli:web');
   grunt.registerTask('report', 'todo');
   grunt.registerTask('yhint', 'yoctohint');
-
 };
