@@ -12,15 +12,16 @@ var routeJoiSchema = joi.object().keys({
   path            : joi.string().required().min(1).trim(),
   alias           : joi.array().items(joi.string().min(1).trim()),
   model           : joi.string().required().min(1).trim(),
-  param           : joi.array().items(joi.string().min(1).trim().allow(
-    'post', 'get', 'put', 'patch', 'delete', 'head')),
-  excluded        : joi.array().items(joi.string().min(1).trim()),
+  excluded        : joi.array().items(
+    joi.string().valid('post', 'get', 'put', 'patch', 'delete', 'head')
+  ),
   methods         : joi.array().items(
     joi.object().keys({
       method : joi.string().required().allow('post', 'get', 'put', 'patch', 'delete', 'head'),
       path   : joi.string().required().min(1),
       fn     : joi.string().required().min(1)
-    }))
+    })
+  )
 });
 
 /**
@@ -362,13 +363,14 @@ pathCallback) {
       methods.push(_.first(splited));
 
       try {
-        var pathSubReq = path.normalize(pathRequest + '/' + method.path);
+        var pathSubReq = path.normalize(route.path + '/' + method.path);
 
         // Load corresponded callback file to retrieve function
         var callbackFile = require(path.normalize(pathCallback + nameModel.toLowerCase() + '.js'));
 
         if (!_.isUndefined(callbackFile[method.fn])) {
 
+          console.log(' use fn : ', method.fn , 'for path : ', pathSubReq);
           // Bind method to the route
           scope.router[method.method](pathSubReq, function (req, res, next) {
             callbackFile[method.fn](req, res, next, model);
@@ -384,12 +386,13 @@ pathCallback) {
       }
     });
 
+//    if (model)
     // Handle wich requests are implemented
     // Retrieve the difference betwenn ALL_HTTP_REQUESTS and all requests excluded
     _.each(_.difference(scope.ALL_HTTP_REQUESTS, reqExcluded), function (fn) {
 
       // Bind routes to model
-      httpMethods[fn](model, pathRequest, param, fn);
+      httpMethods[fn](model, pathRequest, 'id', fn);
     }, this);
 
     return true;
@@ -456,7 +459,12 @@ RouteController.prototype.init = function (pathRoutes, ecrmDatabase, pathCallbac
 
       // add Main route
       _.each(routeAndAlias, function (val) {
-        this.addRoute(val, route.model, route.excluded, route.param, route, pathCallback);
+
+        // add default params id
+        val += '/:id?';
+
+        // Add route in router
+        this.addRoute(val, route.model, route.excluded, route.param, route, pathCallback, route.optionalParam);
       }, this);
 
     } else {
