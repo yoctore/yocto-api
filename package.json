@@ -1,7 +1,7 @@
 {
   "name": "yocto-api",
   "main": "src/app/routes/controller.js",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "private": true,
   "description": "Yocto REST API ",
   "homepage": "http://www.yocto.re",
@@ -50,7 +50,8 @@
     "grunt-contrib-uglify": "0.9.2",
     "grunt-contrib-yuidoc": "0.10.0",
     "grunt-mocha-cli": "1.14.0",
-    "yocto-hint": "latest"
+    "yocto-hint": "latest",
+    "yocto-utils" : "latest"
   },
   "apidoc": {
     "title": "Yocto Rest Api",

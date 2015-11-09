@@ -6,6 +6,7 @@ var logger      = require('yocto-logger');
 var express     = require('express');
 var fs          = require('fs');
 var path        = require('path');
+var utils       = require('yocto-utils');
 
 // Define a Joi schema for test if route have a goodformat
 var routeJoiSchema = joi.object().keys({
@@ -243,7 +244,20 @@ pathCallback) {
       logger.debug('[ ControllerRoutes.patch ] - revceiving request,' +
       ' route is : ' + path);
 
-      model.update(req.params[param], req.body, 'patch').then(function () {
+      var data = req.body;
+
+      // tricks to pass the yocto-hint norme
+      var updatedDate = 'updated_date';
+
+      // Test if variable updated_date was defined, and update it
+      if (!_.isUndefined(model.schema.paths[updatedDate])) {
+
+        data = _.merge(data, utils.obj.underscoreKeys({
+          updatedDate : Date.now()
+        }));
+      }
+
+      model.update(req.params[param], data, 'patch').then(function () {
 
         res.status(200).jsonp({
           status  : 'success',

@@ -1,3 +1,7 @@
+# 0.2.3 (2015-11-09)
+
+- Add automatcally the var updated_date when a PATCH is called, before add it, we test if the param was defined
+
 # 0.2.2 (2015-11-04)
 
 - Add an verification step to dermine if an request like '/accout/sync' is an subroot and not an id for the main root like '/account/:id'
