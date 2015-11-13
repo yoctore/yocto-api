@@ -1,3 +1,7 @@
+# 0.2.4 (2015-11-09)
+
+- when a PATCH comes in a default model route, if the param "id" is not defined, the request doesnt execute and a error status was returned
+
 # 0.2.3 (2015-11-09)
 
 - Add automatcally the var updated_date when a PATCH is called, before add it, we test if the param was defined

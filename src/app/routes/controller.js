@@ -128,7 +128,7 @@ pathCallback) {
       if (!req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
 
         // Return to the user an special error
-        return res.status(400).jsonp({
+        return res.status(200).jsonp({
           status  : 'error',
           code    : '400000',
           message : 'You have an error in your request, an Id should be compose ' +
@@ -176,7 +176,7 @@ pathCallback) {
 
       }).catch(function (error) {
 
-        res.status(400).jsonp({
+        res.status(200).jsonp({
           status  : 'error',
           code    : '400000',
           message : 'An error occured when retrieving document',
@@ -193,8 +193,8 @@ pathCallback) {
     httpMethods.get(model, path, param, method);
   };
 
-  // Is for delete methods
-  httpMethods.delete = function (model, path, param) {
+  // Delete an document specified by his ID, only if 'deleted_date' was defined in his mongoose schema
+  httpMethods.delete = function (model, path) {
 
     // Add methode update to the route
     scope.router.delete(path, function (req, res, next) {
@@ -208,25 +208,66 @@ pathCallback) {
       logger.debug('[ ControllerRoutes.delete ] - revceiving request,' +
       ' route is : ' + path);
 
-      model.delete(req.params[param]).then(function () {
+      // tricks to pass the yocto-hint norme
+      var deletedDate = 'deleted_date';
 
-        res.status(200).jsonp({
-          status  : 'success',
-          code    : '200000',
-          message : 'The document(s) was deleted',
-          data    : {}
-        });
-      }).catch(function (error) {
+      // Test if variable deletedDate was defined, and an id is specified
+      if (!_.isUndefined(model.schema.paths[deletedDate]) &&
+      !_.isUndefined(req.params.id)) {
 
-        res.status(400).jsonp({
-          status  : 'error',
-          code    : '400000',
-          message : 'An error occured, the document was not deleted',
-          data    : {}
+        var data = utils.obj.underscoreKeys({
+          updatedDate : Date.now(),
+          deletedDate : Date.now()
         });
 
-        logger.error('[ ControllerRoutes.delete ] - error : ' + error);
+        // Set date in the param deleted_date in document to indicate it was deleted
+        return model.update(req.params.id, data).then(function (value) {
+
+          // test if an document was deleted
+          if (_.isEmpty(value)) {
+            logger.error('[ ControllerRoutes.delete ] - the document with id : ' +  req.params.id +
+            ' wasn\'t deleted because this id doesn\'t correspond to an existant document');
+
+            return res.status(200).jsonp({
+              status  : 'error',
+              code    : '400000',
+              message : 'An error occured, the document was not deleted because this id doesn\'t ' +
+              'correspond to an existant document',
+              data    : {}
+            });
+          }
+
+          // The document was deleted
+          res.status(200).jsonp({
+            status  : 'success',
+            code    : '200000',
+            message : 'The document(s) was deleted',
+            data    : {}
+          });
+          logger.info('[ ControllerRoutes.delete ] - the document with id : ' +  req.params.id +
+          ' was deleted');
+        }).catch(function (error) {
+
+          res.status(200).jsonp({
+            status  : 'error',
+            code    : '400000',
+            message : 'An error occured, the document was not deleted',
+            data    : {}
+          });
+          logger.error('[ ControllerRoutes.delete ] - error : ' + error);
+        });
+      }
+
+      // The pramas id was not specified or deleted_date doesnt exist in this schema
+      res.status(200).jsonp({
+        status  : 'error',
+        code    : '400000',
+        message : 'The document was not deleted because id wasn\'t' +
+        'specified, or the field deleted_date doesn\'t exist in schema',
+        data    : {}
       });
+      logger.error('[ ControllerRoutes.delete ] - The document was not deleted because id wasn\'t' +
+      'specified, or the field deleted_date doesn\'t exist in schema');
     });
   };
 
@@ -246,36 +287,64 @@ pathCallback) {
 
       var data = req.body;
 
-      // tricks to pass the yocto-hint norme
-      var updatedDate = 'updated_date';
+      // Test if id is specified, because ID is required to an patch an document
+      if (!_.isUndefined(req.params.id)) {
 
-      // Test if variable updated_date was defined, and update it
-      if (!_.isUndefined(model.schema.paths[updatedDate])) {
+        // tricks to pass the yocto-hint norme
+        var updatedDate = 'updated_date';
 
-        data = _.merge(data, utils.obj.underscoreKeys({
-          updatedDate : Date.now()
-        }));
+        // Test if variable updated_date was defined, and update it
+        if (!_.isUndefined(model.schema.paths[updatedDate])) {
+
+          data = _.merge(data, utils.obj.underscoreKeys({
+            updatedDate : Date.now()
+          }));
+        }
+
+        return model.update(req.params[param], data, 'patch').then(function (value) {
+
+          // test if an document was updated for this id
+          if (_.isEmpty(value)) {
+            logger.error('[ ControllerRoutes.patch ] - the document with id : ' +  req.params.id +
+            ' wasn\'t updated because this id doesn\'t correspond to an existing document');
+
+            return res.status(200).jsonp({
+              status  : 'error',
+              code    : '400000',
+              message : 'An error occured, the document was not updated because this id doesn\'t ' +
+              'correspond to an existing document',
+              data    : {}
+            });
+          }
+
+          // Document updated
+          res.status(200).jsonp({
+            status  : 'success',
+            code    : '200000',
+            message : 'The document(s) was updated',
+            data    : {}
+          });
+        }).catch(function (error) {
+
+          res.status(200).jsonp({
+            status  : 'error',
+            code    : '400000',
+            message : 'An error occured, the document was not updated',
+            data    : {}
+          });
+          logger.error('[ ControllerRoutes.patch ] - error : ' + error);
+        });
       }
 
-      model.update(req.params[param], data, 'patch').then(function () {
-
-        res.status(200).jsonp({
-          status  : 'success',
-          code    : '200000',
-          message : 'The document(s) was patched',
-          data    : {}
-        });
-      }).catch(function (error) {
-
-        res.status(400).jsonp({
-          status  : 'error',
-          code    : '400000',
-          message : 'An error occured, the document was not updated',
-          data    : {}
-        });
-
-        logger.error('[ ControllerRoutes.patch ] - error : ' + error);
+      // The pramas id was not specified or deleted_date doesnt exist in this schema
+      res.status(200).jsonp({
+        status  : 'error',
+        code    : '400000',
+        message : 'The document wasn\'t updated because id wasn\'t specified in params.',
+        data    : {}
       });
+      logger.error('[ ControllerRoutes.patch ] - The document was not updated because id wasn\'t' +
+      'specified');
     });
   };
 
@@ -304,7 +373,7 @@ pathCallback) {
         });
       }).catch(function (error) {
 
-        res.status(400).jsonp({
+        res.status(200).jsonp({
           status  : 'error',
           code    : '400000',
           message : 'An error occured, the document was not updated',
@@ -350,10 +419,10 @@ pathCallback) {
       }).catch(function (error) {
 
         // Error creating object
-        res.status(400).jsonp({
+        res.status(200).jsonp({
           status  : 'error',
           code    : '400000',
-          message : 'An error occured, the document was not created',
+          message : 'An error occured, the document was not created, please check your request',
           data    : {}
         });
 
@@ -384,7 +453,6 @@ pathCallback) {
 
         if (!_.isUndefined(callbackFile[method.fn])) {
 
-          console.log(' use fn : ', method.fn , 'for path : ', pathSubReq);
           // Bind method to the route
           scope.router[method.method](pathSubReq, function (req, res, next) {
             callbackFile[method.fn](req, res, next, model);
@@ -400,7 +468,6 @@ pathCallback) {
       }
     });
 
-//    if (model)
     // Handle wich requests are implemented
     // Retrieve the difference betwenn ALL_HTTP_REQUESTS and all requests excluded
     _.each(_.difference(scope.ALL_HTTP_REQUESTS, reqExcluded), function (fn) {
@@ -478,7 +545,8 @@ RouteController.prototype.init = function (pathRoutes, ecrmDatabase, pathCallbac
         val += '/:id?';
 
         // Add route in router
-        this.addRoute(val, route.model, route.excluded, route.param, route, pathCallback, route.optionalParam);
+        this.addRoute(val, route.model, route.excluded, route.param, route, pathCallback,
+        route.optionalParam);
       }, this);
 
     } else {
