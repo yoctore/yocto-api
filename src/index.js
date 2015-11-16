@@ -3,7 +3,6 @@
 var joi         = require('joi');
 var _           = require('lodash');
 var logger      = require('yocto-logger');
-var express     = require('express');
 var fs          = require('fs');
 var path        = require('path');
 var utils       = require('yocto-utils');
@@ -64,12 +63,12 @@ function RouteController () {
   this.models = {};
 
   /**
-  * The main router
+  * Instance of app
   *
-  * @property router
+  * @property app
   * @type Object
   */
-  this.router = express();
+  this.app = {};
 
   /**
   * The main logger
@@ -154,7 +153,7 @@ pathCallback) {
   httpMethods.get = function (model, path, param) {
 
     // Add methode head to the route
-    scope.router.get(path, function (req, res, next) {
+    scope.app.get(path, function (req, res, next) {
 
       // Check if this root is valid for this request
       var checkRequest = isValidRequest(req, res, next, methods);
@@ -197,7 +196,7 @@ pathCallback) {
   httpMethods.delete = function (model, path) {
 
     // Add methode update to the route
-    scope.router.delete(path, function (req, res, next) {
+    scope.app.delete(path, function (req, res, next) {
 
       // Check if this root is valid for this request
       var checkRequest = isValidRequest(req, res, next, methods);
@@ -274,7 +273,7 @@ pathCallback) {
   // patch method update only param given
   httpMethods.patch = function (model, path, param) {
 
-    scope.router.patch(path, function (req, res, next) {
+    scope.app.patch(path, function (req, res, next) {
 
       // Check if this root is valid for this request
       var checkRequest = isValidRequest(req, res, next, methods);
@@ -348,11 +347,10 @@ pathCallback) {
     });
   };
 
-  // NOTE : vérifier fonctionnement put()
   // put should update the whole object with data given ..
   httpMethods.put = function (model, path, param) {
 
-    scope.router.put(path, function (req, res, next) {
+    scope.app.put(path, function (req, res, next) {
 
       // Check if this root is valid for this request
       var checkRequest = isValidRequest(req, res, next, methods);
@@ -397,7 +395,7 @@ pathCallback) {
   httpMethods.post = function (model, path) {
 
     // Add methode post to the route
-    scope.router.post(path, function (req, res, next) {
+    scope.app.post(path, function (req, res, next) {
 
       // Check if this root is valid for this request
       var checkRequest = isValidRequest(req, res, next, methods);
@@ -454,7 +452,7 @@ pathCallback) {
         if (!_.isUndefined(callbackFile[method.fn])) {
 
           // Bind method to the route
-          scope.router[method.method](pathSubReq, function (req, res, next) {
+          scope.app[method.method](pathSubReq, function (req, res, next) {
             callbackFile[method.fn](req, res, next, model);
           });
 
@@ -488,15 +486,20 @@ pathCallback) {
 * Retrieve all routes and thoose alias and add there into router
 *
 * @method init
+* @param {Object} app Instance of express
 * @param {String} pathRoutes the path of the file route.json
 * @param {Object} ecrmDatabase The whole database model, it's an yocto-mongoose object
 * @param {String} pathCallback the path folder where all the callback are
 * @return {Boolean} If success return true, otherwise false
 */
-RouteController.prototype.init = function (pathRoutes, ecrmDatabase, pathCallback) {
+RouteController.prototype.init = function (app, pathRoutes, ecrmDatabase, pathCallback) {
 
   logger.debug('[ ControllerRoutes.init ] - start');
 
+  // Retrieve Instance of express and save it
+  this.app   = app;
+
+  // define object that contains all routes
   var routes = {};
 
   // test if the two params are string and not empty
@@ -519,6 +522,7 @@ RouteController.prototype.init = function (pathRoutes, ecrmDatabase, pathCallbac
   }
 
   this.models = ecrmDatabase;
+
   // read json file and add each routes
   _.each(routes.routes, function (route) {
 

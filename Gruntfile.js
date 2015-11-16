@@ -19,27 +19,12 @@ module.exports = function(grunt) {
     pkg : grunt.file.readJSON('package.json'),
 
     /**
-    * Jshint permit to flags suspicious usage in programs
-    * @submodule jshint
-    */
-    jshint : {
-      options : {
-        node : true,
-        yui : true,
-      },
-      all : [ 'server.js',
-      'src/app/**/*.js',
-      'src/app/**/*.json'
-    ]},
-
-    /**
     * @submodule uglify
     */
     uglify : {
       my_target : {
         files : {
-           'dist/app/models/controller.js' : ['src/app/models/controller.js'],
-           'dist/app/routes/controller.js' : ['src/app/routes/controller.js']
+           'dist/index.js' : ['src/index.js']
         }
       }
      },
@@ -112,7 +97,7 @@ module.exports = function(grunt) {
           jshint : {}
         },
         // Set all your file here
-        all : [ 'src/app/models/controller.js', 'src/app/routes/controller.js', 'src/app/routes/crud-methods.js' ]
+        all : [ 'src/index.js' ]
       }
     });
 
@@ -126,7 +111,7 @@ module.exports = function(grunt) {
 
   // register task
   grunt.registerTask('default', ['yoctohint', 'yuidoc', 'uglify']);
-  grunt.registerTask('build', ['uglify']);
+  grunt.registerTask('build', ['uglify', 'yoctohint']);
   grunt.registerTask('tests', 'mochacli:all');
   grunt.registerTask('testWeb', 'mochacli:web');
   grunt.registerTask('report', 'todo');

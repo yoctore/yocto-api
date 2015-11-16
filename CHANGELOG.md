@@ -1,3 +1,7 @@
+# 0.3.0 (2015-11-09)
+
+- The middleware doesn't use express.router now, an Instance of express (app) will be passed, to create all the routes.
+
 # 0.2.4 (2015-11-09)
 
 - when a PATCH comes in a default model route, if the param "id" is not defined, the request doesnt execute and a error status was returned

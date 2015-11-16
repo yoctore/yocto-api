@@ -1,12 +1,12 @@
 'use strict';
 
-var express    = require('express'); // Load express
-var bodyParser = require('body-parser'); // load bodyparser
-var mongoose   = require('mongoose'); // Load the mongodb driver
-var routes     = require('../src/app/routes/controller.js'); // Load the api
-var app        = express(); // Create app
-var path      = require('path');
-var fs        = require('fs');
+var express     = require('express'); // Load express
+var bodyParser  = require('body-parser'); // load bodyparser
+var mongoose    = require('mongoose'); // Load the mongodb driver
+var routes      = require('../src/app/routes/controller.js'); // Load the api
+var app         = express(); // Create app
+var path        = require('path');
+var fs          = require('fs');
 
 var base = path.normalize(process.cwd());
 
@@ -37,5 +37,4 @@ app.listen(port);
 
 console.log(' server start on port : ' + port );
 
-//
-console.log( routes.models.getModel('user').schema.methods.create.toString());
+console.log(routes.models.getModel('user').schema.methods.create.toString());
