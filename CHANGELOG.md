@@ -1,3 +1,7 @@
+# 0.4.1 (2015-11-18)
+
+- Log each incoming route in the default middleware
+
 # 0.4.0 (2015-11-18)
 
 - Add default middleware that test if request comes from 'apidocjs', and if needed parse his data

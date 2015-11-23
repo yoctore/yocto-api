@@ -496,7 +496,7 @@ RouteController.prototype.init = function (app, pathRoutes, ecrmDatabase, pathCa
   this.app   = app;
 
   // Add default middleware of api
-  this.app.use(this.middlewareApidoc);
+  this.app.use(this.middlewareApi);
 
   // define object that contains all routes
   var routes = {};
@@ -569,13 +569,17 @@ RouteController.prototype.init = function (app, pathRoutes, ecrmDatabase, pathCa
 };
 
 /**
- * Add a Middleware that test if incomming comes from apidocjs test, and parse his data
+ * Add a Middleware that log each request and est if incomming comes from apidocjs test,
+ * and JSON parse his data.
  *
  * @param  {Object} req defautl request of express
  * @param  {Object} res defautl response of express
  * @param  {Function} next defautl next function of express
  */
-RouteController.prototype.middlewareApidoc = function (req, res, next) {
+RouteController.prototype.middlewareApi = function (req, res, next) {
+
+  logger.info('[ api.middlewareApi ] - incoming request : ' + req.url +
+  ' ;  body is : \n' + utils.obj.inspect(req.body));
 
   // Test if request is from apidocjs client
   if (!_.isUndefined(req.headers['x-client-type']) &&
