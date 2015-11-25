@@ -578,8 +578,8 @@ RouteController.prototype.init = function (app, pathRoutes, ecrmDatabase, pathCa
  */
 RouteController.prototype.middlewareApi = function (req, res, next) {
 
-  logger.info('[ api.middlewareApi ] - incoming request : ' + req.url +
-  ' ;  body is : \n' + utils.obj.inspect(req.body));
+  logger.info('[ api.middlewareApi ] - incoming request : [ ' + req.method + ' ] on url ' +
+  req.url + (_.isEmpty(req.body) ? '' : ' -  body is : \n' + utils.obj.inspect(req.body)));
 
   // Test if request is from apidocjs client
   if (!_.isUndefined(req.headers['x-client-type']) &&
