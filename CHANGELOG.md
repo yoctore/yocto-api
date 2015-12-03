@@ -1,3 +1,8 @@
+# 0.4.2 (2015-11-18)
+
+- Add filter on default route GET to remove default mongo field
+- package update
+
 # 0.4.1 (2015-11-18)
 
 - Log each incoming route in the default middleware

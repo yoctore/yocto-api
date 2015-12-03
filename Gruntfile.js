@@ -102,7 +102,6 @@ module.exports = function(grunt) {
     });
 
   // Load the plugins
-  grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-yuidoc');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-mocha-cli');
@@ -115,5 +114,5 @@ module.exports = function(grunt) {
   grunt.registerTask('tests', 'mochacli:all');
   grunt.registerTask('testWeb', 'mochacli:web');
   grunt.registerTask('report', 'todo');
-  grunt.registerTask('yhint', 'yoctohint');
+  grunt.registerTask('hint', 'yoctohint');
 };

@@ -110,6 +110,7 @@ pathCallback) {
    */
   var isValidRequest = function (req, res, next, subMethods) {
 
+    // test if id was defined
     if (!_.isUndefined(req.params.id)) {
 
       // Test if is an subroute method
@@ -148,20 +149,33 @@ pathCallback) {
   */
   httpMethods.get = function (model, path, param) {
 
-    // Add methode head to the route
+    // create route in express instance
     scope.app.get(path, function (req, res, next) {
 
-      // Check if this root is valid for this request
+      // Check if this route is valid for this request
       var checkRequest = isValidRequest(req, res, next, methods);
+
+      // route is not valid so return statement of method
       if (!checkRequest) {
         return checkRequest;
       }
 
-      logger.debug('[ ControllerRoutes.get ] - revceiving request,' +
-      ' route is : ' + path);
+      // define data to find all docs
+      var fn      = 'find';
+      var query   = {};
 
-      model.read(req.params[param]).then(function (result) {
-        // Send respond to client
+      // test if we should retrieve only one document
+      if (!_.isUndefined(req.params[param])) {
+
+        // define data to find only one doc by his id
+        fn    = 'findById';
+        query = req.params[param];
+      }
+
+      // Find doc in database and omit '__v' of result
+      model[fn](query, '-__v').then(function (result) {
+
+        // Send respond to client an success response
         res.status(200).jsonp({
           status  : 'success',
           code    : '200000',
@@ -171,6 +185,7 @@ pathCallback) {
 
       }).catch(function (error) {
 
+        // Send respond to client an error response
         res.status(200).jsonp({
           status  : 'error',
           code    : '400000',
@@ -178,20 +193,23 @@ pathCallback) {
           data    : {}
         });
 
+        // log the error
         logger.error('[ ControllerRoutes.get ] - error : ' + error);
       });
     });
   };
 
+  // default method to get only head of method
   httpMethods.head = function (model, path, param, method) {
 
+    // call get method and remove his body to get only header
     httpMethods.get(model, path, param, method);
   };
 
   // Delete an document specified by his ID, only if 'deleted_date' was defined in his mongoose schema
   httpMethods.delete = function (model, path) {
 
-    // Add methode update to the route
+    // create route in express instance
     scope.app.delete(path, function (req, res, next) {
 
       // Check if this root is valid for this request
@@ -269,6 +287,7 @@ pathCallback) {
   // patch method update only param given
   httpMethods.patch = function (model, path, param) {
 
+    // create route in express instance
     scope.app.patch(path, function (req, res, next) {
 
       // Check if this root is valid for this request
@@ -291,11 +310,13 @@ pathCallback) {
         // Test if variable updated_date was defined, and update it
         if (!_.isUndefined(model.schema.paths[updatedDate])) {
 
+          // merge data to set 'updated_date' to current date
           data = _.merge(data, utils.obj.underscoreKeys({
             updatedDate : Date.now()
           }));
         }
 
+        // return result of an update document
         return model.update(req.params[param], data, 'patch').then(function (value) {
 
           // test if an document was updated for this id
@@ -346,6 +367,7 @@ pathCallback) {
   // put should update the whole object with data given ..
   httpMethods.put = function (model, path, param) {
 
+    // create route in express instance
     scope.app.put(path, function (req, res, next) {
 
       // Check if this root is valid for this request
@@ -390,7 +412,7 @@ pathCallback) {
   */
   httpMethods.post = function (model, path) {
 
-    // Add methode post to the route
+    // create route in express instance
     scope.app.post(path, function (req, res, next) {
 
       // Check if this root is valid for this request
