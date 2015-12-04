@@ -9,17 +9,17 @@ var utils       = require('yocto-utils');
 
 // Define a Joi schema for test if route have a goodformat
 var routeJoiSchema = joi.object().keys({
-  path            : joi.string().required().min(1).trim(),
-  alias           : joi.array().items(joi.string().min(1).trim()),
-  model           : joi.string().required().min(1).trim(),
+  path            : joi.string().required().empty().trim(),
+  alias           : joi.array().items(joi.string().empty().trim()),
+  model           : joi.string().required().empty().trim(),
   excluded        : joi.array().items(
     joi.string().valid('post', 'get', 'put', 'patch', 'delete', 'head')
   ),
-  methods         : joi.array().items(
+  methods         : joi.array().min(0).items(
     joi.object().keys({
       method : joi.string().required().allow('post', 'get', 'put', 'patch', 'delete', 'head'),
-      path   : joi.string().required().min(1),
-      fn     : joi.string().required().min(1)
+      path   : joi.string().required().empty(''),
+      fn     : joi.string().required().empty()
     })
   )
 });
