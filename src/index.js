@@ -68,6 +68,13 @@ function RouteController (yLogger) {
   this.app = {};
 
   /**
+  * Configuration of the instance of application
+  *
+  * @type {Object}
+  */
+  this.config = {};
+
+  /**
   * Default logger instance. can be override by set function
   *
   * @type {Object}
@@ -471,7 +478,9 @@ pathCallback) {
 
           // Bind method to the route
           scope.app[method.method](pathSubReq, function (req, res, next) {
-            callbackFile[method.fn](req, res, next, model);
+
+            // pass current model and config of application
+            callbackFile[method.fn](req, res, next, model, scope.config);
           });
 
         } else {
@@ -504,27 +513,30 @@ pathCallback) {
 * Retrieve all routes and thoose alias and add there into router
 *
 * @method init
-* @param {Object} app Instance of express
+* @param {Object} core Instance of yocto-core-stack
 * @param {String} pathRoutes the path of the file route.json
 * @param {Object} ecrmDatabase The whole database model, it's an yocto-mongoose object
 * @param {String} pathCallback the path folder where all the callback are
 * @return {Boolean} If success return true, otherwise false
 */
-RouteController.prototype.init = function (app, pathRoutes, ecrmDatabase, pathCallback) {
+RouteController.prototype.init = function (core, pathRoutes, ecrmDatabase, pathCallback) {
 
   logger.debug('[ ControllerRoutes.init ] - start');
 
   // Retrieve Instance of express and save it
-  this.app   = app;
+  this.app    = core.app.app;
+
+  // Retrieve config of application
+  this.config = core.config.config;
 
   // Add default middleware of api
-  this.app.use(this.middlewareApi);
-
-  // define object that contains all routes
-  var routes = {};
+  this.app.use(this.middlewareApi.bind(this));
 
   // save models
   this.models = ecrmDatabase;
+
+  // define object that contains all routes
+  var routes = {};
 
   // test if the two params are string and not empty
   if (!_.isString(pathRoutes) || !_.isString(pathCallback) ||
@@ -540,8 +552,9 @@ RouteController.prototype.init = function (app, pathRoutes, ecrmDatabase, pathCa
 
     // Load route config file
     routes = JSON.parse(fs.readFileSync(pathRoutes, 'utf-8'));
-  } catch (e) {
-    logger.error('[ ControllerRoutes.init ] - error during loading files, more details : ' + e);
+  } catch (error) {
+    this.logger.error('[ ControllerRoutes.init ] - error during loading files, more details : ' +
+     error);
     return false;
   }
 
@@ -576,14 +589,15 @@ RouteController.prototype.init = function (app, pathRoutes, ecrmDatabase, pathCa
       }, this);
 
     } else {
+
       logger.error('[ ControllerRoutes.init ] - Joi Validation failed ; error when trying to add ' +
       'a new route, please check the file : \'routes.json\'');
 
       // log each error
       _.each(result.error.details, function (val) {
 
-        logger.warning('[ ControllerRoutes.init ] - ' + val.message + ' at ' + val.path);
-      });
+        this.logger.warning('[ ControllerRoutes.init ] - ' + val.message + ' at ' + val.path);
+      }, this);
     }
   }, this);
 
@@ -600,7 +614,7 @@ RouteController.prototype.init = function (app, pathRoutes, ecrmDatabase, pathCa
  */
 RouteController.prototype.middlewareApi = function (req, res, next) {
 
-  logger.info('[ api.middlewareApi ] - incoming request : [ ' + req.method + ' ] on url ' +
+  this.logger.info('[ api.middlewareApi ] - incoming request : [ ' + req.method + ' ] on url ' +
   req.url + (_.isEmpty(req.body) ? '' : ' -  body is : \n' + utils.obj.inspect(req.body)));
 
   // Test if request is from apidocjs client

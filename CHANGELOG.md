@@ -1,3 +1,7 @@
+# 0.4.3 (2015-11-18)
+
+- Add config object for each subMethods
+
 # 0.4.2 (2015-11-18)
 
 - Add filter on default route GET to remove default mongo field
@@ -25,7 +29,7 @@
 
 # 0.2.2 (2015-11-04)
 
-- Add an verification step to dermine if an request like '/accout/sync' is an subroot and not an id for the main root like '/account/:id'
+- Add an verification step to determine if an request like '/accout/sync' is an subroot and not an id for the main root like '/account/:id'
 - Add an verification for the main root that are the param 'id' like params, the id should be compose with 24 characters and/or digit
 
 # 0.2.1 (2015-10-28)
