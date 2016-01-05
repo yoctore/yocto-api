@@ -1,3 +1,8 @@
+# 0.5.0 (2015-12-30)
+
+- Optimization : use bind and apply instead of saving context
+- Each subMethods have in his context the reference of the model
+
 # 0.4.3 (2015-11-18)
 
 - Add config object for each subMethods

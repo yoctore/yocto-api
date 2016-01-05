@@ -96,12 +96,10 @@ function RouteController (yLogger) {
 RouteController.prototype.addRoute = function (pathRequest, nameModel, reqExcluded, param, route,
 pathCallback) {
 
-  // Save scope
-  var scope = this;
-
+  // Object that will contains all private function
   var httpMethods = {};
 
-  logger.debug('[ ControllerRoutes.addRoute ] - new route found, path : ' + pathRequest);
+  this.logger.debug('[ ControllerRoutes.addRoute ] - new route found, path : ' + pathRequest);
 
   // array that contains all subroot for filtering route
   var methods = [];
@@ -157,7 +155,7 @@ pathCallback) {
   httpMethods.get = function (model, path, param) {
 
     // create route in express instance
-    scope.app.get(path, function (req, res, next) {
+    this.app.get(path, function (req, res, next) {
 
       // Check if this route is valid for this request
       var checkRequest = isValidRequest(req, res, next, methods);
@@ -201,10 +199,10 @@ pathCallback) {
         });
 
         // log the error
-        logger.error('[ ControllerRoutes.get ] - error : ' + error);
-      });
+        this.logger.error('[ ControllerRoutes.get ] - error : ' + error);
+      }.bind(this));
     });
-  };
+  }.bind(this);
 
   // default method to get only head of method
   httpMethods.head = function (model, path, param, method) {
@@ -217,16 +215,13 @@ pathCallback) {
   httpMethods.delete = function (model, path) {
 
     // create route in express instance
-    scope.app.delete(path, function (req, res, next) {
+    this.app.delete(path, function (req, res, next) {
 
       // Check if this root is valid for this request
       var checkRequest = isValidRequest(req, res, next, methods);
       if (!checkRequest) {
         return checkRequest;
       }
-
-      logger.debug('[ ControllerRoutes.delete ] - revceiving request,' +
-      ' route is : ' + path);
 
       // tricks to pass the yocto-hint norme
       var deletedDate = 'deleted_date';
@@ -245,8 +240,9 @@ pathCallback) {
 
           // test if an document was deleted
           if (_.isEmpty(value)) {
-            logger.error('[ ControllerRoutes.delete ] - the document with id : ' +  req.params.id +
-            ' wasn\'t deleted because this id doesn\'t correspond to an existant document');
+            this.logger.error('[ ControllerRoutes.delete ] - the document with id : ' +
+            req.params.id + ' wasn\'t deleted because this id doesn\'t ' +
+            'correspond to an existant document');
 
             return res.status(200).jsonp({
               status  : 'error',
@@ -264,9 +260,9 @@ pathCallback) {
             message : 'The document(s) was deleted',
             data    : {}
           });
-          logger.info('[ ControllerRoutes.delete ] - the document with id : ' +  req.params.id +
+          this.logger.info('[ ControllerRoutes.delete ] - the document with id : ' + req.params.id +
           ' was deleted');
-        }).catch(function (error) {
+        }.bind(this)).catch(function (error) {
 
           res.status(200).jsonp({
             status  : 'error',
@@ -274,8 +270,8 @@ pathCallback) {
             message : 'An error occured, the document was not deleted',
             data    : {}
           });
-          logger.error('[ ControllerRoutes.delete ] - error : ' + error);
-        });
+          this.logger.error('[ ControllerRoutes.delete ] - error : ' + error);
+        }.bind(this));
       }
 
       // The pramas id was not specified or deleted_date doesnt exist in this schema
@@ -286,25 +282,22 @@ pathCallback) {
         'specified, or the field deleted_date doesn\'t exist in schema',
         data    : {}
       });
-      logger.error('[ ControllerRoutes.delete ] - The document was not deleted because id wasn\'t' +
-      'specified, or the field deleted_date doesn\'t exist in schema');
-    });
-  };
+      this.logger.error('[ ControllerRoutes.delete ] - The document was not deleted ' +
+      'because id wasn\'t specified, or the field deleted_date doesn\'t exist in schema');
+    }.bind(this));
+  }.bind(this);
 
   // patch method update only param given
   httpMethods.patch = function (model, path, param) {
 
     // create route in express instance
-    scope.app.patch(path, function (req, res, next) {
+    this.app.patch(path, function (req, res, next) {
 
       // Check if this root is valid for this request
       var checkRequest = isValidRequest(req, res, next, methods);
       if (!checkRequest) {
         return checkRequest;
       }
-
-      logger.debug('[ ControllerRoutes.patch ] - revceiving request,' +
-      ' route is : ' + path);
 
       var data = req.body;
 
@@ -328,8 +321,9 @@ pathCallback) {
 
           // test if an document was updated for this id
           if (_.isEmpty(value)) {
-            logger.error('[ ControllerRoutes.patch ] - the document with id : ' +  req.params.id +
-            ' wasn\'t updated because this id doesn\'t correspond to an existing document');
+            this.logger.error('[ ControllerRoutes.patch ] - the document with id : ' +
+            req.params.id + ' wasn\'t updated because this id doesn\'t ' +
+            'correspond to an existing document');
 
             return res.status(200).jsonp({
               status  : 'error',
@@ -347,7 +341,7 @@ pathCallback) {
             message : 'The document(s) was updated',
             data    : {}
           });
-        }).catch(function (error) {
+        }.bind(this)).catch(function (error) {
 
           res.status(200).jsonp({
             status  : 'error',
@@ -355,8 +349,8 @@ pathCallback) {
             message : 'An error occured, the document was not updated',
             data    : {}
           });
-          logger.error('[ ControllerRoutes.patch ] - error : ' + error);
-        });
+          this.logger.error('[ ControllerRoutes.patch ] - error : ' + error);
+        }.bind(this));
       }
 
       // The pramas id was not specified or deleted_date doesnt exist in this schema
@@ -366,25 +360,22 @@ pathCallback) {
         message : 'The document wasn\'t updated because id wasn\'t specified in params.',
         data    : {}
       });
-      logger.error('[ ControllerRoutes.patch ] - The document was not updated because id wasn\'t' +
-      'specified');
-    });
-  };
+      this.logger.error('[ ControllerRoutes.patch ] - The document was not updated because' +
+      ' id wasn\'t specified');
+    }.bind(this));
+  }.bind(this);
 
   // put should update the whole object with data given ..
   httpMethods.put = function (model, path, param) {
 
     // create route in express instance
-    scope.app.put(path, function (req, res, next) {
+    this.app.put(path, function (req, res, next) {
 
       // Check if this root is valid for this request
       var checkRequest = isValidRequest(req, res, next, methods);
       if (!checkRequest) {
         return checkRequest;
       }
-
-      logger.debug('[ ControllerRoutes.put ] - revceiving request,' +
-      ' route is : ' + path);
 
       model.update(req.params[param], req.body, 'put').then(function () {
 
@@ -403,10 +394,10 @@ pathCallback) {
           data    : {}
         });
 
-        logger.error('[ ControllerRoutes.put ] - error : ' + error);
-      });
-    });
-  };
+        this.logger.error('[ ControllerRoutes.put ] - error : ' + error);
+      }.bind(this));
+    }.bind(this));
+  }.bind(this);
 
   /**
   * Implement the http request : POST </br>
@@ -420,15 +411,13 @@ pathCallback) {
   httpMethods.post = function (model, path) {
 
     // create route in express instance
-    scope.app.post(path, function (req, res, next) {
+    this.app.post(path, function (req, res, next) {
 
       // Check if this root is valid for this request
       var checkRequest = isValidRequest(req, res, next, methods);
       if (!checkRequest) {
         return checkRequest;
       }
-
-      logger.debug('[ ControllerRoutes.post ] - revceiving request, route is : ' + path);
 
       model.create(req.body).then(function (value) {
 
@@ -449,13 +438,13 @@ pathCallback) {
           data    : {}
         });
 
-        logger.error('[ ControllerRoutes.post ] - error : ' + error);
-      });
-    });
-  };
+        this.logger.error('[ ControllerRoutes.post ] - error : ' + error);
+      }.bind(this));
+    }.bind(this));
+  }.bind(this);
 
   // retrieve the model
-  var model = scope.models.db.getModel(nameModel);
+  var model = this.models.db.getModel(nameModel);
 
   // check if model is not false
   if (model) {
@@ -477,34 +466,41 @@ pathCallback) {
         if (!_.isUndefined(callbackFile[method.fn])) {
 
           // Bind method to the route
-          scope.app[method.method](pathSubReq, function (req, res, next) {
+          this.app[method.method](pathSubReq, function (req, res, next) {
 
             // pass current model and config of application
-            callbackFile[method.fn](req, res, next, model, scope.config);
-          });
+            callbackFile[method.fn].apply({
+              model   : model,
+              config  : this.config,
+              logger  : this.logger
+            }, [req, res, next]);
 
+          }.bind(this));
         } else {
           throw ' Function \'' + method.fn + '\' not found';
         }
 
       } catch (e) {
         logger.error('[ ControllerRoutes.addRoute ] - can\'t add specifiq route : \'' +
-        method.sync + '\' for model : \'' + nameModel + '\', more details : ' + e);
+        method.sync + '\' for model : \'' + nameModel + '\', more details : ' + e.toString());
       }
-    });
+    }, this);
 
     // Handle wich requests are implemented
     // Retrieve the difference betwenn ALL_HTTP_REQUESTS and all requests excluded
-    _.each(_.difference(scope.ALL_HTTP_REQUESTS, reqExcluded), function (fn) {
+    _.each(_.difference(this.ALL_HTTP_REQUESTS, reqExcluded), function (fn) {
 
       // Bind routes to model
       httpMethods[fn](model, pathRequest, 'id', fn);
-    }, this);
+    });
 
+    // return true because success
     return true;
   }
-  logger.error('[ ControllerRoutes.addRoute ] - can\'t add route : \'' +
+  this.logger.error('[ ControllerRoutes.addRoute ] - can\'t add route : \'' +
   pathRequest + '\' ,because model is not defined');
+
+  // return false because fail
   return false;
 };
 
@@ -521,7 +517,7 @@ pathCallback) {
 */
 RouteController.prototype.init = function (core, pathRoutes, ecrmDatabase, pathCallback) {
 
-  logger.debug('[ ControllerRoutes.init ] - start');
+  this.logger.debug('[ ControllerRoutes.init ] - initialising api start');
 
   // Retrieve Instance of express and save it
   this.app    = core.app.app;
@@ -552,9 +548,9 @@ RouteController.prototype.init = function (core, pathRoutes, ecrmDatabase, pathC
 
     // Load route config file
     routes = JSON.parse(fs.readFileSync(pathRoutes, 'utf-8'));
-  } catch (error) {
-    this.logger.error('[ ControllerRoutes.init ] - error during loading files, more details : ' +
-     error);
+  } catch (e) {
+    this.logger.error('[ ControllerRoutes.init ] - error during loading files,' +
+    ' more details : ' + e);
     return false;
   }
 
