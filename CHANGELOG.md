@@ -1,3 +1,7 @@
+# 0.5.1 (2016-01-06)
+
+- add possibilities to add endpoint in the api by passing an file
+
 # 0.5.0 (2015-12-30)
 
 - Optimization : use bind and apply instead of saving context

@@ -18,8 +18,19 @@ var routeJoiSchema = joi.object().keys({
   methods         : joi.array().min(0).items(
     joi.object().keys({
       method : joi.string().required().allow('post', 'get', 'put', 'patch', 'delete', 'head'),
-      path   : joi.string().required().empty(''),
-      fn     : joi.string().required().empty()
+      path   : joi.string().required().empty('').default(''),
+      fn     : joi.string().required().empty(),
+      notify : joi.object().optional().keys({
+        sms   : joi.array().optional().items([
+          joi.string().empty()
+        ]).default([]),
+        mail  : joi.array().optional().items([
+          joi.string().empty()
+        ]).default([])
+      }).default({
+        sms   : [],
+        mail  : []
+      })
     })
   )
 });
@@ -80,6 +91,13 @@ function RouteController (yLogger) {
   * @type {Object}
   */
   this.logger = yLogger || logger;
+
+  /**
+  * Contains default end points methods of api
+  *
+  * @type {Object}
+  */
+  this.endPoints = {};
 }
 
 /**
@@ -241,8 +259,8 @@ pathCallback) {
           // test if an document was deleted
           if (_.isEmpty(value)) {
             this.logger.error('[ ControllerRoutes.delete ] - the document with id : ' +
-            req.params.id + ' wasn\'t deleted because this id doesn\'t ' +
-            'correspond to an existant document');
+            req.params.id +
+            ' wasn\'t deleted because this id doesn\'t correspond to an existant document');
 
             return res.status(200).jsonp({
               status  : 'error',
@@ -283,7 +301,7 @@ pathCallback) {
         data    : {}
       });
       this.logger.error('[ ControllerRoutes.delete ] - The document was not deleted ' +
-      'because id wasn\'t specified, or the field deleted_date doesn\'t exist in schema');
+      'because id wasn\'t' + 'specified, or the field deleted_date doesn\'t exist in schema');
     }.bind(this));
   }.bind(this);
 
@@ -322,8 +340,8 @@ pathCallback) {
           // test if an document was updated for this id
           if (_.isEmpty(value)) {
             this.logger.error('[ ControllerRoutes.patch ] - the document with id : ' +
-            req.params.id + ' wasn\'t updated because this id doesn\'t ' +
-            'correspond to an existing document');
+            req.params.id +
+            ' wasn\'t updated because this id doesn\'t correspond to an existing document');
 
             return res.status(200).jsonp({
               status  : 'error',
@@ -360,8 +378,8 @@ pathCallback) {
         message : 'The document wasn\'t updated because id wasn\'t specified in params.',
         data    : {}
       });
-      this.logger.error('[ ControllerRoutes.patch ] - The document was not updated because' +
-      ' id wasn\'t specified');
+      this.logger.error('[ ControllerRoutes.patch ] - The document was not updated ' +
+      'because id wasn\'t specified');
     }.bind(this));
   }.bind(this);
 
@@ -470,9 +488,12 @@ pathCallback) {
 
             // pass current model and config of application
             callbackFile[method.fn].apply({
-              model   : model,
-              config  : this.config,
-              logger  : this.logger
+              model       : model,
+              config      : this.config,
+              logger      : this.logger,
+              end         : this.endPoints,
+              // indicate if an notify should be created
+              notify      : method.notify
             }, [req, res, next]);
 
           }.bind(this));
@@ -481,7 +502,7 @@ pathCallback) {
         }
 
       } catch (e) {
-        logger.error('[ ControllerRoutes.addRoute ] - can\'t add specifiq route : \'' +
+        this.logger.error('[ ControllerRoutes.addRoute ] - can\'t add specifiq route : \'' +
         method.sync + '\' for model : \'' + nameModel + '\', more details : ' + e.toString());
       }
     }, this);
@@ -515,7 +536,8 @@ pathCallback) {
 * @param {String} pathCallback the path folder where all the callback are
 * @return {Boolean} If success return true, otherwise false
 */
-RouteController.prototype.init = function (core, pathRoutes, ecrmDatabase, pathCallback) {
+RouteController.prototype.init = function (core, pathRoutes, ecrmDatabase, pathCallback,
+pathEndPoints) {
 
   this.logger.debug('[ ControllerRoutes.init ] - initialising api start');
 
@@ -536,7 +558,8 @@ RouteController.prototype.init = function (core, pathRoutes, ecrmDatabase, pathC
 
   // test if the two params are string and not empty
   if (!_.isString(pathRoutes) || !_.isString(pathCallback) ||
-  _.isEmpty(pathRoutes) || _.isEmpty(pathCallback)) {
+  _.isEmpty(pathRoutes) || _.isEmpty(pathCallback) ||
+  _.isEmpty(pathEndPoints) || _.isEmpty(pathEndPoints)) {
     return false;
   }
 
@@ -548,9 +571,13 @@ RouteController.prototype.init = function (core, pathRoutes, ecrmDatabase, pathC
 
     // Load route config file
     routes = JSON.parse(fs.readFileSync(pathRoutes, 'utf-8'));
-  } catch (e) {
-    this.logger.error('[ ControllerRoutes.init ] - error during loading files,' +
-    ' more details : ' + e);
+
+    // retrieve all endPoints methods
+    this.endPoints = require(pathEndPoints);
+
+  } catch (error) {
+    this.logger.error('[ ControllerRoutes.init ] - error during loading files, more details : ' +
+    error);
     return false;
   }
 
@@ -562,6 +589,9 @@ RouteController.prototype.init = function (core, pathRoutes, ecrmDatabase, pathC
 
     // Check if have no error in joi validation
     if (_.isEmpty(result) || _.isEmpty(result.error)) {
+
+      // retrieve value of joi
+      route = result.value;
 
       // create a array that contains the main route, and all thoose aliases
       var routeAndAlias = [];
