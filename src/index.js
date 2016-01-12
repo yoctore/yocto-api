@@ -21,15 +21,37 @@ var routeJoiSchema = joi.object().keys({
       path   : joi.string().required().empty('').default(''),
       fn     : joi.string().required().empty(),
       notify : joi.object().optional().keys({
-        sms   : joi.array().optional().items([
-          joi.string().empty()
-        ]).default([]),
-        mail  : joi.array().optional().items([
-          joi.string().empty()
-        ]).default([])
+        sms   : joi.object().optional().keys({
+          references  : joi.array().optional().items(
+            joi.string().empty()
+          ).default([]),
+          enable      : joi.boolean().optional().default(false)
+        }).default({
+          mail    : {
+            references : [],
+            enable     : false
+          }
+        }),
+        mail  : joi.object().optional().keys({
+          references  : joi.array().optional().items(
+            joi.string().empty()
+          ).default([]),
+          enable      : joi.boolean().optional().default(false)
+        }).default({
+          mail    : {
+            references : [],
+            enable     : false
+          }
+        })
       }).default({
-        sms   : [],
-        mail  : []
+        sms     : {
+          references : [],
+          enable     : false
+        },
+        mail    : {
+          references : [],
+          enable     : false
+        }
       })
     })
   )

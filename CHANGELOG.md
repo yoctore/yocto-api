@@ -1,3 +1,7 @@
+# 0.5.2 (2016-01-12)
+
+- Update schema validation of joi
+
 # 0.5.1 (2016-01-06)
 
 - add possibilities to add endpoint in the api by passing an file
