@@ -1,7 +1,7 @@
 {
   "name": "yocto-api",
   "main": "src/index.js",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "Yocto REST API ",
   "homepage": "http://www.yocto.re",
@@ -29,14 +29,13 @@
     "example"
   ],
   "dependencies": {
-    "glob": "6.0.1",
-    "joi": "7.0.1",
+    "glob": "6.0.4",
+    "joi": "7.2.2",
     "lodash": "3.10.1",
-    "superagent": "1.4.0",
     "yocto-logger": "1.1.1"
   },
   "devDependencies": {
-    "body-parser": "1.14.1",
+    "body-parser": "1.14.2",
     "express": "4.13.3",
     "chai": "3.4.1",
     "grunt": "0.4.5",
@@ -44,9 +43,10 @@
     "grunt-contrib-uglify": "0.11.0",
     "grunt-contrib-yuidoc": "0.10.0",
     "grunt-mocha-cli": "2.0.0",
-    "yocto-hint": "1.2.6 ",
+    "yocto-hint": "1.2.7 ",
     "yocto-utils" : "1.1.2",
-    "grunt-todo": "0.5.0"
+    "grunt-todo": "0.5.0",
+    "superagent": "1.7.0"
   },
   "apidoc": {
     "title": "Yocto Rest Api",

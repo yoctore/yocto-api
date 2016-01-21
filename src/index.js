@@ -21,37 +21,64 @@ var routeJoiSchema = joi.object().keys({
       path   : joi.string().required().empty('').default(''),
       fn     : joi.string().required().empty(),
       notify : joi.object().optional().keys({
-        sms   : joi.object().optional().keys({
+        sms           : joi.object().optional().keys({
           references  : joi.array().optional().items(
             joi.string().empty()
           ).default([]),
           enable      : joi.boolean().optional().default(false)
         }).default({
-          mail    : {
+          mail          : {
+            references : [],
+            enable     : false
+          },
+          notification  : {
+            references : [],
+            enable     : false
+          },
+        }),
+        mail          : joi.object().optional().keys({
+          references  : joi.array().optional().items(
+            joi.string().empty()
+          ).default([]),
+          enable      : joi.boolean().optional().default(false)
+        }).default({
+          sms    : {
+            references : [],
+            enable     : false
+          },
+          notification    : {
             references : [],
             enable     : false
           }
         }),
-        mail  : joi.object().optional().keys({
+        notification  : joi.object().optional().keys({
           references  : joi.array().optional().items(
             joi.string().empty()
           ).default([]),
           enable      : joi.boolean().optional().default(false)
         }).default({
-          mail    : {
+          sms    : {
+            references : [],
+            enable     : false
+          },
+          notification    : {
             references : [],
             enable     : false
           }
         })
       }).default({
-        sms     : {
+        sms           : {
           references : [],
           enable     : false
         },
-        mail    : {
+        mail          : {
           references : [],
           enable     : false
-        }
+        },
+        notification  : {
+          references : [],
+          enable     : false
+        },
       })
     })
   )
