@@ -1,4 +1,8 @@
-# 0.1.0 (2016-01-12)
+# 1.0.1 (2016-01-21)
+
+- Update joi schema and update package
+
+# 1.0.0 (2016-01-12)
 
 - Add "app" to scope when binding subMethods
 

@@ -42,7 +42,7 @@ var routeJoiSchema = joi.object().keys({
           ).default([]),
           enable      : joi.boolean().optional().default(false)
         }).default({
-          sms    : {
+          sms             : {
             references : [],
             enable     : false
           },
@@ -57,7 +57,7 @@ var routeJoiSchema = joi.object().keys({
           ).default([]),
           enable      : joi.boolean().optional().default(false)
         }).default({
-          sms    : {
+          sms             : {
             references : [],
             enable     : false
           },
