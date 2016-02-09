@@ -3,3 +3,4 @@ node_modules
 joitest.js
 mongoooseTest.js
 *.log
+*~
