@@ -7,7 +7,7 @@
   "homepage": "http://www.yocto.re",
   "repository": {
     "type": "git",
-    "url": "git+ssh:://git@gitlab.com:yocto-node-modules/yocto-api.git"
+    "url": "https://github.com/yoctore/yocto-api.git"
   },
   "keywords": [
     "API",
