@@ -111,8 +111,7 @@ module.exports = function(grunt) {
   // register task
   grunt.registerTask('default', ['yoctohint', 'yuidoc', 'uglify']);
   grunt.registerTask('build', ['uglify', 'yoctohint']);
-  grunt.registerTask('tests', 'mochacli:all');
-  grunt.registerTask('testWeb', 'mochacli:web');
+  grunt.registerTask('test', 'mochacli:web');
   grunt.registerTask('report', 'todo');
   grunt.registerTask('hint', 'yoctohint');
 };

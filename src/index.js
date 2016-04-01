@@ -444,25 +444,69 @@ pathCallback) {
         return checkRequest;
       }
 
-      model.update(req.params[param], req.body, 'put').then(function () {
+      var data = req.body;
 
-        res.status(200).jsonp({
-          status  : 'success',
-          code    : '200000',
-          message : 'The document(s) was updated',
-          data    : {}
-        });
-      }).catch(function (error) {
+      // Test if id is specified, because ID is required to an put an document
+      if (!_.isUndefined(req.params.id)) {
 
-        res.status(200).jsonp({
-          status  : 'error',
-          code    : '400000',
-          message : 'An error occured, the document was not updated',
-          data    : {}
-        });
+        // tricks to pass the yocto-hint norme
+        var updatedDate = 'updated_date';
 
-        this.logger.error('[ ControllerRoutes.put ] - error : ' + error);
-      }.bind(this));
+        // Test if variable updated_date was defined, and update it
+        if (!_.isUndefined(model.schema.paths[updatedDate])) {
+
+          // merge data to set 'updated_date' to current date
+          data = _.merge(data, utils.obj.underscoreKeys({
+            updatedDate : Date.now()
+          }));
+        }
+
+        // return result of an update document
+        return model.update(req.params[param], data, 'put').then(function (value) {
+
+          // test if an document was updated for this id
+          if (_.isEmpty(value)) {
+            this.logger.error('[ ControllerRoutes.put ] - the document with id : ' +
+            req.params.id +
+            ' wasn\'t updated because this id doesn\'t correspond to an existing document');
+
+            return res.status(200).jsonp({
+              status  : 'error',
+              code    : '400000',
+              message : 'An error occured, the document was not updated because this id doesn\'t ' +
+              'correspond to an existing document',
+              data    : {}
+            });
+          }
+
+          // Document updated
+          res.status(200).jsonp({
+            status  : 'success',
+            code    : '200000',
+            message : 'The document(s) was updated',
+            data    : {}
+          });
+        }.bind(this)).catch(function (error) {
+
+          res.status(200).jsonp({
+            status  : 'error',
+            code    : '400000',
+            message : 'An error occured, the document was not updated',
+            data    : {}
+          });
+          this.logger.error('[ ControllerRoutes.put ] - error : ' + error);
+        }.bind(this));
+      }
+
+      // The pramas id was not specified or deleted_date doesnt exist in this schema
+      res.status(200).jsonp({
+        status  : 'error',
+        code    : '400000',
+        message : 'The document wasn\'t updated because id wasn\'t specified in params.',
+        data    : {}
+      });
+      this.logger.error('[ ControllerRoutes.put ] - The document was not updated ' +
+      'because id wasn\'t specified');
     }.bind(this));
   }.bind(this);
 
