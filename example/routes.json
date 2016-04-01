@@ -1,28 +1,32 @@
 {
-  "path"     : "/account",
-  "alias"    : [],
-  "model"    : "account",
-  "excluded" : [],
-  "methods"  : [
+  "routes" : [
     {
-      "method"   : "get",
-      "path"     : "account/all",
-      "fn"       : "getAll"
-    },
-    {
-      "method"   : "post",
-      "path"     : "notify/all",
-      "fn"       : "notifyAll",
-      "notify"  : {
-        "sms"   : {
-          "references" : [ "cardAdd" ],
-          "enable"     : true
+      "path"     : "/account",
+      "alias"    : [],
+      "model"    : "Account",
+      "excluded" : [],
+      "methods"  : [
+        {
+          "method"   : "get",
+          "path"     : "test1",
+          "fn"       : "test1"
         },
-        "mail"   : {
-          "references" : [ "cardAdd" ],
-          "enable"     : true
+        {
+          "method"   : "get",
+          "path"     : "notify/all",
+          "fn"       : "notifyAll",
+          "notify"  : {
+            "sms"   : {
+              "references" : [ "cardAdd" ],
+              "enable"     : true
+            },
+            "mail"   : {
+              "references" : [ "cardAdd" ],
+              "enable"     : true
+            }
+          }
         }
-      }
+      ]
     }
   ]
 }

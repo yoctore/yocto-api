@@ -1,0 +1,33 @@
+{
+  "model" : {
+    "name"      : "Account",
+    "crud"      : {
+      "enable"  : true,
+      "exclude" : []
+    },
+    "fn" : [
+      {
+        "type"  : "static",
+        "name"  : "getItems"
+      },
+      {
+        "type" : "static",
+        "name" : "test1"
+      }
+    ],
+    "elastic" : false,
+    "validator"      : "account",
+    "properties"     : {
+      "name"    : {
+        "required"     : true,
+        "type"         : "String",
+        "es_indexed"   : false
+      },
+      "test"    : {
+        "required"      : true,
+        "type"          : "String",
+        "es_indexed"    : false
+      }
+    }
+  }
+}

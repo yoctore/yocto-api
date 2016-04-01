@@ -553,7 +553,7 @@ pathCallback) {
 
       } catch (e) {
         this.logger.error('[ ControllerRoutes.addRoute ] - can\'t add specifiq route : \'' +
-        method.sync + '\' for model : \'' + nameModel + '\', more details : ' + e.toString());
+        method.path + '\' for model : \'' + nameModel + '\', more details : ' + e.toString());
       }
     }, this);
 
@@ -582,11 +582,11 @@ pathCallback) {
 * @method init
 * @param {Object} core Instance of yocto-core-stack
 * @param {String} pathRoutes the path of the file route.json
-* @param {Object} ecrmDatabase The whole database model, it's an yocto-mongoose object
+* @param {Object} yoctoMongoose The whole database model, it's an yocto-mongoose object
 * @param {String} pathCallback the path folder where all the callback are
 * @return {Boolean} If success return true, otherwise false
 */
-RouteController.prototype.init = function (core, pathRoutes, ecrmDatabase, pathCallback,
+RouteController.prototype.init = function (core, pathRoutes, yoctoMongoose, pathCallback,
 pathEndPoints) {
 
   this.logger.debug('[ ControllerRoutes.init ] - initialising api start');
@@ -601,7 +601,7 @@ pathEndPoints) {
   this.app.use(this.middlewareApi.bind(this));
 
   // save models
-  this.models = ecrmDatabase;
+  this.models = yoctoMongoose;
 
   // define object that contains all routes
   var routes = {};
@@ -612,7 +612,6 @@ pathEndPoints) {
   _.isEmpty(pathEndPoints) || _.isEmpty(pathEndPoints)) {
     return false;
   }
-
   // Test if the config files exist and retrive routes files
   try {
 
@@ -633,7 +632,6 @@ pathEndPoints) {
 
   // read json file and add each routes
   _.each(routes.routes, function (route) {
-
     // Execute the joi vailidation
     var result = routeJoiSchema.validate(route);
 

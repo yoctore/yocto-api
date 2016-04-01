@@ -1,3 +1,7 @@
+# 1.0.1 (2016-04-01)
+
+- Update package.json
+
 # 1.0.1 (2016-01-21)
 
 - Update joi schema and update package
