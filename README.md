@@ -1,4 +1,10 @@
+[![NPM](https://nodei.co/npm/yocto-api.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/yocto-api/)
 ![alt text](https://david-dm.org/yoctore/yocto-api.svg "Dependencies Status")
+[![Code Climate](https://codeclimate.com/github/yoctore/yocto-api/badges/gpa.svg)](https://codeclimate.com/github/yoctore/yocto-api)
+[![Test Coverage](https://codeclimate.com/github/yoctore/yocto-api/badges/coverage.svg)](https://codeclimate.com/github/yoctore/yocto-api/coverage)
+[![Issue Count](https://codeclimate.com/github/yoctore/yocto-api/badges/issue_count.svg)](https://codeclimate.com/github/yoctore/yocto-api)
+[![Build Status](https://travis-ci.org/yoctore/yocto-api.svg?branch=master)](https://travis-ci.org/yoctore/yocto-api)
+
 
 # Yocto API
 
