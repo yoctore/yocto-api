@@ -707,7 +707,14 @@ RouteController.prototype.middlewareApi = function (req, res, next) {
   next();
 };
 
-/**
-* Export current Controller to use it on node
-*/
-module.exports = new (RouteController)();
+// Default export
+module.exports = function (l) {
+  // is a valid logger ?
+  if (_.isUndefined(l) || _.isNull(l)) {
+    logger.warning('[ RouteController.constructor ] - Invalid logger given. Use internal logger');
+    // assign
+    l = logger;
+  }
+  // default statement
+  return new (RouteController)(l);
+};

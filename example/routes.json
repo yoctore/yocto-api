@@ -1,0 +1,28 @@
+{
+  "path"     : "/account",
+  "alias"    : [],
+  "model"    : "account",
+  "excluded" : [],
+  "methods"  : [
+    {
+      "method"   : "get",
+      "path"     : "account/all",
+      "fn"       : "getAll"
+    },
+    {
+      "method"   : "post",
+      "path"     : "notify/all",
+      "fn"       : "notifyAll",
+      "notify"  : {
+        "sms"   : {
+          "references" : [ "cardAdd" ],
+          "enable"     : true
+        },
+        "mail"   : {
+          "references" : [ "cardAdd" ],
+          "enable"     : true
+        }
+      }
+    }
+  ]
+}
