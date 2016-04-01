@@ -31,8 +31,6 @@ var createServer = function(port) {
     if (db.isReady(true)) {
       db.load().then(function() {
 
-        console.log('===> start API ')
-
         // Initialise the API router
         restApi.init(
           // simulate yctp core stacks
