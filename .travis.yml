@@ -21,3 +21,5 @@ deploy:
     repo: yoctore/yocto-api
 before_install: npm install -g grunt-cli
 install: npm install
+services:
+- mongodb
