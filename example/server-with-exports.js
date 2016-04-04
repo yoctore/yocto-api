@@ -2,7 +2,7 @@
 var express       = require('express'); // Load express
 var logger        = require('yocto-logger');
 // disableConsole
-logger.disableConsole();
+// logger.disableConsole();
 
 var db            = require('yocto-mongoose')(logger);
 var restApi       = require('../src/index.js')(logger);
@@ -51,6 +51,7 @@ var createServer = function(port) {
       });
     }
   }).catch(function(error) {
+
     if (db.isConnected()) {
       db.disconnect().then(function() {
 
@@ -65,4 +66,19 @@ var createServer = function(port) {
   return app.listen(port);
 };
 
-module.exports = createServer;
+// close db connect
+var closeServer = function () {
+  if (db.isConnected()) {
+    db.disconnect().then(function() {
+
+    }, function(error) {
+      console.log('diconnect failed');
+      console.log(error);
+    });
+  }
+};
+
+module.exports = {
+  createServer : createServer,
+  closeServer  : closeServer
+};

@@ -11,13 +11,12 @@ var logger     = require('yocto-logger')
 // disableConsole
 logger.disableConsole();
 
-
-describe('httpRequests', function() {
+describe('httpRequests', function(doneDescribe) {
   var app;
   var port = 3974;
   var url = 'http://localhost:' + port ;
 
-  app = server(port);
+  app = server.createServer(port);
 
   if (app) {
     // should retrieve user
@@ -190,12 +189,11 @@ describe('httpRequests', function() {
         });
       }
     ], function (err, results) {
-
-      // method call to close server
+      // close server
       after(function() {
         app.close();
+        server.closeServer()
       });
-      done();
     });
   }
 });
