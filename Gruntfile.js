@@ -96,7 +96,6 @@ module.exports = function(grunt) {
   // Load the plugins
   grunt.loadNpmTasks('grunt-contrib-yuidoc');
   grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-mocha-cli');
   grunt.loadNpmTasks('grunt-todo');
   grunt.loadNpmTasks('yocto-hint');
   grunt.loadNpmTasks('grunt-mocha-test');
