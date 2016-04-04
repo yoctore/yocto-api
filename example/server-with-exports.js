@@ -23,8 +23,6 @@ var port = 3974;
 var createServer = function(port) {
   // Connect
   db.connect('mongodb://localhost:27017/test').then(function() {
-    console.log('serv -  mongodb connected : ');
-
     // load models
     db.models('./example/models');
     db.validators('./example/controllers');
@@ -32,8 +30,6 @@ var createServer = function(port) {
     db.enums('./example/enums');
     if (db.isReady(true)) {
       db.load().then(function() {
-        console.log('serv -  db is loaded : ');
-
         // Initialise the API router
         restApi.init(
           // simulate yctp core stacks
@@ -55,7 +51,6 @@ var createServer = function(port) {
     }
   }).catch(function(error) {
 
-    console.log('serv db.isReady - error occurerd ')
     if (db.isConnected()) {
       db.disconnect().then(function() {
 
@@ -65,15 +60,12 @@ var createServer = function(port) {
       });
     }
   });
-
-  console.log('serv -  SERVER start on port : ', port);
   // START THE SERVER
   return app.listen(port);
 };
 
 // close db connect
 var closeServer = function () {
-  console.log('serv - cloese DB server connection')
   if (db.isConnected()) {
     db.disconnect().then(function() {
 
