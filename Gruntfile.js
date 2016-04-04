@@ -24,10 +24,10 @@ module.exports = function(grunt) {
     uglify : {
       my_target : {
         files : {
-           'dist/index.js' : ['src/index.js']
+          'dist/index.js' : ['src/index.js']
         }
       }
-     },
+    },
 
     /**
     * Yuidoc permit to generate the yuidoc
@@ -51,55 +51,47 @@ module.exports = function(grunt) {
     /**
     * Mocah unit test
     */
-    mochacli : {
-      options : {
-        'reporter'       : 'spec',
-        'inline-diffs'   : false,
-        'no-exit'        : true,
-        'force'          : false,
-        'check-leaks'    : true,
-        'bail'           : false
-      },
-      web : {
+    // unit testing
+    mochaTest : {
+      // Test all unit test
+      all  : {
         options : {
-          files   : ['test/web/httpRequest.js'],
-          timeout : 20000
-        }
+          reporter : 'spec',
+        },
+        src     : [ 'test/unit/*.js' ]
+      }
+    },
+    /**
+    * Todo process
+    */
+    todo : {
+      options : {
+        marks: [
+          { name : "TODO", pattern : /TODO/, color : "yellow" },
+          { name : "FIXME", pattern : /FIXME/, color : "red" },
+          { name : "NOTE", pattern : /NOTE/, color : "blue" }
+        ],
+        file : "REPORT.md",
+        githubBoxes : true,
+        colophon : true,
+        usePackage : true
       },
-        all : [ 'test/routesController.js' ]
+      src : [
+        'src/app/*/*'
+      ]
     },
 
-     /**
-      * Todo process
-      */
-      todo : {
-        options : {
-          marks: [
-            { name : "TODO", pattern : /TODO/, color : "yellow" },
-            { name : "FIXME", pattern : /FIXME/, color : "red" },
-            { name : "NOTE", pattern : /NOTE/, color : "blue" }
-          ],
-          file : "REPORT.md",
-          githubBoxes : true,
-          colophon : true,
-          usePackage : true
-        },
-        src : [
-          'src/app/*/*'
-        ]
+    yoctohint : {
+      options : {
+        // If you wan to override jshint rules ...
+        // prefer defined rules. But if by default you are in node mode.
+        // If you want to hint in classic mode, set node property to null
+        jshint : {}
       },
-
-      yoctohint : {
-        options : {
-          // If you wan to override jshint rules ...
-          // prefer defined rules. But if by default you are in node mode.
-          // If you want to hint in classic mode, set node property to null
-          jshint : {}
-        },
-        // Set all your file here
-        all : [ 'src/index.js' ]
-      }
-    });
+      // Set all your file here
+      all : [ 'src/index.js' ]
+    }
+  });
 
   // Load the plugins
   grunt.loadNpmTasks('grunt-contrib-yuidoc');
@@ -107,11 +99,12 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-mocha-cli');
   grunt.loadNpmTasks('grunt-todo');
   grunt.loadNpmTasks('yocto-hint');
+  grunt.loadNpmTasks('grunt-mocha-test');
 
   // register task
   grunt.registerTask('default', ['yoctohint', 'yuidoc', 'uglify']);
   grunt.registerTask('build', ['uglify', 'yoctohint']);
-  grunt.registerTask('test', 'mochacli:web');
+  grunt.registerTask('test', 'mochaTest');
   grunt.registerTask('report', 'todo');
   grunt.registerTask('hint', 'yoctohint');
 };
