@@ -7,14 +7,15 @@
       "excluded" : [],
       "methods"  : [
         {
-          "method"   : "get",
+          "method"   : "post",
           "path"     : "test1",
+          "displayBody" : false,
           "fn"       : "test1"
         },
         {
-          "method"   : "get",
-          "path"     : "notify/all",
-          "fn"       : "notifyAll",
+          "method"      : "get",
+          "path"        : "notify/all",
+          "fn"          : "notifyAll",
           "notify"  : {
             "sms"   : {
               "references" : [ "cardAdd" ],

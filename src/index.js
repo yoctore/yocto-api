@@ -6,6 +6,7 @@ var logger      = require('yocto-logger');
 var fs          = require('fs');
 var path        = require('path');
 var utils       = require('yocto-utils');
+var requestIp   = require('request-ip');
 
 // Define a Joi schema for test if route have a goodformat
 var routeJoiSchema = joi.object().keys({
@@ -17,10 +18,11 @@ var routeJoiSchema = joi.object().keys({
   ),
   methods         : joi.array().min(0).items(
     joi.object().keys({
-      method : joi.string().required().allow('post', 'get', 'put', 'patch', 'delete', 'head'),
-      path   : joi.string().required().empty('').default(''),
-      fn     : joi.string().required().empty(),
-      notify : joi.object().optional().keys({
+      method      : joi.string().required().allow('post', 'get', 'put', 'patch', 'delete', 'head'),
+      path        : joi.string().required().empty('').default(''),
+      fn          : joi.string().required().empty(),
+      displayBody : joi.boolean().optional().default(true),
+      notify      : joi.object().optional().keys({
         sms           : joi.object().optional().keys({
           references  : joi.array().optional().items(
             joi.string().empty()
@@ -147,6 +149,13 @@ function RouteController (yLogger) {
   * @type {Object}
   */
   this.endPoints = {};
+
+  /**
+  * Array of route that body should not be displayed into log
+  *
+  * @type {Array}
+  */
+  this.omitLogRoutes = [];
 }
 
 /**
@@ -181,7 +190,6 @@ pathCallback) {
    * @return {Boolean}              Return true if the request is valid otherwise the function that should be called
    */
   var isValidRequest = function (req, res, next, subMethods) {
-
     // test if id was defined
     if (!_.isUndefined(req.params.id)) {
 
@@ -557,16 +565,16 @@ pathCallback) {
   // retrieve the model
   var model = this.models.db.getModel(nameModel);
 
-  // check if model is not false
+  // check if model was found
   if (model) {
-    logger.debug('[ ControllerRoutes.addRoute ] - adding new route, path : ' + pathRequest);
+    this.logger.debug('[ ControllerRoutes.addRoute ] - adding new route, path : ' + pathRequest);
 
     // retrieve specifiq route in model
     _.each(route.methods, function (method) {
 
       // Push first subroot of the path
       var splited = method.path.split('/');
-      methods.push(_.first(splited));
+      methods.push(_.head(splited));
 
       try {
         var pathSubReq = path.normalize(route.path + '/' + method.path);
@@ -574,7 +582,12 @@ pathCallback) {
         // Load corresponded callback file to retrieve function
         var callbackFile = require(path.normalize(pathCallback + nameModel.toLowerCase() + '.js'));
 
+        // check if the method was found for the route
         if (!_.isUndefined(callbackFile[method.fn])) {
+          // check if the body of url should be displayed
+          if (!method.displayBody) {
+            this.omitLogRoutes.push('/' + method.path);
+          }
 
           // Bind method to the route
           this.app[method.method](pathSubReq, function (req, res, next) {
@@ -599,7 +612,7 @@ pathCallback) {
         this.logger.error('[ ControllerRoutes.addRoute ] - can\'t add specifiq route : \'' +
         method.path + '\' for model : \'' + nameModel + '\', more details : ' + e.toString());
       }
-    }, this);
+    }.bind(this));
 
     // Handle wich requests are implemented
     // Retrieve the difference betwenn ALL_HTTP_REQUESTS and all requests excluded
@@ -697,15 +710,12 @@ pathEndPoints) {
 
       // add Main route
       _.each(routeAndAlias, function (val) {
-
         // add default params id
         val += '/:id?';
 
         // Add route in router
-        this.addRoute(val, route.model, route.excluded, route.param, route, pathCallback,
-        route.optionalParam);
-      }, this);
-
+        this.addRoute(val, route.model, route.excluded, route.param, route, pathCallback);
+      }.bind(this));
     } else {
 
       logger.error('[ ControllerRoutes.init ] - Joi Validation failed ; error when trying to add ' +
@@ -715,9 +725,9 @@ pathEndPoints) {
       _.each(result.error.details, function (val) {
 
         this.logger.warning('[ ControllerRoutes.init ] - ' + val.message + ' at ' + val.path);
-      }, this);
+      }.bind(this));
     }
-  }, this);
+  }.bind(this));
 
   return true;
 };
@@ -732,8 +742,10 @@ pathEndPoints) {
  */
 RouteController.prototype.middlewareApi = function (req, res, next) {
 
-  this.logger.info('[ api.middlewareApi ] - incoming request : [ ' + req.method + ' ] on url ' +
-  req.url + (_.isEmpty(req.body) ? '' : ' -  body is : \n' + utils.obj.inspect(req.body)));
+  this.logger.info('[ api.middlewareApi ] - incoming request : [ ' + req.method + ' ] ' +
+  'from ip : ' + requestIp.getClientIp(req) + ' on url' + req.url +
+  (_.isEmpty(req.body) ? '' : ' -  body is :' + (_.indexOf(this.omitLogRoutes, req.url) >= 0 ?
+  ' < the body not allowed to be logged for this route >' : ' \n' + utils.obj.inspect(req.body))));
 
   // Test if request is from apidocjs client
   if (!_.isUndefined(req.headers['x-client-type']) &&

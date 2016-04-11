@@ -1,3 +1,7 @@
+# 1.1.0 (2016-04-11)
+
+- Add possibilities to not display the body of an request by setting optional value 'displayBody' to false
+
 # 1.0.1 (2016-04-01)
 
 - Update package.json
