@@ -1,6 +1,6 @@
-# 1.1.0 (2016-04-11)
+# 1.1.0 && 1.1.1 (2016-04-11)
 
-- Add possibilities to not display the body of an request by setting optional value 'displayBody' to false
+- Add possibilities to not display the body of an request by setting optional value 'displayBody' to false. To not display the url should match an regexp for an subroute with field displayBody = false
 
 # 1.0.1 (2016-04-01)
 

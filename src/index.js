@@ -7,6 +7,7 @@ var fs          = require('fs');
 var path        = require('path');
 var utils       = require('yocto-utils');
 var requestIp   = require('request-ip');
+var async       = require('async');
 
 // Define a Joi schema for test if route have a goodformat
 var routeJoiSchema = joi.object().keys({
@@ -22,6 +23,7 @@ var routeJoiSchema = joi.object().keys({
       path        : joi.string().required().empty('').default(''),
       fn          : joi.string().required().empty(),
       displayBody : joi.boolean().optional().default(true),
+      regexp      : joi.string().when('displayBody', { is : false, then : joi.required().empty() }),
       notify      : joi.object().optional().keys({
         sms           : joi.object().optional().keys({
           references  : joi.array().optional().items(
@@ -585,8 +587,9 @@ pathCallback) {
         // check if the method was found for the route
         if (!_.isUndefined(callbackFile[method.fn])) {
           // check if the body of url should be displayed
-          if (!method.displayBody) {
-            this.omitLogRoutes.push('/' + method.path);
+          if (!method.displayBody && !_.isNull(method.regexp)) {
+            // push the regexp found and create the start of regexp by escaping the first level
+            this.omitLogRoutes.push(_.escapeRegExp(route.path + '/') + method.regexp);
           }
 
           // Bind method to the route
@@ -719,13 +722,8 @@ pathEndPoints) {
     } else {
 
       logger.error('[ ControllerRoutes.init ] - Joi Validation failed ; error when trying to add ' +
-      'a new route, please check the file : \'routes.json\'');
-
-      // log each error
-      _.each(result.error.details, function (val) {
-
-        this.logger.warning('[ ControllerRoutes.init ] - ' + val.message + ' at ' + val.path);
-      }.bind(this));
+      'a new route, please check the file : \'routes.json\' , more details : ' +
+      result.error.toString());
     }
   }.bind(this));
 
@@ -734,7 +732,7 @@ pathEndPoints) {
 
 /**
  * Add a Middleware that log each request and est if incomming comes from apidocjs test,
- * and JSON parse his data.
+ * and JSON parse his data. If url correspond to an omitted body log, the body will not be logged
  *
  * @param  {Object} req defautl request of express
  * @param  {Object} res defautl response of express
@@ -742,23 +740,41 @@ pathEndPoints) {
  */
 RouteController.prototype.middlewareApi = function (req, res, next) {
 
-  this.logger.info('[ api.middlewareApi ] - incoming request : [ ' + req.method + ' ] ' +
-  'from ip : ' + requestIp.getClientIp(req) + ' on url' + req.url +
-  (_.isEmpty(req.body) ? '' : ' -  body is :' + (_.indexOf(this.omitLogRoutes, req.url) >= 0 ?
-  ' < the body not allowed to be logged for this route >' : ' \n' + utils.obj.inspect(req.body))));
+  // read each reg exp to check if url correspond to one
+  async.each(this.omitLogRoutes, function (reg, nextItem) {
 
-  // Test if request is from apidocjs client
-  if (!_.isUndefined(req.headers['x-client-type']) &&
-  req.headers['x-client-type'] === 'apidocjs') {
+    // create RegExp
+    reg = new RegExp(reg);
 
-    // test if data is an array, if it's parse it
-    if (!_.isUndefined(req.body.data) && !_.isEmpty(req.body.data)) {
-      req.body.data = JSON.parse(req.body.data);
+    // check value
+    if (reg.test(req.url)) {
+      // reg exp correspond so return true
+      return nextItem(true);
     }
-  }
 
-  // call the next routes
-  next();
+    // not correspond so call next in list
+    nextItem();
+  }, function (success) {
+    // log incoming route
+    this.logger.info('[ api.middlewareApi ] - incoming request : [ ' + req.method + ' ] ' +
+    'from ip : ' + requestIp.getClientIp(req) + ' on url : ' + req.url +
+    (_.isEmpty(req.body) ? '' : ' -  body is :' + (success ?
+    ' < the body was not allowed to be logged for this route >' :
+    ' \n' + utils.obj.inspect(req.body))));
+
+    // Test if request is from apidocjs client
+    if (!_.isUndefined(req.headers['x-client-type']) &&
+    req.headers['x-client-type'] === 'apidocjs') {
+
+      // test if data is an array, if it's parse it
+      if (!_.isUndefined(req.body.data) && !_.isEmpty(req.body.data)) {
+        req.body.data = JSON.parse(req.body.data);
+      }
+    }
+
+    // call the next routes
+    next();
+  }.bind(this));
 };
 
 // Default export
