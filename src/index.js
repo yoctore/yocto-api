@@ -597,13 +597,15 @@ pathCallback) {
 
             // pass current model and config of application
             callbackFile[method.fn].apply({
-              model       : model,
-              app         : this.app,
-              config      : this.config,
-              logger      : this.logger,
-              end         : this.endPoints,
+              model         : model,
+              app           : this.app,
+              config        : this.config,
+              logger        : this.logger,
+              end           : this.endPoints,
               // data will be used to indicate if an notify should be created
-              notify      : method.notify
+              notify        : method.notify,
+              callbackFile  : callbackFile
+
             }, [req, res, next]);
 
           }.bind(this));
