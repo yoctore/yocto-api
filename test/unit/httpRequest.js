@@ -18,7 +18,7 @@ var base          = path.normalize(process.cwd());
 
 // set our port
 var port = 3974;
-var url = 'http://localhost:' + port ;
+var url = 'http://127.0.0.1:' + port ;
 var accountId = '';
 
 // disableConsole
@@ -28,51 +28,54 @@ logger.disableConsole();
 app.use(bodyParser.urlencoded({ extended : true }));
 app.use(bodyParser.json());
 
-describe('aa', function() {
-
-  before(function () {
-    // Connect
-    db.connect('mongodb://localhost:27017/test').then(function() {
-      // load models
-      db.models('./example/models');
-      db.validators('./example/controllers');
-      db.methods('./example/methods');
-      db.enums('./example/enums');
-      if (db.isReady(true)) {
-        db.load().then(function() {
-          // Initialise the API router
-          restApi.init(
-            // simulate yctp core stacks
-            {
-              app : {
-                app : app
-              },
-              config : {}
-            }, base + '/example/routes.json',
-            // simulate wrapper mongoose
-            {
-              db : db
+before(function (done) {
+  // Connect
+  db.connect('mongodb://localhost:27017/test').then(function() {
+    // load models
+    db.models('./example/models');
+    db.validators('./example/controllers');
+    db.methods('./example/methods');
+    db.enums('./example/enums');
+    if (db.isReady(true)) {
+      db.load().then(function() {
+        // Initialise the API router
+        restApi.init(
+          // simulate yctp core stacks
+          {
+            app : {
+              app : app
             },
-            base + '/example/callback/', base + '/example/endpoints.js'
-          );
+            config : {}
+          }, base + '/example/routes.json',
+          // simulate wrapper mongoose
+          {
+            db : db
+          },
+          base + '/example/callback/', base + '/example/endpoints.js'
+        );
 
-          app.listen(port);
+        app.listen(port);
+        done();
 
-        }, function() {
-          console.log('load error');
-        });
-      }
-    }).catch(function(error) {
-      if (db.isConnected()) {
-        db.disconnect().then(function() {
-
-        }, function(error) {
-          console.log('diconnect failed');
-          console.log(error);
-        });
-      }
-    });
+      }).catch(function (error) {
+        console.log('load error : ', error);
+        done(error);
+      });
+    }
+  }).catch(function(error) {
+    if (db.isConnected()) {
+      db.disconnect().then(function() {
+        done();
+      }, function(error) {
+        console.log('diconnect failed');
+        console.log(error);
+        done(error);
+      });
+    }
   });
+});
+
+describe('Test process', function (done) {
 
   /*******************************************************/
   /* All next method should not be called syncrhonously  */
@@ -85,7 +88,7 @@ describe('aa', function() {
       describe('GET method : ', function () {
 
         // should retrieve user
-        it('returns all user - should return 200 and json object', function(done) {
+        it('returns all user - should return 200 and json object', function (done) {
           superagent
           .get(url + '/account').end(function(err, res) {
             assert.ifError(err);
@@ -95,7 +98,8 @@ describe('aa', function() {
           });
         });
       });
-    },function (callback) {
+    },
+    function (callback) {
       describe('HEAD method : ', function () {
 
         // should retrieve user
@@ -110,7 +114,8 @@ describe('aa', function() {
           });
         });
       });
-    },function (callback) {
+    },
+    function (callback) {
       describe('POST method : ', function () {
 
         // should not post because body is xrong
@@ -126,7 +131,8 @@ describe('aa', function() {
           });
         });
       });
-    },function (callback) {
+    },
+    function (callback) {
       describe('PATCH method : ', function () {
 
         it('should not patch user because id was not specified', function(done) {
@@ -145,7 +151,8 @@ describe('aa', function() {
           });
         });
       });
-    },function (callback) {
+    },
+    function (callback) {
       describe('PUT method :', function () {
 
         it('should not put user because id was not specified', function(done) {
@@ -164,7 +171,8 @@ describe('aa', function() {
           });
         });
       });
-    },function (callback) {
+    },
+    function (callback) {
       describe('DELETE method : ', function () {
 
         it('should not delete user because id was not specified', function(done) {
@@ -178,7 +186,8 @@ describe('aa', function() {
           });
         });
       });
-    },function (callback) {
+    },
+    function (callback) {
 
       describe('POST method : ', function () {
 
@@ -216,7 +225,8 @@ describe('aa', function() {
           });
         });
       });
-    },function (callback) {
+    },
+    function (callback) {
 
       describe('PATCH method : ', function () {
 
@@ -235,7 +245,8 @@ describe('aa', function() {
           });
         });
       });
-    },function (callback) {
+    },
+    function (callback) {
 
       describe('PUT method : ', function () {
 
@@ -254,7 +265,8 @@ describe('aa', function() {
           });
         });
       });
-    },function (callback) {
+    },
+    function (callback) {
 
       describe('DELETE method : ', function () {
 
@@ -275,6 +287,8 @@ describe('aa', function() {
     // close server
     app.close();
     closeServer();
+
+    done();
   });
 });
 
